@@ -1,5 +1,6 @@
 
 import json, os
+from datetime import datetime
 
 def loadFixture (resourceName):
 	script_dir = os.path.dirname(__file__)
@@ -18,3 +19,21 @@ extension ISO8601DateFormatter {
         return formatter
     }
 '''
+
+
+'''
+extension DateFormatter {
+    static var descriptionFormatter: DateFormatter {
+        let formatter = self.init()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ssZZZZZ"
+
+        return formatter
+    }
+}
+'''
+
+# converts string to d
+def dateFormatter (dateString):
+	isoDate = datetime.strptime (dateString, "%Y-%m-%dT%H:%M:%S").isoformat()
+
+	return isoDate

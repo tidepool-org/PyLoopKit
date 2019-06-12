@@ -36,6 +36,11 @@ class HKQuantity:
 
 
 def loadFixture (resourceName, extension):
+    path = findFullPath (resourceName, extension)
+    return json.load( open(path))
+
+# this will return the FIRST instance of the file
+def findFullPath (resourceName, extension):
     searchDir = os.path.dirname(__file__)
     for root, dirs, files in os.walk(searchDir):
         for name in files:

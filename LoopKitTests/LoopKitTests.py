@@ -34,11 +34,17 @@ class HKQuantity:
             otherValue *= 18
         return selfValue == otherValue
 
-def loadFixture (resourceName):
-    script_dir = os.path.dirname(__file__)
-    return json.load( open(str(script_dir) + "/" + str(resourceName) + ".json"))
 
-print ( loadFixture ("GlucoseKitPython/momentum_effect_bouncing_glucose_input") )
+def loadFixture (resourceName, extension):
+    searchDir = os.path.dirname(__file__)
+    for root, dirs, files in os.walk(searchDir):
+        for name in files:
+            pathEnd = os.path.basename(name)
+            (base, ext) = os.path.splitext(name)
+            if base == resourceName and extension == ext:
+                return os.path.join(root, name)
+    print ("No file found for that key")
+    return ""
 
 '''
 extension ISO8601DateFormatter {

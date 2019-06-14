@@ -104,8 +104,14 @@ def runTestCases():
             if expected.start_date != calculated.start_date:
                 print("Test failed because", expected.start_date, "!=",
                       calculated.start_date)
-            if (expected.quantity.double_value
+            elif (expected.quantity.double_value
                     != calculated.quantity.double_value):
                 print("Test failed because", expected.quantity.double_value,
                       "!=", calculated.quantity.double_value)
-        print("Test passed!!!")
+            else:
+                print("Test passed!!!")
+
+    test_momentum_effect_for_bouncing_glucose()
+
+
+runTestCases()

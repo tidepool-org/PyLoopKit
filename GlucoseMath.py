@@ -100,7 +100,7 @@ def has_single_provenance(obj_list):
 #   - duration: The duration of the effects
 #   - delta: The time differential for the returned values
 # - Returns: An array of glucose effects
-def linear_momentum_effect(object_list, duration, delta):
+def linear_momentum_effect(object_list, duration=30, delta=5):
     if (len(object_list) <= 2 or not is_continuous(object_list)
             or not is_calibrated(object_list)
             or not has_single_provenance(object_list)):

@@ -118,8 +118,37 @@ def runTestCases():
             else:
                 print("Tests passed!")
 
+
+    def test_momentum_effect_for_rising_glucose_doubles():
+        input_ = load_input_fixture("momentum_effect_rising_glucose_double_entries_input")
+        output = load_output_fixture("momentum_effect_rising_glucose_output")
+
+        effects = linear_momentum_effect(input_)
+
+        if len(output) != len(effects):
+            print("Test failed, expected output is length", len(output),
+                  "but output from program is", len(effects))
+
+        for(expected, calculated) in zip(output, effects):
+            if expected.start_date != calculated.start_date:
+                print("Test failed because expected date",
+                      expected.start_date, "!= output date",
+                      calculated.start_date)
+            elif (round(expected.quantity.double_value, 2)
+                    != round(calculated.quantity.double_value, 2)):
+                print("Test failed because expected value",
+                      round(expected.quantity.double_value, 2),
+                      "!= output value",
+                      round(calculated.quantity.double_value, 2))
+            else:
+                print("Tests passed!")
+
     test_momentum_effect_for_bouncing_glucose()
+    print("\n")
     test_momentum_effect_for_rising_glucose()
+    print("\n")
+    test_momentum_effect_for_rising_glucose_doubles()
+    
 
 
 runTestCases()

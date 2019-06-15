@@ -64,7 +64,7 @@ def is_continuous(obj_list, interval=5):
         first = obj_list[0]
         last = obj_list[len(obj_list)-1]
         return (abs(time_interval_since(first.start_date, last.start_date))/60
-                < interval * (len(obj_list) - 1))
+                <= interval * (len(obj_list) - 1))
 
     except IndexError:
         print("Out of bounds error: list doesn't contain objects")
@@ -118,7 +118,7 @@ def linear_momentum_effect(object_list, duration=30, delta=5):
 
     (slope, intercept) = linear_regression(list(map(create_tuples,
 
-    if math.isNaN(slope) or math.isinf(slope):
+    if math.isnan(slope) or math.isinf(slope):
         return []
 
     date = start_date

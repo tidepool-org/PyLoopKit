@@ -81,14 +81,17 @@ def runTestCases():
                   "but output from program is", len(effects))
         for(expected, calculated) in zip(output, effects):
             if expected.start_date != calculated.start_date:
-                print("Test failed because", expected.start_date, "!=",
+                print("Test failed because expected date",
+                      expected.start_date, "!= output date",
                       calculated.start_date)
-            elif (expected.quantity.double_value
-                    != calculated.quantity.double_value):
-                print("Test failed because", expected.quantity.double_value,
-                      "!=", calculated.quantity.double_value)
+            elif (round(expected.quantity.double_value, 2)
+                    != round(calculated.quantity.double_value, 2)):
+                print("Test failed because expected value",
+                      round(expected.quantity.double_value, 2),
+                      "!= output value",
+                      round(calculated.quantity.double_value, 2))
             else:
-                print("Test passed!!!")
+                print("Tests passed!")
 
     test_momentum_effect_for_bouncing_glucose()
 

@@ -34,3 +34,4 @@ def simulation_date_range_for_samples(samples, duration, delta, start=None,
         return (date_floored_to_time_interval(start or min_date, delta),
                 date_ceiled_to_time_interval(end or max_date +
                                              timedelta(minutes=duration+delay),
+                                             delta))

@@ -125,8 +125,8 @@ def linear_momentum_effect(object_list, duration=30, delta=5):
     values = []
 
     while date <= end_date:
-        value = max(0, time_interval_since(date,
-                                           last_sample.start_date)) * slope
+        value = (max(0, time_interval_since(date, last_sample.start_date))
+                 * slope)
         values.append(GlucoseEffect(date, HKQuantity("mg/dL", value)))
         date += timedelta(minutes=delta)
 

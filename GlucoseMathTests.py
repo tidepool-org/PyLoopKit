@@ -70,27 +70,6 @@ def runTestCases():
 
         return list(map(glucose_effect_velocity_maker, fixture))
 
-    '''
-    func testMomentumEffectForBouncingGlucose() {
-        let input = loadInputFixture("momentum_effect_bouncing_glucose_input")
-        let output = loadOutputFixture(
-        "momentum_effect_bouncing_glucose_output")
-
-        let effects = input.linearMomentumEffect()
-        let unit = HKUnit.milligramsPerDeciliter
-
-        XCTAssertEqual(output.count, effects.count)
-
-        for (expected, calculated) in zip(output, effects) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.quantity.doubleValue(for: unit),
-            calculated.quantity.doubleValue(for: unit),
-            accuracy: Double(Float.ulpOfOne))
-        }
-    }
-
-    '''
-
     def test_momentum_effect_for_bouncing_glucose():
         input_ = load_input_fixture("momentum_effect_bouncing_glucose_input")
         output = load_output_fixture("momentum_effect_bouncing_glucose_output")

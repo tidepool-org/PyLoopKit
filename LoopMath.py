@@ -25,8 +25,12 @@ def simulation_date_range_for_samples(samples, duration, delta, start=None,
         for sample in samples:
             if sample.start_date < min_date:
                 min_date = sample.start_date
-            if sample.end_date > max_date:
-                max_date = sample.end_date
+            try:
+                if sample.end_date > max_date:
+                    max_date = sample.end_date
+            # if the object passed has no end_date property, don't error
+            except AttributeError:
+                pass
         return (date_floored_to_time_interval(start or min_date, delta),
                 date_ceiled_to_time_interval(end or max_date +
                                              timedelta(minutes=delay), delta))

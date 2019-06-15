@@ -46,7 +46,7 @@ def runTestCases():
                                                   dict.get("amount")),
                                        dict.get("display_only") or False,
                                        dict.get("provenance_identifier"))
-        return map(glucose_fixture_maker, fixture)
+        return list(map(glucose_fixture_maker, fixture))
 
     def load_output_fixture(resource_name):
         fixture = load_fixture(resource_name, ".json")
@@ -56,7 +56,7 @@ def runTestCases():
                                  HKQuantity(dict.get("unit"),
                                             dict.get("amount")))
 
-        return map(glucose_effect_maker, fixture)
+        return list(map(glucose_effect_maker, fixture))
 
     def load_effect_velocity_fixture(resource_name):
         fixture = load_fixture(resource_name, ".json")
@@ -68,7 +68,7 @@ def runTestCases():
                                          HKQuantity(dict.get("unit"),
                                                     dict.get("value")))
 
-        return map(glucose_effect_velocity_maker, fixture)
+        return list(map(glucose_effect_velocity_maker, fixture))
 
     '''
     func testMomentumEffectForBouncingGlucose() {

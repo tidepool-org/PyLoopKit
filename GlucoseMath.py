@@ -52,7 +52,7 @@ def is_calibrated(obj_list):
     def filter_func(obj):
         return obj.is_display_only
 
-    return len(filter(filter_func, obj_list)) == 0
+    return len(list(filter(filter_func, obj_list))) == 0
 
 
 # Whether the collection can be considered continuous
@@ -116,7 +116,7 @@ def linear_momentum_effect(object_list, duration=30, delta=5):
                                     first_sample.start_date),
                 object_.quantity.double_value)
 
-    (slope, intercept) = linear_regression(map(create_tuples, object_list))
+    (slope, intercept) = linear_regression(list(map(create_tuples,
 
     if math.isNaN(slope) or math.isinf(slope):
         return []

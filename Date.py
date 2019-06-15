@@ -18,14 +18,14 @@ import datetime
 #          since January, 1st, 2001: 12:00 am (mid night)
 def time_interval_since_reference_date(actual_time):
     ref_time = date_formatter("2001-01-01T00:00:00")
-    dif = abs(actual_time - ref_time)
+    dif = abs(actual_time - ref_time).total_seconds()
     return dif
 
 
 # input - two datetime objects
 # output - the seconds between two times (with a sign)
 def time_interval_since(date_1, date_2):
-    return (date_2 - date_1).total_seconds()
+    return (date_1 - date_2).total_seconds()
 
 
 def date_floored_to_time_interval(time, interval):

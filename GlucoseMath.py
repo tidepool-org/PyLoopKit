@@ -112,11 +112,12 @@ def linear_momentum_effect(object_list, duration=30, delta=5):
                                                                duration, delta)
 
     def create_tuples(object_):
-        return (time_interval_since(object_.start_date,
-                                    first_sample.start_date),
+        return (abs(time_interval_since(object_.start_date,
+                                        first_sample.start_date)),
                 object_.quantity.double_value)
 
     (slope, intercept) = linear_regression(list(map(create_tuples,
+                                                    object_list)))
 
     if math.isnan(slope) or math.isinf(slope):
         return []

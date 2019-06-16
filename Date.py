@@ -8,7 +8,7 @@ Created on Fri Jun 14 08:45:26 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/Extensions/Date.swift
 """
-from LoopKitTests import date_formatter
+from loop_kit_tests import date_formatter
 import math
 import datetime
 

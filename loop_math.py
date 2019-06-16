@@ -8,7 +8,7 @@ Created on Fri Jun 14 10:40:48 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
             57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/LoopMath.swift
 """
-from Date import date_floored_to_time_interval, date_ceiled_to_time_interval
+from date import date_floored_to_time_interval, date_ceiled_to_time_interval
 from datetime import timedelta
 
 

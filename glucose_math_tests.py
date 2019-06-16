@@ -9,10 +9,10 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/GlucoseMathTests.swift
 """
 
-from LoopKitTests import load_fixture, date_formatter, HKQuantity
-from GlucoseEffect import GlucoseEffect
-from GlucoseEffectVelocity import GlucoseEffectVelocity
-from GlucoseMath import linear_momentum_effect
+from loop_kit_tests import load_fixture, date_formatter, HKQuantity
+from glucose_effect import GlucoseEffect
+from glucose_effect_velocity import GlucoseEffectVelocity
+from glucose_math import linear_momentum_effect
 
 
 class GlucoseFixtureValue:
@@ -35,7 +35,7 @@ class GlucoseFixtureValue:
                 self.provenance_identifier == other.provenance_identifier)
 
 
-def runTestCases():
+def run_test_cases():
 
     def load_input_fixture(resource_name):
         fixture = load_fixture(resource_name, ".json")
@@ -118,7 +118,6 @@ def runTestCases():
             else:
                 print("Tests passed!")
 
-
     def test_momentum_effect_for_rising_glucose_doubles():
         input_ = load_input_fixture("momentum_effect_rising_glucose_double_entries_input")
         output = load_output_fixture("momentum_effect_rising_glucose_output")
@@ -148,7 +147,6 @@ def runTestCases():
     test_momentum_effect_for_rising_glucose()
     print("\n")
     test_momentum_effect_for_rising_glucose_doubles()
-    
 
 
-runTestCases()
+run_test_cases()

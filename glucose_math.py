@@ -8,10 +8,10 @@ Created on Fri Jun 14 09:53:33 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/GlucoseKit/GlucoseMath.swift
 """
-from Date import time_interval_since
-from LoopMath import simulation_date_range_for_samples
-from GlucoseEffect import GlucoseEffect
-from LoopKitTests import HKQuantity
+from date import time_interval_since
+from loop_math import simulation_date_range_for_samples
+from glucose_effect import GlucoseEffect
+from loop_kit_tests import HKQuantity
 import math
 from datetime import timedelta
 

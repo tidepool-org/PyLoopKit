@@ -9,6 +9,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/GlucoseMathTests.swift
 """
 import unittest
+import path_grabber # pylint: disable=unused-import
 from datetime import datetime
 from loop_kit_tests import load_fixture
 from glucose_effect import GlucoseEffect

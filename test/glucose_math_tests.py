@@ -17,12 +17,15 @@ from glucose_math import linear_momentum_effect
 
 
 class GlucoseFixtureValue:
-    """ Constructs a glucose value with the following properties:
-            start_date = date and time of glucose value
-            quantity = HKValue with quantity and unit
-            is_display_only = whether to do computations with
-            provenance_identifier = where value came from; defaults to
-                                    com.loopkit.LoopKitTests """
+    """ Constructs a glucose value for the purposes of running tests.
+
+    Keyword arguments:
+    start_date -- date and time of glucose value
+    quantity -- HKValue with quantity and unit
+    is_display_only -- whether to do computations with
+    provenance_identifier -- where value came from; defaults to
+                                 com.loopkit.LoopKitTests
+    """
     def __init__(self, start_date, quantity, is_display_only,
                  provenance_identifier):
         self.start_date = start_date
@@ -42,42 +45,65 @@ class GlucoseFixtureValue:
 
 
 class TestGlucoseKitFunctions(unittest.TestCase):
+    """ unittest class to run GlucoseKit tests."""
 
     def load_input_fixture(self, resource_name):
+        """ Load input json file
+
+        Keyword arguments:
+        resource_name -- name of file without the extension
+
+        Output:
+        list of GlucoseFixtureValue
+        """
         fixture = load_fixture(resource_name, ".json")
 
-        def glucose_fixture_maker(dict):
-            return GlucoseFixtureValue(datetime.
-                                       fromisoformat(dict.get("date")),
-                                       HKQuantity(dict.get("unit"),
-                                                  dict.get("amount")),
-                                       dict.get("display_only") or False,
-                                       dict.get("provenance_identifier"))
+        def glucose_fixture_maker(dict_):
+            return GlucoseFixtureValue(
+                datetime.fromisoformat(dict_.get("date")),
+                HKQuantity(dict_.get("unit"), dict_.get("amount")),
+                dict_.get("display_only") or False,
+                dict_.get("provenance_identifier"))
         self.input = list(map(glucose_fixture_maker, fixture))
 
     def load_output_fixture(self, resource_name):
+        """ Load output json file
+
+        Keyword arguments:
+        resource_name -- name of file without the extension
+
+        Output:
+        list of GlucoseEffect
+        """
         fixture = load_fixture(resource_name, ".json")
 
-        def glucose_effect_maker(dict):
-            return GlucoseEffect(datetime.fromisoformat(dict.get("date")),
-                                 HKQuantity(dict.get("unit"),
-                                            dict.get("amount")))
+        def glucose_effect_maker(dict_):
+            return GlucoseEffect(
+                datetime.fromisoformat(dict_.get("date")),
+                HKQuantity(dict_.get("unit"), dict_.get("amount")))
 
         self.output = list(map(glucose_effect_maker, fixture))
 
     def load_effect_velocity_fixture(self, resource_name):
+        """ Load effect-velocity json file
+
+        Keyword arguments:
+        resource_name -- name of file without the extension
+
+        Output:
+        list of GlucoseEffectVelocity
+        """
         fixture = load_fixture(resource_name, ".json")
 
-        def glucose_effect_velocity_maker(dict):
-            return GlucoseEffectVelocity(datetime.fromisoformat(dict.get(
-                "start_date")),
-                                         datetime.fromisoformat(dict.get(
-                                                 "end_date")),
-                                         HKQuantity(dict.get("unit"),
-                                                    dict.get("value")))
+        def glucose_effect_velocity_maker(dict_):
+            return GlucoseEffectVelocity(
+                datetime.fromisoformat(dict_.get("start_date")),
+                datetime.fromisoformat(dict_.get("end_date")),
+                HKQuantity(dict_.get("unit"), dict_.get("value")))
 
         self.output = list(map(glucose_effect_velocity_maker, fixture))
 
+    """ Tests for linear_momentum_effect """
     def test_momentum_effect_for_bouncing_glucose(self):
         self.load_input_fixture("momentum_effect_bouncing_glucose_input")
         self.load_output_fixture("momentum_effect_bouncing_glucose_output")

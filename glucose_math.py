@@ -86,12 +86,6 @@ def is_continuous(obj_list, interval=5):
         return False
 
 
-# Whether the collection is all from the same source.
-# Runtime: O(n)
-# - Parameters:
-#   - obj_list: list of Glucose-related objects with provenance_identifier
-#     property
-# - Returns: True if the samples are from same source
 def has_single_provenance(obj_list):
     """ Checks whether the collection is all from the same source
     Runtime: O(n)

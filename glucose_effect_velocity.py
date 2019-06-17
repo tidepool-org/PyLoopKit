@@ -11,8 +11,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 
 
 class GlucoseEffectVelocity:
-    def __init__(self, start_date, end_date, quantity, unit):
+    def __init__(self, start_date, end_date, quantity):
         self.start_date = start_date
         self.end_date = end_date
         self.quantity = quantity
-        self.unit = unit

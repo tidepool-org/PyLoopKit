@@ -5,3 +5,10 @@ URL of Loop repo version used for algorithm: https://github.com/tidepool-org/Loo
 
 URL of LoopKit repo version used for algorithm: https://github.com/tidepool-org/LoopKit/tree/57a9f2ba65ae3765ef7baafe66b883e654e08391
 
+## To use the Virtual Environment
+In Bash run `source activate py-loop`, or in the Anaconda Prompt 
+install TensorFlow 2.0 with `pip install tensorflow==2.0.0-beta1`
+run `conda activate py-loop` to start the environment.
+
+Run `deactivate` to stop the environment.
+

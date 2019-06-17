@@ -33,8 +33,8 @@ def date_floored_to_time_interval(time, interval):
         return time
     ref_time = date_formatter("2001-01-01T00:00:00")
     # this assumes the interval is in mins
-    floored_delta = (math.floor(time_interval_since_reference_date(time)
-                     / interval / 60) * interval * 60)
+    floored_delta = (math.floor(time_interval_since_reference_date(time) /
+                                interval / 60) * interval * 60)
 
     return ref_time + datetime.timedelta(seconds=floored_delta)
 
@@ -44,7 +44,7 @@ def date_ceiled_to_time_interval(time, interval):
         return time
     ref_time = date_formatter("2001-01-01T00:00:00")
     # this assumes the interval is in mins
-    ceiled_delta = (math.ceil(time_interval_since_reference_date(time)
-                    / interval / 60) * interval * 60)
+    ceiled_delta = (math.ceil(time_interval_since_reference_date(time) /
+                              interval / 60) * interval * 60)
 
     return ref_time + datetime.timedelta(seconds=ceiled_delta)

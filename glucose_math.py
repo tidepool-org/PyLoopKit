@@ -13,7 +13,6 @@ from datetime import timedelta
 from date import time_interval_since
 from loop_math import simulation_date_range_for_samples
 from glucose_effect import GlucoseEffect
-from loop_kit_tests import HKQuantity
 
 
 def linear_regression(tuples_list):
@@ -142,7 +141,7 @@ def linear_momentum_effect(object_list, duration=30, delta=5):
     def create_tuples(object_):
         return (abs(time_interval_since(object_.start_date,
                                         first_sample.start_date)),
-                object_.quantity.double_value)
+                object_.quantity)
 
     slope = linear_regression(list(map(create_tuples, object_list)))[0]
 
@@ -155,7 +154,7 @@ def linear_momentum_effect(object_list, duration=30, delta=5):
     while date <= end_date:
         value = (max(0, time_interval_since(date, last_sample.start_date))
                  * slope)
-        values.append(GlucoseEffect(date, HKQuantity("mg/dL", value)))
+        values.append(GlucoseEffect(date, value))
         date += timedelta(minutes=delta)
 
     return values

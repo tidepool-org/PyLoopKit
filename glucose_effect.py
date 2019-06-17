@@ -15,7 +15,7 @@ class GlucoseEffect:
 
     Attributes:
     start_date -- date and time of the effect
-    quantity -- HKValue with quantity and unit
+    quantity -- glucose value (mg/dL)
     """
     def __init__(self, start_date, quantity):
         self.start_date = start_date

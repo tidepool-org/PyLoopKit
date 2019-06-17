@@ -10,7 +10,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 """
 import unittest
 from datetime import datetime
-from loop_kit_tests import load_fixture, HKQuantity
+from loop_kit_tests import load_fixture
 from glucose_effect import GlucoseEffect
 from glucose_effect_velocity import GlucoseEffectVelocity
 from glucose_math import linear_momentum_effect
@@ -21,7 +21,7 @@ class GlucoseFixtureValue:
 
     Attributes:
     start_date -- date and time of glucose value
-    quantity -- HKValue with quantity and unit
+    quantity -- glucose value (mg/dL)
     is_display_only -- whether to do computations with
     provenance_identifier -- where value came from; defaults to
                                  com.loopkit.LoopKitTests
@@ -61,7 +61,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         def glucose_fixture_maker(dict_):
             return GlucoseFixtureValue(
                 datetime.fromisoformat(dict_.get("date")),
-                HKQuantity(dict_.get("unit"), dict_.get("amount")),
+                dict_.get("amount"),
                 dict_.get("display_only") or False,
                 dict_.get("provenance_identifier"))
         self.input = list(map(glucose_fixture_maker, fixture))
@@ -80,7 +80,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         def glucose_effect_maker(dict_):
             return GlucoseEffect(
                 datetime.fromisoformat(dict_.get("date")),
-                HKQuantity(dict_.get("unit"), dict_.get("amount")))
+                dict_.get("amount"))
 
         self.output = list(map(glucose_effect_maker, fixture))
 
@@ -99,7 +99,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
             return GlucoseEffectVelocity(
                 datetime.fromisoformat(dict_.get("start_date")),
                 datetime.fromisoformat(dict_.get("end_date")),
-                HKQuantity(dict_.get("unit"), dict_.get("value")))
+                dict_.get("value"))
 
         self.output = list(map(glucose_effect_velocity_maker, fixture))
 
@@ -114,8 +114,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         self.assertEqual(len(output), len(effects))
         for(expected, calculated) in zip(output, effects):
             self.assertEqual(expected.start_date, calculated.start_date)
-            self.assertAlmostEqual(expected.quantity.double_value,
-                                   calculated.quantity.double_value, 2)
+            self.assertAlmostEqual(expected.quantity,
+                                   calculated.quantity, 2)
 
     def test_momentum_effect_for_rising_glucose(self):
         self.load_input_fixture("momentum_effect_rising_glucose_input")
@@ -127,8 +127,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         self.assertEqual(len(output), len(effects))
         for(expected, calculated) in zip(output, effects):
             self.assertEqual(expected.start_date, calculated.start_date)
-            self.assertAlmostEqual(expected.quantity.double_value,
-                                   calculated.quantity.double_value, 2)
+            self.assertAlmostEqual(expected.quantity,
+                                   calculated.quantity, 2)
 
     def test_momentum_effect_for_rising_glucose_doubles(self):
         self.load_input_fixture("momentum_effect_rising_glucose" +
@@ -141,8 +141,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         self.assertEqual(len(output), len(effects))
         for(expected, calculated) in zip(output, effects):
             self.assertEqual(expected.start_date, calculated.start_date)
-            self.assertAlmostEqual(expected.quantity.double_value,
-                                   calculated.quantity.double_value, 2)
+            self.assertAlmostEqual(expected.quantity,
+                                   calculated.quantity, 2)
 
 
 if __name__ == '__main__':

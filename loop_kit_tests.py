@@ -12,33 +12,6 @@ import json
 import os
 
 
-class HKQuantity:
-    """ Constructs a value with amount and unit.
-
-    Attributes:
-    unit -- unit of the double_value
-    double_value -- amount of whatever you're putting in
-    """
-    def __init__(self, unit, double_value):
-        self.unit = unit
-        self.double_value = double_value
-
-    def __lt__(self, other):
-        self_value = self.double_value
-        other_value = other.double_value
-        return self_value < other_value
-
-    def __gt__(self, other):
-        self_value = self.double_value
-        other_value = other.double_value
-        return self_value > other_value
-
-    def __eq__(self, other):
-        self_value = self.double_value
-        other_value = other.double_value
-        return self_value == other_value
-
-
 def load_fixture(resource_name, extension):
     """ Load file given name and extension
 

@@ -8,8 +8,8 @@ Created on Tue Jun 11 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/GlucoseMathTests.swift
 """
-
-from loop_kit_tests import load_fixture, date_formatter, HKQuantity
+from datetime import datetime
+from loop_kit_tests import load_fixture, HKQuantity
 from glucose_effect import GlucoseEffect
 from glucose_effect_velocity import GlucoseEffectVelocity
 from glucose_math import linear_momentum_effect
@@ -41,7 +41,7 @@ def run_test_cases():
         fixture = load_fixture(resource_name, ".json")
 
         def glucose_fixture_maker(dict):
-            return GlucoseFixtureValue(date_formatter(dict.get("date")),
+            return GlucoseFixtureValue(datetime.fromisoformat(dict.get("date")),
                                        HKQuantity(dict.get("unit"),
                                                   dict.get("amount")),
                                        dict.get("display_only") or False,
@@ -52,7 +52,7 @@ def run_test_cases():
         fixture = load_fixture(resource_name, ".json")
 
         def glucose_effect_maker(dict):
-            return GlucoseEffect(date_formatter(dict.get("date")),
+            return GlucoseEffect(datetime.fromisoformat(dict.get("date")),
                                  HKQuantity(dict.get("unit"),
                                             dict.get("amount")))
 
@@ -62,9 +62,9 @@ def run_test_cases():
         fixture = load_fixture(resource_name, ".json")
 
         def glucose_effect_velocity_maker(dict):
-            return GlucoseEffectVelocity(date_formatter(dict.get(
+            return GlucoseEffectVelocity(datetime.fromisoformat(dict.get(
                                                         "start_date")),
-                                         date_formatter(dict.get("end_date")),
+                                         datetime.fromisoformat(dict.get("end_date")),
                                          HKQuantity(dict.get("unit"),
                                                     dict.get("value")))
 

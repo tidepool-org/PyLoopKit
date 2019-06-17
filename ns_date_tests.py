@@ -21,8 +21,8 @@ def is_test_passed(time_1, time_2):
     if time_1 == time_2:
         return "Test passed"
     else:
-        return "Test failed;", time_1.strftime('%m/%d/%y %H:%M:%S.%f'),\
-               "!=", time_2.strftime('%m/%d/%y %H:%M:%S.%f')
+        return "Test failed;", datetime.isoformat(time_1),\
+               "!=", datetime.isoformat(time_2)
 
 
 """

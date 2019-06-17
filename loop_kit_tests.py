@@ -49,15 +49,3 @@ def find_full_path(resource_name, extension):
                 return os.path.join(root, name)
     print("No file found for that key")
     return ""
-
-
-# converts string to datetime object in the ISO 8601 format
-def date_formatter(date_string):
-    try:
-        iso_date = datetime.strptime(date_string,
-                                     "%Y-%m-%dT%H:%M:%S")
-    except Exception as e:
-        print(e)
-        iso_date = datetime.strptime(date_string,
-                                     "%Y-%m-%dT%H:%M:%S%z")
-    return iso_date

@@ -11,6 +11,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 import math
 import datetime
 
+REF_TIME = datetime.datetime.fromisoformat("2001-01-01T00:00:00")
+
 
 def time_interval_since_reference_date(actual_time):
     """ Calculates seconds since since January, 1st, 2001 @ 12:00 AM
@@ -21,8 +23,7 @@ def time_interval_since_reference_date(actual_time):
     Output:
     Num of seconds since Jan 1st, 2001 @ 12:00 AM (without a sign)
     """
-    ref_time = datetime.datetime.fromisoformat("2001-01-01T00:00:00")
-    dif = abs(actual_time - ref_time).total_seconds()
+    dif = abs(actual_time - REF_TIME).total_seconds()
     return dif
 
 
@@ -54,12 +55,11 @@ def date_floored_to_time_interval(time_, interval):
     """
     if interval == 0:
         return time_
-    ref_time = datetime.datetime.fromisoformat("2001-01-01T00:00:00")
     # this assumes the interval is in mins
     floored_delta = (math.floor(time_interval_since_reference_date(time_) /
                                 interval / 60) * interval * 60)
 
-    return ref_time + datetime.timedelta(seconds=floored_delta)
+    return REF_TIME + datetime.timedelta(seconds=floored_delta)
 
 
 def date_ceiled_to_time_interval(time, interval):
@@ -77,9 +77,8 @@ def date_ceiled_to_time_interval(time, interval):
     """
     if interval == 0:
         return time
-    ref_time = datetime.datetime.fromisoformat("2001-01-01T00:00:00")
     # this assumes the interval is in mins
     ceiled_delta = (math.ceil(time_interval_since_reference_date(time) /
                               interval / 60) * interval * 60)
 
-    return ref_time + datetime.timedelta(seconds=ceiled_delta)
+    return REF_TIME + datetime.timedelta(seconds=ceiled_delta)

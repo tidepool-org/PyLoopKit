@@ -64,7 +64,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
                 dict_.get("amount"),
                 dict_.get("display_only") or False,
                 dict_.get("provenance_identifier"))
-        self.input = list(map(glucose_fixture_maker, fixture))
+        return list(map(glucose_fixture_maker, fixture))
 
     def load_output_fixture(self, resource_name):
         """ Load output json file
@@ -82,7 +82,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
                 datetime.fromisoformat(dict_.get("date")),
                 dict_.get("amount"))
 
-        self.output = list(map(glucose_effect_maker, fixture))
+        return list(map(glucose_effect_maker, fixture))
 
     def load_effect_velocity_fixture(self, resource_name):
         """ Load effect-velocity json file
@@ -101,15 +101,16 @@ class TestGlucoseKitFunctions(unittest.TestCase):
                 datetime.fromisoformat(dict_.get("end_date")),
                 dict_.get("value"))
 
-        self.output = list(map(glucose_effect_velocity_maker, fixture))
+        return list(map(glucose_effect_velocity_maker, fixture))
 
     """ Tests for linear_momentum_effect """
     def test_momentum_effect_for_bouncing_glucose(self):
-        self.load_input_fixture("momentum_effect_bouncing_glucose_input")
-        self.load_output_fixture("momentum_effect_bouncing_glucose_output")
+        input_ = self.load_input_fixture("momentum_effect_bouncing_glucose" +
+                                         "_input")
+        output = self.load_output_fixture("momentum_effect_bouncing_glucose" +
+                                          "_output")
 
-        effects = linear_momentum_effect(self.input)
-        output = self.output
+        effects = linear_momentum_effect(input_)
 
         self.assertEqual(len(output), len(effects))
         for(expected, calculated) in zip(output, effects):
@@ -118,11 +119,12 @@ class TestGlucoseKitFunctions(unittest.TestCase):
                                    calculated.quantity, 2)
 
     def test_momentum_effect_for_rising_glucose(self):
-        self.load_input_fixture("momentum_effect_rising_glucose_input")
-        self.load_output_fixture("momentum_effect_rising_glucose_output")
+        input_ = self.load_input_fixture("momentum_effect_rising_glucose" +
+                                         "_input")
+        output = self.load_output_fixture("momentum_effect_rising_glucose" +
+                                          "_output")
 
-        effects = linear_momentum_effect(self.input)
-        output = self.output
+        effects = linear_momentum_effect(input_)
 
         self.assertEqual(len(output), len(effects))
         for(expected, calculated) in zip(output, effects):
@@ -131,12 +133,12 @@ class TestGlucoseKitFunctions(unittest.TestCase):
                                    calculated.quantity, 2)
 
     def test_momentum_effect_for_rising_glucose_doubles(self):
-        self.load_input_fixture("momentum_effect_rising_glucose" +
-                                "_double_entries_input")
-        self.load_output_fixture("momentum_effect_rising_glucose_output")
+        input_ = self.load_input_fixture("momentum_effect_rising_glucose" +
+                                         "_double_entries_input")
+        output = self.load_output_fixture("momentum_effect_rising_glucose" +
+                                          "_output")
 
-        effects = linear_momentum_effect(self.input)
-        output = self.output
+        effects = linear_momentum_effect(input_)
 
         self.assertEqual(len(output), len(effects))
         for(expected, calculated) in zip(output, effects):

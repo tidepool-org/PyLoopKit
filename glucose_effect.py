@@ -11,6 +11,12 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 
 
 class GlucoseEffect:
+    """ Constructs a glucose effect
+
+    Attributes:
+    start_date -- date and time of the effect
+    quantity -- HKValue with quantity and unit
+    """
     def __init__(self, start_date, quantity):
         self.start_date = start_date
         self.quantity = quantity

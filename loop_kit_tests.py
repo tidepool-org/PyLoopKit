@@ -10,10 +10,15 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 """
 import json
 import os
-from datetime import datetime
 
 
 class HKQuantity:
+    """ Constructs a value with amount and unit.
+
+    Attributes:
+    unit -- unit of the double_value
+    double_value -- amount of whatever you're putting in
+    """
     def __init__(self, unit, double_value):
         self.unit = unit
         self.double_value = double_value
@@ -35,12 +40,30 @@ class HKQuantity:
 
 
 def load_fixture(resource_name, extension):
+    """ Load file given name and extension
+
+    Keyword arguments:
+    resource_name -- name of file without the extension
+    extension -- ending of file (ex: ".json")
+
+    Output:
+    contents of file
+    """
     path = find_full_path(resource_name, extension)
     return json.load(open(path))
 
 
 # this will return the FIRST instance of the file
 def find_full_path(resource_name, extension):
+    """ Find file path, given name and extension
+
+    Keyword arguments:
+    resource_name -- name of file without the extension
+    extension -- ending of file (ex: ".json")
+
+    Output:
+    path to file
+    """
     search_dir = os.path.dirname(__file__)
     for root, dirs, files in os.walk(search_dir):
         for name in files:

@@ -19,7 +19,7 @@ from glucose_math import linear_momentum_effect
 class GlucoseFixtureValue:
     """ Constructs a glucose value for the purposes of running tests.
 
-    Keyword arguments:
+    Attributes:
     start_date -- date and time of glucose value
     quantity -- HKValue with quantity and unit
     is_display_only -- whether to do computations with

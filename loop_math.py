@@ -15,7 +15,7 @@ from datetime import timedelta
 def simulation_date_range_for_samples(samples, duration, delta, start=None,
                                       end=None, delay=0):
     if len(samples) <= 0:
-        return
+        raise ValueError
     if start is not None and end is not None:
         return(date_floored_to_time_interval(start, delta),
                date_ceiled_to_time_interval(end, delta))

@@ -43,10 +43,13 @@ def linear_regression(x_list, y_list):
         sum_x_squared += x * x
         sum_y_squared += y * y
 
-    slope = (((count * sum_xy) - (sum_x * sum_y)) /
-             ((count * sum_x_squared) - (sum_x * sum_x)))
+    try:
+        slope = (((count * sum_xy) - (sum_x * sum_y)) /
+                 ((count * sum_x_squared) - (sum_x * sum_x)))
 
-    # I didn't include the intercept because it was unused
+        # I didn't include the intercept because it was unused
+    except ZeroDivisionError:
+        return float('NaN')
 
     return slope
 
@@ -129,7 +132,7 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
     if (len(date_list) <= 2 or not is_continuous(date_list)
             or is_calibrated(display_list)
             or not has_single_provenance(provenance_list)):
-        return []
+        return ([], [])
 
     first_time = date_list[0]
     last_time = date_list[-1]
@@ -143,7 +146,7 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
                               glucose_value_list)
 
     if math.isnan(slope) or math.isinf(slope):
-        return []
+        return ([], [])
 
     date = start_date
     glucose_effect_dates = []

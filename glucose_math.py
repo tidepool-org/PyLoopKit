@@ -12,10 +12,9 @@ import math
 from datetime import timedelta
 from date import time_interval_since
 from loop_math import simulation_date_range_for_samples
-from glucose_effect import GlucoseEffect
 
 
-def linear_regression(tuples_list):
+def linear_regression(x_list, y_list):
     """ Calculates slope and intercept using linear regression
     This implementation is not suited for large datasets
 
@@ -25,16 +24,17 @@ def linear_regression(tuples_list):
     Output:
     A tuple of slope and intercept values
     """
+    assert len(x_list) == len(y_list), "expected input shape to match"
     sum_x = 0.0
     sum_y = 0.0
     sum_xy = 0.0
     sum_x_squared = 0.0
     sum_y_squared = 0.0
-    count = len(tuples_list)
+    count = len(x_list)
 
-    for tuple_ in tuples_list:
-        x = tuple_[0]
-        y = tuple_[1]
+    for i in range(0, x_list):
+        x = x_list[i]
+        y = y_list[i]
         sum_x += x
         sum_y += y
         sum_xy += x * y
@@ -58,35 +58,30 @@ def is_calibrated(display_list):
                 property
 
     Output:
-    Whether the collection contains no calibration entries
+    Whether the collection contains calibration entries
     """
-    def filter_func(obj):
-        return obj.is_display_only
-
-    return len(list(filter(filter_func, obj_list))) == 0
+    return True in display_list
 
 
-def is_continuous(obj_list, interval=5):
+def is_continuous(date_list, interval=5):
     """ Checks whether the collection can be considered continuous
 
     Keyword arguments:
-    obj_list -- list of Glucose-related objects with start_date property
+    date_list -- list of datetime objects
 
     Output:
     Whether the collection is continuous
     """
     try:
-        first = obj_list[0]
-        last = obj_list[len(obj_list)-1]
-        return (abs(time_interval_since(first.start_date, last.start_date))/60
-                <= interval * (len(obj_list) - 1))
+        return (abs(time_interval_since(date_list[0], date_list[-1]))/60
+                <= interval * (len(date_list) - 1))
 
     except IndexError:
-        print("Out of bounds error: list doesn't contain objects")
+        print("Out of bounds error: list doesn't contain date values")
         return False
 
 
-def has_single_provenance(obj_list):
+def has_single_provenance(prov_list):
     """ Checks whether the collection is all from the same source
     Runtime: O(n)
 
@@ -98,57 +93,65 @@ def has_single_provenance(obj_list):
     True if the samples are from same source
     """
     try:
-        first_provenance = obj_list[0].provenance_identifier
+        first_provenance = prov_list[0]
 
     except IndexError:
         print("Out of bounds error: list doesn't contain objects")
 
-    for sample in obj_list:
-        if sample.provenance_identifier != first_provenance:
+    for prov in prov_list:
+        if prov != first_provenance:
             return False
 
     return True
 
 
-def linear_momentum_effect(object_list, duration=30, delta=5):
+def linear_momentum_effect(date_list, glucose_value_list, display_list,
+                           provenance_list, duration=30, delta=5):
     """ Calculates the short-term predicted momentum effect using
         linear regression
 
     Keyword arguments:
-    obj_list -- list of Glucose-related objects
+    date_list -- list of datetime objects
+    glucose_value_list -- list of glucose values (unit: mg/dL)
+    display_list -- list of display_only booleans
+    provenance_list -- list of provenances (Strings)
     duration -- the duration of the effects
     delta -- the time differential for the returned values
 
     Output:
     an array of glucose effects
     """
-    if (len(object_list) <= 2 or not is_continuous(object_list)
-            or not is_calibrated(object_list)
-            or not has_single_provenance(object_list)):
+    assert len(date_list) == len(glucose_value_list) == len(display_list)\
+        == len(provenance_list), "expected input shape to match"
+
+    if (len(date_list) <= 2 or not is_continuous(date_list)
+            or is_calibrated(display_list)
+            or not has_single_provenance(provenance_list)):
         return []
 
-    first_sample = object_list[0]
-    last_sample = object_list[len(object_list)-1]
-    (start_date, end_date) = simulation_date_range_for_samples([last_sample],
+    first_time = date_list[0]
+    last_time = date_list[-1]
+    (start_date, end_date) = simulation_date_range_for_samples([last_time], [],
                                                                duration, delta)
 
-    def create_tuples(object_):
-        return (abs(time_interval_since(object_.start_date,
-                                        first_sample.start_date)),
-                object_.quantity)
+    def create_times(time):
+        return abs(time_interval_since(time, first_time))
 
-    slope = linear_regression(list(map(create_tuples, object_list)))[0]
+    slope = linear_regression(list(map(create_times, date_list)),
+                              glucose_value_list)
 
     if math.isnan(slope) or math.isinf(slope):
         return []
 
     date = start_date
-    values = []
+    glucose_effect_date = []
+    glucose_effect_value = []
 
     while date <= end_date:
-        value = (max(0, time_interval_since(date, last_sample.start_date))
+        value = (max(0, time_interval_since(date, last_time))
                  * slope)
-        values.append(GlucoseEffect(date, value))
+        glucose_effect_date.append(date)
+        glucose_effect_value.append(value)
         date += timedelta(minutes=delta)
 
-    return values
+    return (glucose_effect_date, glucose_effect_value)

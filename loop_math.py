@@ -12,12 +12,13 @@ from datetime import timedelta
 from date import date_floored_to_time_interval, date_ceiled_to_time_interval
 
 
-def simulation_date_range_for_samples(samples, duration, delta, start=None,
-                                      end=None, delay=0):
+def simulation_date_range_for_samples(start_times, end_times, duration, delta,
+                                      start=None, end=None, delay=0):
     """ Create date range based on samples and user-specified parameters
 
     Keyword arguments:
-    samples -- list of Glucose-related object(s)
+    start_times -- list of datetime object(s) at start
+    end_times -- list of datetime object(s) at end
     duration -- length of interval
     delta -- what to round to
     start -- specified start date
@@ -27,19 +28,19 @@ def simulation_date_range_for_samples(samples, duration, delta, start=None,
     Output:
     tuple with (start_time, end_time) structure
     """
-    if not samples:
+    if not start_times:
         raise ValueError
     if start is not None and end is not None:
         return(date_floored_to_time_interval(start, delta),
                date_ceiled_to_time_interval(end, delta))
-    min_date = samples[0].start_date
+    min_date = start_times[0]
     max_date = min_date
-    for sample in samples:
-        if sample.start_date < min_date:
-            min_date = sample.start_date
+    for i in range(0, len(start_times)):
+        if start_times[i] < min_date:
+            min_date = start_times[i]
         try:
-            if sample.end_date > max_date:
-                max_date = sample.end_date
+            if end_times[i] > max_date:
+                max_date = end_times[i]
         # if the object passed has no end_date property, don't error
         except AttributeError:
             continue

@@ -21,5 +21,5 @@ class GlucoseEffect:
         self.start_date = start_date
         self.quantity = quantity
 
-    def __ls__(self, other):
+    def __lt__(self, other):
         return self.start_date < other.start_date

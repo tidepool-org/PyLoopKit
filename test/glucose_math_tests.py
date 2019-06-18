@@ -67,8 +67,11 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         dates = [datetime.fromisoformat(dict_.get("date"))
                  for dict_ in fixture]
         glucose_values = [dict_.get("amount") for dict_ in fixture]
-        display_onlys = [dict_.get("display_only") or False
-                         for dict_ in fixture]
+
+        def get_boolean(dict_):
+            return dict_.get("display_only") in ("yes", "true", "True")
+
+        display_onlys = [get_boolean(dict_) for dict_ in fixture]
         providences = [dict_.get("provenance_identifier") or
                        "com.loopkit.LoopKitTests" for dict_ in fixture]
 
@@ -167,6 +170,109 @@ class TestGlucoseKitFunctions(unittest.TestCase):
             self.assertEqual(out_date_list[i], glucose_effect_dates[i])
             self.assertAlmostEqual(glucose_effect_values[i],
                                    out_glucose_list[i], 2)
+
+    def test_momentum_effect_for_falling_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_falling_glucose_input")
+        (out_date_list, out_glucose_list) = self.load_output_fixture(
+            "momentum_effect_falling_glucose_output")
+
+        (glucose_effect_dates, glucose_effect_values) = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)
+
+        self.assertEqual(len(out_date_list), len(glucose_effect_dates))
+        for i in range(0, len(out_date_list)):
+            self.assertEqual(out_date_list[i], glucose_effect_dates[i])
+            self.assertAlmostEqual(glucose_effect_values[i],
+                                   out_glucose_list[i], 2)
+
+    def test_momentum_effect_for_falling_glucose_duplicates(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_falling_glucose_duplicate"
+                                    + "_input")
+        (out_date_list, out_glucose_list) = self.load_output_fixture(
+            "momentum_effect_falling_glucose_output")
+
+        (glucose_effect_dates, glucose_effect_values) = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)
+
+        self.assertEqual(len(out_date_list), len(glucose_effect_dates))
+        for i in range(0, len(out_date_list)):
+            self.assertEqual(out_date_list[i], glucose_effect_dates[i])
+            self.assertAlmostEqual(glucose_effect_values[i],
+                                   out_glucose_list[i], 2)
+
+    def test_momentum_effect_for_stable_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_stable_glucose_input")
+        (out_date_list, out_glucose_list) = self.load_output_fixture(
+            "momentum_effect_stable_glucose_output")
+
+        (glucose_effect_dates, glucose_effect_values) = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)
+
+        self.assertEqual(len(out_date_list), len(glucose_effect_dates))
+        for i in range(0, len(out_date_list)):
+            self.assertEqual(out_date_list[i], glucose_effect_dates[i])
+            self.assertAlmostEqual(glucose_effect_values[i],
+                                   out_glucose_list[i], 2)
+
+    def test_momentum_effect_for_duplicate_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_duplicate_glucose_input")
+
+        glucose_effect_dates = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)[0]
+
+        self.assertEqual(0, len(glucose_effect_dates))
+
+    def test_momentum_effect_for_empty_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            ([], [], [], [])
+
+        glucose_effect_dates = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)[0]
+
+        self.assertEqual(0, len(glucose_effect_dates))
+
+    def test_momentum_effect_for_spaced_out_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_incomplete_glucose_input")
+
+        glucose_effect_dates = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)[0]
+
+        self.assertEqual(0, len(glucose_effect_dates))
+
+    def test_momentum_effect_for_too_few_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_bouncing_glucose_input")
+
+        glucose_effect_dates = linear_momentum_effect(
+            i_date_list[0:1], i_glucose_list[0:1], display_list[0:1],
+            providence_list[0:1])[0]
+
+        self.assertEqual(0, len(glucose_effect_dates))
+
+    def test_momentum_effect_for_display_only_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_display_only_glucose"
+                                    + "_input")
+
+        glucose_effect_dates = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)[0]
+
+        self.assertEqual(0, len(glucose_effect_dates))
+
+    def test_momentum_effect_for_mixed_provenance_glucose(self):
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_mixed_provenance_glucose"
+                                    + "_input")
+
+        glucose_effect_dates = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)[0]
+
+        self.assertEqual(0, len(glucose_effect_dates))
 
 
 if __name__ == '__main__':

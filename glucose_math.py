@@ -43,13 +43,13 @@ def linear_regression(tuples_list):
 
     slope = (((count * sum_xy) - (sum_x * sum_y)) /
              ((count * sum_x_squared) - (sum_x * sum_x)))
-    intercept = ((sum_y * sum_x_squared - (sum_x * sum_xy)) /
-                 (count * sum_x_squared - (sum_x * sum_x)))
 
-    return (slope, intercept)
+    # I didn't include the intercept because it was unused
+
+    return slope
 
 
-def is_calibrated(obj_list):
+def is_calibrated(display_list):
     """ Checks if no calibration entries are present
     Runtime: O(n)
 

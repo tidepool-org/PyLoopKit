@@ -8,6 +8,8 @@ Created on Fri Jun 14 10:40:48 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
             57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/LoopMath.swift
 """
+# pylint: disable=R0913, R0914
+# disable pylint errors for too many arguments/variables
 from datetime import timedelta
 from date import date_floored_to_time_interval, date_ceiled_to_time_interval
 
@@ -41,8 +43,8 @@ def simulation_date_range_for_samples(start_times, end_times, duration, delta,
         try:
             if end_times[i] > max_date:
                 max_date = end_times[i]
-        # if the object passed has no end_date property, don't error
-        except AttributeError:
+        # if end_times is an empty list, don't error
+        except IndexError:
             continue
     return (date_floored_to_time_interval(start or min_date, delta),
             date_ceiled_to_time_interval(end or max_date +

@@ -8,6 +8,8 @@ Created on Fri Jun 14 09:53:33 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/GlucoseKit/GlucoseMath.swift
 """
+# pylint: disable=C0103, R0913, R0914
+# disable pylint errors for too many arguments/variables
 import math
 from datetime import timedelta
 from date import time_interval_since
@@ -32,7 +34,7 @@ def linear_regression(x_list, y_list):
     sum_y_squared = 0.0
     count = len(x_list)
 
-    for i in range(0, x_list):
+    for i in range(0, len(x_list)):
         x = x_list[i]
         y = y_list[i]
         sum_x += x
@@ -119,7 +121,7 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
     delta -- the time differential for the returned values
 
     Output:
-    an array of glucose effects
+    tuple with format (date_of_glucose_effect, value_of_glucose_effect)
     """
     assert len(date_list) == len(glucose_value_list) == len(display_list)\
         == len(provenance_list), "expected input shape to match"
@@ -144,14 +146,16 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
         return []
 
     date = start_date
-    glucose_effect_date = []
-    glucose_effect_value = []
+    glucose_effect_dates = []
+    glucose_effect_values = []
 
     while date <= end_date:
         value = (max(0, time_interval_since(date, last_time))
                  * slope)
-        glucose_effect_date.append(date)
-        glucose_effect_value.append(value)
+        glucose_effect_dates.append(date)
+        glucose_effect_values.append(value)
         date += timedelta(minutes=delta)
 
-    return (glucose_effect_date, glucose_effect_value)
+    assert len(glucose_effect_dates) == len(glucose_effect_values),\
+        "expected output shape to match"
+    return (glucose_effect_dates, glucose_effect_values)

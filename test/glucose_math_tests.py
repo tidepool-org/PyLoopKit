@@ -8,12 +8,12 @@ Created on Tue Jun 11 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/GlucoseMathTests.swift
 """
+# pylint: disable=C0111, C0411, R0201, W0105
+# diable pylint warnings for too many arguments/variables and missing docstring
 import unittest
 import path_grabber  # pylint: disable=unused-import
 from datetime import datetime
 from loop_kit_tests import load_fixture
-from glucose_effect import GlucoseEffect
-from glucose_effect_velocity import GlucoseEffectVelocity
 from glucose_math import linear_momentum_effect
 
 
@@ -54,18 +54,28 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         Keyword arguments:
         resource_name -- name of file without the extension
 
+        Variable names:
+        fixture -- list of dictionaries; each dictionary contains properties
+        of a GlucoseFixtureValue
+
         Output:
-        list of GlucoseFixtureValue
+        4 lists in (date, glucose_value,
+        display_only (for calibration purposes), providence_identifier) format
         """
         fixture = load_fixture(resource_name, ".json")
 
-        def glucose_fixture_maker(dict_):
-            return GlucoseFixtureValue(
-                datetime.fromisoformat(dict_.get("date")),
-                dict_.get("amount"),
-                dict_.get("display_only") or False,
-                dict_.get("provenance_identifier"))
-        return list(map(glucose_fixture_maker, fixture))
+        dates = [datetime.fromisoformat(dict_.get("date"))
+                 for dict_ in fixture]
+        glucose_values = [dict_.get("amount") for dict_ in fixture]
+        display_onlys = [dict_.get("display_only") or False
+                         for dict_ in fixture]
+        providences = [dict_.get("provenance_identifier") or
+                       "com.loopkit.LoopKitTests" for dict_ in fixture]
+
+        assert len(dates) == len(glucose_values) == len(display_onlys) ==\
+            len(providences), "expected output shape to match"
+
+        return (dates, glucose_values, display_onlys, providences)
 
     def load_output_fixture(self, resource_name):
         """ Load output json file
@@ -74,16 +84,18 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         resource_name -- name of file without the extension
 
         Output:
-        list of GlucoseEffect
+        2 lists in (date, glucose_value) format
         """
         fixture = load_fixture(resource_name, ".json")
 
-        def glucose_effect_maker(dict_):
-            return GlucoseEffect(
-                datetime.fromisoformat(dict_.get("date")),
-                dict_.get("amount"))
+        dates = [datetime.fromisoformat(dict_.get("date"))
+                 for dict_ in fixture]
+        glucose_values = [dict_.get("amount") for dict_ in fixture]
 
-        return list(map(glucose_effect_maker, fixture))
+        assert len(dates) == len(glucose_values),\
+            "expected output shape to match"
+
+        return (dates, glucose_values)
 
     def load_effect_velocity_fixture(self, resource_name):
         """ Load effect-velocity json file
@@ -92,60 +104,69 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         resource_name -- name of file without the extension
 
         Output:
-        list of GlucoseEffectVelocity
+        3 lists in (start_date, end_date, glucose_effects) format
         """
         fixture = load_fixture(resource_name, ".json")
 
-        def glucose_effect_velocity_maker(dict_):
-            return GlucoseEffectVelocity(
-                datetime.fromisoformat(dict_.get("start_date")),
-                datetime.fromisoformat(dict_.get("end_date")),
-                dict_.get("value"))
+        start_dates = [datetime.fromisoformat(dict_.get("start_date"))
+                       for dict_ in fixture]
+        end_dates = [datetime.fromisoformat(dict_.get("end_date"))
+                     for dict_ in fixture]
+        glucose_effects = [dict_.get("value") for dict_ in fixture]
 
-        return list(map(glucose_effect_velocity_maker, fixture))
+        assert len(start_dates) == len(end_dates) == len(glucose_effects),\
+            "expected output shape to match"
+
+        return (start_dates, end_dates, glucose_effects)
 
     """ Tests for linear_momentum_effect """
     def test_momentum_effect_for_bouncing_glucose(self):
-        input_ = self.load_input_fixture("momentum_effect_bouncing_glucose" +
-                                         "_input")
-        output = self.load_output_fixture("momentum_effect_bouncing_glucose" +
-                                          "_output")
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_bouncing_glucose" +
+                                    "_input")
+        (out_date_list, out_glucose_list) = self.load_output_fixture(
+            "momentum_effect_bouncing_glucose_output")
 
-        effects = linear_momentum_effect(input_)
+        (glucose_effect_dates, glucose_effect_values) = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)
 
-        self.assertEqual(len(output), len(effects))
-        for(expected, calculated) in zip(output, effects):
-            self.assertEqual(expected.start_date, calculated.start_date)
-            self.assertAlmostEqual(expected.quantity,
-                                   calculated.quantity, 2)
+        self.assertEqual(len(out_date_list), len(glucose_effect_dates))
+        for i in range(0, len(out_date_list)):
+            self.assertEqual(out_date_list[i], glucose_effect_dates[i])
+            self.assertAlmostEqual(glucose_effect_values[i],
+                                   out_glucose_list[i], 2)
 
     def test_momentum_effect_for_rising_glucose(self):
-        input_ = self.load_input_fixture("momentum_effect_rising_glucose" +
-                                         "_input")
-        output = self.load_output_fixture("momentum_effect_rising_glucose" +
-                                          "_output")
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_rising_glucose" +
+                                    "_input")
+        (out_date_list, out_glucose_list) = self.load_output_fixture(
+            "momentum_effect_rising_glucose_output")
 
-        effects = linear_momentum_effect(input_)
+        (glucose_effect_dates, glucose_effect_values) = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)
 
-        self.assertEqual(len(output), len(effects))
-        for(expected, calculated) in zip(output, effects):
-            self.assertEqual(expected.start_date, calculated.start_date)
-            self.assertAlmostEqual(expected.quantity,
-                                   calculated.quantity, 2)
+        self.assertEqual(len(out_date_list), len(glucose_effect_dates))
+        for i in range(0, len(out_date_list)):
+            self.assertEqual(out_date_list[i], glucose_effect_dates[i])
+            self.assertAlmostEqual(glucose_effect_values[i],
+                                   out_glucose_list[i], 2)
 
     def test_momentum_effect_for_rising_glucose_doubles(self):
-        input_ = self.load_input_fixture("momentum_effect_rising_glucose" +
-                                         "_double_entries_input")
-        output = self.load_output_fixture("momentum_effect_rising_glucose" +
-                                          "_output")
+        (i_date_list, i_glucose_list, display_list, providence_list) =\
+            self.load_input_fixture("momentum_effect_rising_glucose" +
+                                    "_double_entries_input")
+        (out_date_list, out_glucose_list) = self.load_output_fixture(
+            "momentum_effect_rising_glucose_output")
 
-        effects = linear_momentum_effect(input_)
+        (glucose_effect_dates, glucose_effect_values) = linear_momentum_effect(
+            i_date_list, i_glucose_list, display_list, providence_list)
 
-        self.assertEqual(len(output), len(effects))
-        for(expected, calculated) in zip(output, effects):
-            self.assertEqual(expected.start_date, calculated.start_date)
-            self.assertAlmostEqual(expected.quantity,
-                                   calculated.quantity, 2)
+        self.assertEqual(len(out_date_list), len(glucose_effect_dates))
+        for i in range(0, len(out_date_list)):
+            self.assertEqual(out_date_list[i], glucose_effect_dates[i])
+            self.assertAlmostEqual(glucose_effect_values[i],
+                                   out_glucose_list[i], 2)
 
 
 if __name__ == '__main__':

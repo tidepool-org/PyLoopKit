@@ -12,15 +12,11 @@ import path_grabber  # pylint: disable=unused-import
 from date import (date_floored_to_time_interval, date_ceiled_to_time_interval,
                   time_interval_since_reference_date, time_interval_since)
 
-
-"""
-  Checks if two times are equal
-- input: two datetime objects
-- output: string stating that test is passed or failed
-"""
+REF_DATE = datetime(2001, 1, 1, 0, 0, 0)
 
 
 class TestDateFunctions(unittest.TestCase):
+
     """
       Tests for date_ceiled_to_time_interval
     """
@@ -42,10 +38,11 @@ class TestDateFunctions(unittest.TestCase):
         self.assertEqual(five_50, date_ceiled_to_time_interval(five_47, 5))
 
         twenty_three_59 = calendar.replace(
-            hour=23, minute=59, second=0, microsecond=0)
+            hour=23, minute=59, second=0, microsecond=0
+        )
         tomorrow_midnight = (calendar.replace(
-            hour=23, minute=59, second=0, microsecond=0) +
-                             timedelta(minutes=1))
+            hour=23, minute=59, second=0, microsecond=0
+        ) + timedelta(minutes=1))
         self.assertEqual(tomorrow_midnight,
                          date_ceiled_to_time_interval(twenty_three_59, 5))
 
@@ -73,19 +70,18 @@ class TestDateFunctions(unittest.TestCase):
     """
 
     def test_time_interval_since_reference_date(self):
-        ref_date = datetime(2001, 1, 1, 0, 0, 0)
-        self.assertEqual(0, time_interval_since_reference_date(ref_date))
+        self.assertEqual(0, time_interval_since_reference_date(REF_DATE))
 
         self.assertEqual(371, time_interval_since_reference_date(
-            ref_date + timedelta(seconds=371)))
+            REF_DATE + timedelta(seconds=371)))
         self.assertEqual(12345, time_interval_since_reference_date(
-            ref_date + timedelta(seconds=12345)))
+            REF_DATE + timedelta(seconds=12345)))
         self.assertEqual(200, time_interval_since_reference_date(
-            ref_date + timedelta(seconds=-200)))
+            REF_DATE + timedelta(seconds=-200)))
         self.assertEqual(86400, time_interval_since_reference_date(
-            ref_date + timedelta(seconds=-86400)))
+            REF_DATE + timedelta(seconds=-86400)))
         self.assertEqual(86400, time_interval_since_reference_date(
-            ref_date + timedelta(seconds=86400)))
+            REF_DATE + timedelta(seconds=86400)))
 
     def test_time_interval_since(self):
         date = datetime.now()
@@ -106,6 +102,7 @@ class TestDateFunctions(unittest.TestCase):
         self.assertEqual(-86400,
                          time_interval_since(date, date +
                                              timedelta(seconds=86400)))
+
 
 if __name__ == '__main__':
     unittest.main()

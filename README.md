@@ -5,6 +5,14 @@ URL of Loop repo version used for algorithm: https://github.com/tidepool-org/Loo
 
 URL of LoopKit repo version used for algorithm: https://github.com/tidepool-org/LoopKit/tree/57a9f2ba65ae3765ef7baafe66b883e654e08391
 
+## To recreate the Virtual Environment
+1. This environment was developed with Anaconda. You'll need to install [Miniconda](https://conda.io/miniconda.html) or [Anaconda](https://anaconda-installer.readthedocs.io/en/latest/) for your platform.
+2. In a terminal, navigate to the directory where the environment.yml 
+is located (likely the PyLoopKit folder).
+3. Run `conda env create`; this will download all of the package dependencies
+and install them in a virtual environment named py-loop. PLEASE NOTE: this
+may take close to 30 minutes to complete.
+
 ## To use the Virtual Environment
 In Bash run `source activate py-loop`, or in the Anaconda Prompt
 run `conda activate py-loop` to start the environment.

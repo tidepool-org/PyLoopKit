@@ -10,5 +10,4 @@ dependencies:
   - spyder=3.3.4=py37_0
   - pip:
     - tensorflow==2.0.0-beta1
-prefix: /anaconda3/envs/py_loop
 

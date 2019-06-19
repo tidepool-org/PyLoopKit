@@ -162,3 +162,93 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
     assert len(glucose_effect_dates) == len(glucose_effect_values),\
         "expected output shape to match"
     return (glucose_effect_dates, glucose_effect_values)
+
+
+def counteraction_effects(dates, glucose_values, displays, provenances,
+                          effect_dates, effect_values):
+    """ Calculates a timeline of effect velocity (glucose/time) observed
+        in glucose readings that counteract the specified effects.
+
+    Keyword arguments:
+    dates -- list of datetime objects
+    glucose_values -- list of glucose values (unit: mg/dL)
+    displays -- list of display_only booleans
+    provenances -- list of provenances (Strings)
+    effect_dates -- list of datetime objects associated with a glucose effect
+    effect_values -- list of values (in mg/dL/min) associated with
+    a glucose effect
+
+    Output:
+    An array of velocities describing the change in glucose samples
+    compared to the specified effects
+    """
+    assert len(dates) == len(glucose_values) == len(displays)\
+        == len(provenances), "expected input shape to match"
+    assert len(effect_dates) == len(effect_values),\
+        "expected input shape to match"
+
+    if not dates or not effect_dates:
+        return ([], [], [])
+
+    effect_index = 0
+    start_glucose = glucose_values[0]
+    start_date = dates[0]
+    start_prov = provenances[0]
+    start_display = displays[0]
+
+    start_dates = []
+    end_dates = []
+    velocities = []
+
+    for i in range(1, len(dates)):
+        # Find a valid change in glucose, requiring identical
+        # provenance and no calibration
+        glucose_change = glucose_values[i] - start_glucose
+        time_interval = time_interval_since(dates[i], start_date)/60
+
+        if time_interval <= 4:
+            continue
+        if (not start_prov == provenances[i] or start_display or displays[i]):
+            start_glucose = glucose_values[i]
+            start_date = dates[i]
+            start_prov = provenances[i]
+            start_display = displays[i]
+            continue
+
+        start_effect_date = None
+        start_effect_value = None
+        end_effect_date = None
+        end_effect_value = None
+
+        for j in range(effect_index, len(effect_dates)):
+            # if one of the start_effect properties doesn't exist and
+            # the glucose effect at position "j" will happen after the
+            # starting glucose date, then make start_effect equal to that
+            # effect
+            if (not start_effect_date and effect_dates[j] >= start_date):
+                start_effect_date = effect_dates[j]
+                start_effect_value = effect_values[j]
+            elif (not end_effect_date and effect_dates[j] >= dates[i]):
+                end_effect_date = effect_dates[j]
+                end_effect_value = effect_values[j]
+                break
+
+            effect_index += 1
+
+        effect_change = end_effect_value - start_effect_value
+        discrepancy = glucose_change - effect_change
+
+        average_velocity = discrepancy / time_interval
+
+        start_dates.append(start_date)
+        end_dates.append(dates[i])
+        velocities.append(average_velocity)
+
+        start_glucose = glucose_values[i]
+        start_date = dates[i]
+        start_prov = provenances[i]
+        start_display = displays[i]
+
+    assert len(start_dates) == len(end_dates) == len(velocities),\
+        "expected output shape to match"
+    return (start_dates, end_dates, velocities)

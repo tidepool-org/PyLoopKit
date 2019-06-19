@@ -14,7 +14,7 @@ import unittest
 import path_grabber  # pylint: disable=unused-import
 from datetime import datetime
 from loop_kit_tests import load_fixture
-from glucose_math import linear_momentum_effect
+from glucose_math import linear_momentum_effect, counteraction_effects
 
 
 class GlucoseFixtureValue:
@@ -111,9 +111,9 @@ class TestGlucoseKitFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        start_dates = [datetime.fromisoformat(dict_.get("start_date"))
+        start_dates = [datetime.fromisoformat(dict_.get("startDate"))
                        for dict_ in fixture]
-        end_dates = [datetime.fromisoformat(dict_.get("end_date"))
+        end_dates = [datetime.fromisoformat(dict_.get("endDate"))
                      for dict_ in fixture]
         glucose_effects = [dict_.get("value") for dict_ in fixture]
 
@@ -273,6 +273,85 @@ class TestGlucoseKitFunctions(unittest.TestCase):
             i_date_list, i_glucose_list, display_list, providence_list)[0]
 
         self.assertEqual(0, len(glucose_effect_dates))
+
+    """ tests for counteraction_effects """
+    def test_counteraction_effects_for_falling_glucose(self):
+        (i_dates, i_glucoses, displays, provenances) =\
+            self.load_input_fixture("counteraction_effect_falling_glucose"
+                                    + "_input")
+
+        (effect_dates, effect_glucoses) = self.load_output_fixture(
+            "momentum_effect_stable_glucose_output")
+
+        (o_start_dates, o_end_dates, o_velocities) =\
+            self.load_effect_velocity_fixture("counteraction_effect_falling"
+                                              + "_glucose_output")
+
+        (f_start_dates, f_end_dates, f_velocities) =\
+            counteraction_effects(i_dates, i_glucoses, displays, provenances,
+                                  effect_dates, effect_glucoses)
+
+        self.assertEqual(len(o_start_dates), len(f_start_dates))
+        for i in range(0, len(o_start_dates)):
+            self.assertEqual(o_start_dates[i], f_start_dates[i])
+            self.assertAlmostEqual(o_velocities[i], f_velocities[i], 2)
+
+    def test_counteraction_effects_for_falling_glucose_duplicates(self):
+        (i_dates, i_glucoses, displays, provenances) =\
+            self.load_input_fixture("counteraction_effect_falling_glucose"
+                                    + "_double_entries_input")
+
+        (effect_dates, effect_glucoses) = self.load_output_fixture(
+            "counteraction_effect_falling_glucose_insulin")
+
+        (o_start_dates, o_end_dates, o_velocities) =\
+            self.load_effect_velocity_fixture("counteraction_effect_falling"
+                                              + "_glucose_output")
+
+        (f_start_dates, f_end_dates, f_velocities) =\
+            counteraction_effects(i_dates, i_glucoses, displays, provenances,
+                                  effect_dates, effect_glucoses)
+
+        self.assertEqual(len(o_start_dates), len(f_start_dates))
+        for i in range(0, len(o_start_dates)):
+            self.assertEqual(o_start_dates[i], f_start_dates[i])
+            self.assertAlmostEqual(o_velocities[i], f_velocities[i], 2)
+
+    def test_counteraction_effects_for_falling_glucose_almost_duplicates(self):
+        (i_dates, i_glucoses, displays, provenances) =\
+            self.load_input_fixture("counteraction_effect_falling_glucose"
+                                    + "_almost_duplicates_input")
+
+        (effect_dates, effect_glucoses) = self.load_output_fixture(
+            "counteraction_effect_falling_glucose_insulin")
+
+        (o_start_dates, o_end_dates, o_velocities) =\
+            self.load_effect_velocity_fixture("counteraction_effect_falling"
+                + "_glucose_almost_duplicates_output")
+
+        (f_start_dates, f_end_dates, f_velocities) =\
+            counteraction_effects(i_dates, i_glucoses, displays, provenances,
+                                  effect_dates, effect_glucoses)
+
+        self.assertEqual(len(o_start_dates), len(f_start_dates))
+        for i in range(0, len(o_start_dates)):
+            self.assertEqual(o_start_dates[i], f_start_dates[i])
+            self.assertAlmostEqual(o_velocities[i], f_velocities[i], 2)
+
+    def test_counteraction_effects_for_no_glucose(self):
+        i_dates = []
+        i_glucoses = []
+        displays = []
+        provenances = []
+
+        (effect_dates, effect_glucoses) = self.load_output_fixture(
+            "counteraction_effect_falling_glucose_insulin")
+
+        (f_start_dates, f_end_dates, f_velocities) =\
+            counteraction_effects(i_dates, i_glucoses, displays, provenances,
+                                  effect_dates, effect_glucoses)
+
+        self.assertEqual(0, len(f_start_dates))
 
 
 if __name__ == '__main__':

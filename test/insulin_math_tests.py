@@ -167,6 +167,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_end_dates[i], end_dates[i])
             self.assertAlmostEqual(out_values[i], values[i], 2)
 
+    """ Tests for is_continuous """
     def test_continuous_reservoir_values(self):
         (i_dates, i_volumes) = self.load_reservoir_fixture(
             "reservoir_history_with_rewind_and_prime_input")
@@ -208,6 +209,17 @@ class TestInsulinKitFunctions(unittest.TestCase):
         self.assertTrue(is_continuous(
             i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
             datetime.fromisoformat("2016-01-30T19:40:00"), self.WITHIN))
+
+    def test_non_continuous_reservoir_values(self):
+        (i_dates, i_volumes) = self.load_reservoir_fixture(
+            "reservoir_history_with_continuity_holes")
+
+        self.assertTrue(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T18:30:00"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+        self.assertFalse(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T17:30:00"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
 
 
 if __name__ == '__main__':

@@ -110,27 +110,22 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
         if reservoir_dates[i] < start_date or reservoir_dates[i] > end:
             last_date_value = reservoir_dates[i]
             last_volume_value = unit_volumes[i]
-            print("line 112")
             continue
         # We can't trust 0. What else was delivered?
         if unit_volumes[i] <= 0:
-            print("line 116")
             return False
         # Rises in reservoir volume indicate a rewind + prime, and primes
         # can be easily confused with boluses.
         # Small rises (1 U) can be ignored as they're indicative of a
         # mixed-precision sequence.
         if unit_volumes[i] > last_volume_value + 1:
-            print("line 123")
             return False
         # Ensure no more than the maximum interval has passed
         if (time_interval_since(reservoir_dates[i], last_date_value)/60
                 > maximum_duration):
-            print("line 128")
             return False
 
         last_date_value = reservoir_dates[i]
         last_volume_value = unit_volumes[i]
 
-    print("\n")
     return True

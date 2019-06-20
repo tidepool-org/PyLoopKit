@@ -104,7 +104,6 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     last_volume_value = first_volume_value
 
     for i in range(0, len(unit_volumes)):
-        # ! no end_date property...
         # Volume and interval validation only applies for values in
         # the specified range
         if reservoir_dates[i] < start_date or reservoir_dates[i] > end:

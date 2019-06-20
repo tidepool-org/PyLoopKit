@@ -8,12 +8,14 @@ Created on Thu Jun 20 09:00:27 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/InsulinMathTests.swift
 """
-# pylint: disable= R0201
-# diable pylint warnings for "method could be function"
+# pylint: disable= R0201, C0111, W0105, W0612
+# diable pylint warnings for "method could be function", String statement
+# has no effect, unused variable (for tuple unpacking)
 import unittest
 from datetime import datetime
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
+from insulin_math import dose_entries
 
 
 class TestInsulinKitFunctions(unittest.TestCase):
@@ -141,3 +143,28 @@ class TestInsulinKitFunctions(unittest.TestCase):
             "expected output shape to match"
 
         return (start_times, rates, minutes)
+
+    """ Tests for dose_entries """
+    def test_dose_entries_from_reservoir_values(self):
+        (i_dates, i_volumes) = self.load_reservoir_fixture(
+            "reservoir_history_with_rewind_and_prime_input")
+        (out_dose_types, out_start_dates, out_end_dates, out_values,
+         out_scheduled_basal_rates) = self.load_dose_fixture(
+             "reservoir_history_with_rewind_and_prime_output")
+
+        out_start_dates.reverse()
+        out_end_dates.reverse()
+        out_values.reverse()
+
+        (dose_types, start_dates, end_dates, values) = dose_entries(
+            i_dates, i_volumes)
+
+        self.assertEqual(len(out_start_dates), len(start_dates))
+        for i in range(0, len(out_start_dates)):
+            self.assertEqual(out_start_dates[i], start_dates[i])
+            self.assertEqual(out_end_dates[i], end_dates[i])
+            self.assertAlmostEqual(out_values[i], values[i], 2)
+
+
+if __name__ == '__main__':
+    unittest.main()

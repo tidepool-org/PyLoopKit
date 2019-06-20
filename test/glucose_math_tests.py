@@ -8,41 +8,13 @@ Created on Tue Jun 11 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/GlucoseMathTests.swift
 """
-# pylint: disable=C0111, C0411, R0201, W0105
+# pylint: disable=C0111, C0411, R0201, W0105, W0612
 # diable pylint warnings for too many arguments/variables and missing docstring
 import unittest
-import path_grabber  # pylint: disable=unused-import
 from datetime import datetime
+import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
 from glucose_math import linear_momentum_effect, counteraction_effects
-
-
-class GlucoseFixtureValue:
-    """ Constructs a glucose value for the purposes of running tests.
-
-    Attributes:
-    start_date -- date and time of glucose value
-    quantity -- glucose value (mg/dL)
-    is_display_only -- whether to do computations with
-    provenance_identifier -- where value came from; defaults to
-                                 com.loopkit.LoopKitTests
-    """
-    def __init__(self, start_date, quantity, is_display_only,
-                 provenance_identifier):
-        self.start_date = start_date
-        self.quantity = quantity
-        self.is_display_only = is_display_only
-        self.provenance_identifier = (provenance_identifier
-                                      or "com.loopkit.LoopKitTests")
-
-    def __lt__(self, other):
-        return self.start_date < other.start_date
-
-    def __eq__(self, other):
-        return (self.start_date == other.start_date and
-                self.quantity == other.quantity and
-                self.is_display_only == other.is_display_only and
-                self.provenance_identifier == other.provenance_identifier)
 
 
 class TestGlucoseKitFunctions(unittest.TestCase):
@@ -327,7 +299,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
 
         (o_start_dates, o_end_dates, o_velocities) =\
             self.load_effect_velocity_fixture("counteraction_effect_falling"
-                + "_glucose_almost_duplicates_output")
+                                              + "_glucose_almost_duplicates"
+                                              + "_output")
 
         (f_start_dates, f_end_dates, f_velocities) =\
             counteraction_effects(i_dates, i_glucoses, displays, provenances,

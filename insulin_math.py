@@ -14,9 +14,11 @@ MAXIMUM_RESERVOIR_DROP_PER_MINUTE = 6.5
 
 
 def dose_entries(reservoir_dates, unit_volumes):
-    """ Converts reservoir data to dose entries
+    """ Converts a continuous, chronological sequence of reservoir values
+        to a sequence of doses
+    Runtime: O(n)
 
-    Keyword arguments:
+    Arguments:
     reservoir_dates -- list of datetime objects
     unit_volumes -- list of reservoir volumes (in units of insulin)
 
@@ -55,3 +57,80 @@ def dose_entries(reservoir_dates, unit_volumes):
         len(insulin_values), "expected output shape to match"
 
     return (dose_types, start_dates, end_dates, insulin_values)
+
+
+def is_continuous(reservoir_dates, unit_volumes, start, end,
+                  maximum_duration):
+    """ Whether a span of chronological reservoir values is considered
+        continuous and therefore reliable.
+
+    Reservoir values of 0 are automatically considered unreliable due to
+    the assumption that an unknown amount of insulin can be delivered after
+    the 0 marker.
+
+    Arguments:
+    reservoir_dates -- list of datetime objects that correspond by index to
+                        unit_volumes
+    unit_volumes -- volume of reservoir in units, corresponds by index to
+                    reservoir_dates
+    start -- datetime object that is start of the interval which to validate
+             continuity
+    end -- datetime object that is end of the interval which to validate
+             continuity
+    maximum_duration -- the maximum interval to consider reliable for a
+                        reservoir-derived dose
+
+    Variable names:
+    start_date -- the beginning of the interval in which to validate
+                   continuity
+    end_date -- the end of the interval in which to validate continuity
+
+    Outputs:
+    Whether the reservoir values meet the critera for continuity
+    """
+    try:
+        first_date_value = reservoir_dates[0]
+        first_volume_value = unit_volumes[0]
+    except IndexError:
+        return False
+
+    start_date = start
+    # The first value has to be at least as old as the start date
+    # as a reference point.
+    if first_date_value > start_date:
+        return False
+
+    last_date_value = first_date_value
+    last_volume_value = first_volume_value
+
+    for i in range(0, len(unit_volumes)):
+        # ! no end_date property...
+        # Volume and interval validation only applies for values in
+        # the specified range
+        if reservoir_dates[i] < start_date or reservoir_dates[i] > end:
+            last_date_value = reservoir_dates[i]
+            last_volume_value = unit_volumes[i]
+            print("line 112")
+            continue
+        # We can't trust 0. What else was delivered?
+        if unit_volumes[i] <= 0:
+            print("line 116")
+            return False
+        # Rises in reservoir volume indicate a rewind + prime, and primes
+        # can be easily confused with boluses.
+        # Small rises (1 U) can be ignored as they're indicative of a
+        # mixed-precision sequence.
+        if unit_volumes[i] > last_volume_value + 1:
+            print("line 123")
+            return False
+        # Ensure no more than the maximum interval has passed
+        if (time_interval_since(reservoir_dates[i], last_date_value)/60
+                > maximum_duration):
+            print("line 128")
+            return False
+
+        last_date_value = reservoir_dates[i]
+        last_volume_value = unit_volumes[i]
+
+    print("\n")
+    return True

@@ -15,15 +15,17 @@ import unittest
 from datetime import datetime
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from insulin_math import dose_entries
+from insulin_math import dose_entries, is_continuous
 
 
 class TestInsulinKitFunctions(unittest.TestCase):
     """ unittest class to run InsulinKit tests."""
+    WITHIN = 30
+
     def load_reservoir_fixture(self, resource_name):
         """ Load reservior data from json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Variable names:
@@ -47,7 +49,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
     def load_dose_fixture(self, resource_name):
         """ Load dose from json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Output:
@@ -85,7 +87,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
     def load_insulin_value_fixture(self, resource_name):
         """ Load insulin values from json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Output:
@@ -105,7 +107,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
     def load_glucose_effect_fixture(self, resource_name):
         """ Load glucose effects from json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Output:
@@ -125,7 +127,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
     def load_basal_rate_schedule_fixture(self, resource_name):
         """ Load basal schedule from json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Output:
@@ -164,6 +166,48 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_start_dates[i], start_dates[i])
             self.assertEqual(out_end_dates[i], end_dates[i])
             self.assertAlmostEqual(out_values[i], values[i], 2)
+
+    def test_continuous_reservoir_values(self):
+        (i_dates, i_volumes) = self.load_reservoir_fixture(
+            "reservoir_history_with_rewind_and_prime_input")
+        self.assertTrue(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+        # We don't assert whether it's "stale".
+        self.assertTrue(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
+            datetime.fromisoformat("2016-01-30T22:40:00"), self.WITHIN))
+        self.assertTrue(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
+            datetime.now(), self.WITHIN))
+
+        # The values must extend the startDate boundary
+        self.assertFalse(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T15:00:00"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+        # (the boundary condition is GTE)
+        self.assertTrue(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:00:42"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+        # Rises in reservoir volume taint the entire range
+        self.assertFalse(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T15:55:00"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+        # Any values of 0 taint the entire range
+        i_dates.append(datetime.fromisoformat("2016-01-30T20:37:00"))
+        i_volumes.append(0)
+        self.assertFalse(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
+            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+        # As long as the 0 is within the date interval bounds
+        self.assertTrue(is_continuous(
+            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
+            datetime.fromisoformat("2016-01-30T19:40:00"), self.WITHIN))
 
 
 if __name__ == '__main__':

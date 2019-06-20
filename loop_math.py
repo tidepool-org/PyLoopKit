@@ -18,7 +18,7 @@ def simulation_date_range_for_samples(start_times, end_times, duration, delta,
                                       start=None, end=None, delay=0):
     """ Create date range based on samples and user-specified parameters
 
-    Keyword arguments:
+    Arguments:
     start_times -- list of datetime object(s) at start
     end_times -- list of datetime object(s) at end
     duration -- length of interval

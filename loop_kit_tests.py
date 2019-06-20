@@ -15,7 +15,7 @@ import os
 def load_fixture(resource_name, extension):
     """ Load file given name and extension
 
-    Keyword arguments:
+    Arguments:
     resource_name -- name of file without the extension
     extension -- ending of file (ex: ".json")
 
@@ -30,7 +30,7 @@ def load_fixture(resource_name, extension):
 def find_full_path(resource_name, extension):
     """ Find file path, given name and extension
 
-    Keyword arguments:
+    Arguments:
     resource_name -- name of file without the extension
     extension -- ending of file (ex: ".json")
 

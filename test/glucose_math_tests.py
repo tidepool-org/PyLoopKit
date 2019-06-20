@@ -23,7 +23,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
     def load_input_fixture(self, resource_name):
         """ Load input json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Variable names:
@@ -55,7 +55,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
     def load_output_fixture(self, resource_name):
         """ Load output json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Output:
@@ -75,7 +75,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
     def load_effect_velocity_fixture(self, resource_name):
         """ Load effect-velocity json file
 
-        Keyword arguments:
+        Arguments:
         resource_name -- name of file without the extension
 
         Output:

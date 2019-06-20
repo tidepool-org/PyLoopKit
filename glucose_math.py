@@ -20,7 +20,7 @@ def linear_regression(x_list, y_list):
     """ Calculates slope and intercept using linear regression
     This implementation is not suited for large datasets
 
-    Keyword arguments:
+    Arguments:
     tuples_list -- An array of tuples containing x and y values
 
     Output:
@@ -58,7 +58,7 @@ def is_calibrated(display_list):
     """ Checks if no calibration entries are present
     Runtime: O(n)
 
-    Keyword arguments:
+    Arguments:
     obj_list -- list of Glucose-related objects with is_display_only
                 property
 
@@ -71,7 +71,7 @@ def is_calibrated(display_list):
 def is_continuous(date_list, interval=5):
     """ Checks whether the collection can be considered continuous
 
-    Keyword arguments:
+    Arguments:
     date_list -- list of datetime objects
 
     Output:
@@ -90,7 +90,7 @@ def has_single_provenance(prov_list):
     """ Checks whether the collection is all from the same source
     Runtime: O(n)
 
-    Keyword arguments:
+    Arguments:
     obj_list -- list of Glucose-related objects with
                 provenance_identifier property
 
@@ -115,7 +115,7 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
     """ Calculates the short-term predicted momentum effect using
         linear regression
 
-    Keyword arguments:
+    Arguments:
     date_list -- list of datetime objects
     glucose_value_list -- list of glucose values (unit: mg/dL)
     display_list -- list of display_only booleans
@@ -169,7 +169,7 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
     """ Calculates a timeline of effect velocity (glucose/time) observed
         in glucose readings that counteract the specified effects.
 
-    Keyword arguments:
+    Arguments:
     dates -- list of datetime objects
     glucose_values -- list of glucose values (unit: mg/dL)
     displays -- list of display_only booleans

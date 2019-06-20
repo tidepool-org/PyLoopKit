@@ -17,7 +17,7 @@ REF_TIME = datetime.datetime.fromisoformat("2001-01-01T00:00:00")
 def time_interval_since_reference_date(actual_time):
     """ Calculates seconds since since January, 1st, 2001 @ 12:00 AM
 
-    Keyword arguments:
+    Arguments:
     actual_time -- datetime object to compare to Jan 1st, 2001 @ 12:00 AM
 
     Output:
@@ -30,7 +30,7 @@ def time_interval_since_reference_date(actual_time):
 def time_interval_since(date_1, date_2):
     """ Calculates seconds between two times
 
-    Keyword arguments:
+    Arguments:
     date_1 -- datetime object #1
     date_2 -- datetime object #2
 
@@ -43,7 +43,7 @@ def time_interval_since(date_1, date_2):
 def date_floored_to_time_interval(time_, interval):
     """ Floors a datetime object to a particular minute interval
 
-    Keyword arguments:
+    Arguments:
     time -- datetime object to be floored
     interval -- interval to floor the time to, measured in minutes
 
@@ -64,8 +64,8 @@ def date_floored_to_time_interval(time_, interval):
 
 def date_ceiled_to_time_interval(time, interval):
     """ Ceils a datetime object to a particular minute interval
-=
-    Keyword arguments:
+
+    Arguments:
     time -- datetime object to be ceiled
     interval -- interval to ceil the time to, measured in minutes
 

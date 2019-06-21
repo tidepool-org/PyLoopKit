@@ -9,6 +9,8 @@ https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/
 ExponentialInsulinModel.swift
 """
+# pylint: disable=C0103
+# disable "doesn't conform to snake_case naming" for S and a
 import math
 
 
@@ -34,4 +36,4 @@ def percent_effect_remaining(time, action_duration, peak_activity_time):
     S = 1 / (1 - a + (1 + a) * math.exp(-action_duration / tau))
 
     return 1 - S * (1 - a) * ((pow(time, 2) / (tau * action_duration * (1 - a))
-                              - time / tau - 1) * math.exp(-time / tau) + 1)
+                               - time / tau - 1) * math.exp(-time / tau) + 1)

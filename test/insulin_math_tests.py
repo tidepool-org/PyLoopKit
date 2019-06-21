@@ -8,14 +8,16 @@ Created on Thu Jun 20 09:00:27 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/InsulinMathTests.swift
 """
-# pylint: disable= R0201, C0111, W0105, W0612
+# pylint: disable= R0201, C0111, W0105, W0612, C0200
 # diable pylint warnings for "method could be function", String statement
-# has no effect, unused variable (for tuple unpacking)
+# has no effect, unused variable (for tuple unpacking), enumerate instead
+# of range
 import unittest
 from datetime import datetime
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from insulin_math import dose_entries, is_continuous
+from insulin_math import dose_entries, is_continuous, insulin_on_board
+from exponential_insulin_model import percent_effect_remaining
 
 
 class TestInsulinKitFunctions(unittest.TestCase):
@@ -220,6 +222,64 @@ class TestInsulinKitFunctions(unittest.TestCase):
         self.assertFalse(is_continuous(
             i_dates, i_volumes, datetime.fromisoformat("2016-01-30T17:30:00"),
             datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+    # did not include testIOBFromSuspend, testIOBFromDoses, and
+    # testIOBFromNoDoses because they use the Walsh insulin model
+
+    """ Tests for percent_effect_remaining """
+    def test_insulin_on_board_limits_for_exponential_model(self):
+        # tests for adult curve (peak = 75 mins)
+        self.assertAlmostEqual(1, percent_effect_remaining(-1, 360, 75), 3)
+        self.assertAlmostEqual(1, percent_effect_remaining(0, 360, 75), 3)
+        self.assertAlmostEqual(0, percent_effect_remaining(360, 360, 75), 3)
+        self.assertAlmostEqual(0, percent_effect_remaining(361, 360, 75), 3)
+
+        # test at random point
+        self.assertAlmostEqual(0.5110493617156,
+                               percent_effect_remaining(108, 361, 75), 3)
+
+        # test for child curve (peak = 65 mins)
+        self.assertAlmostEqual(0.6002510111374046,
+                               percent_effect_remaining(82, 360, 65), 3)
+
+    """ Tests for insulin_on_board """
+    def test_iob_from_doses_exponential(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_doses")
+
+        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
+            "iob_from_doses_exponential_output")
+
+        model = [360, 75]
+
+        (dates, insulin_values) = insulin_on_board(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model)
+
+        self.assertEqual(len(out_dates), len(dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], dates[i])
+            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 2)
+
+    def test_iob_from_bolus_exponential(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("bolus_dose")
+
+        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
+            "iob_from_bolus_exponential_output")
+
+        model = [360, 75]
+
+        (dates, insulin_values) = insulin_on_board(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model)
+
+        self.assertEqual(len(out_dates), len(dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], dates[i])
+            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
 
 
 if __name__ == '__main__':

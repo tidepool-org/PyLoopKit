@@ -237,7 +237,7 @@ def insulin_on_board_calc(type_, start_date, end_date, value,
 
     # Consider doses within the delta time window as momentary
     # This will normally be for boluses
-    if time_interval_since(end_date, start_date) <= 1.05 * delta:
+    if time_interval_since(end_date, start_date)/60 <= 1.05 * delta:
         return net_basal_units(type_, value, start_date, end_date,
                                scheduled_basal_rate) *\
                 percent_effect_remaining((time - delay), model[0], model[1])
@@ -252,7 +252,7 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
                                          model, delay, delta):
     """ Calculates the percent of original insulin that is still on board
          at a specific time for a dose given over a period greater than
-         the delta (this will almost always be a basal)
+         1.05x the delta (this will almost always be a basal)
 
     Arguments:
     start_date -- the date the dose started at (datetime object)
@@ -315,6 +315,13 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
     Tuple in format (times_glucose_effect_was_calculated_at,
                      glucose_effect_values (mg/dL))
     """
+    assert len(dose_types) == len(dose_start_dates) == len(dose_end_dates)\
+        == len(dose_values) == len(scheduled_basal_rates),\
+        "expected input shapes to match"
+
+    if not dose_types:
+        return ([], [])
+
     if len(model) == 1:
         (start, end) = simulation_date_range_for_samples(
             start_times=dose_start_dates, end_times=dose_end_dates,
@@ -421,18 +428,62 @@ def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
         return 0
     # Consider doses within the delta time window as momentary
     # This will normally be for boluses
-    if time_interval_since(dose_end_date, dose_start_date) <= 1.05 * delta:
+    if time_interval_since(dose_end_date, dose_start_date)/60 <= 1.05 * delta:
+
         if len(model) == 1:  # walsh model
             return net_basal_units(dose_type, dose_value, dose_start_date,
                                    dose_end_date, scheduled_basal_rate) *\
                 -insulin_sensitivity * (1 - walsh_percent_effect_remaining(
                     (time - delay), model[0]))
+
         return net_basal_units(dose_type, dose_value, dose_start_date,
                                dose_end_date, scheduled_basal_rate) *\
             -insulin_sensitivity * (1 - percent_effect_remaining(
                 (time - delay), model[0], model[1]))
-    # This will normally be for basals
+
+    # This will normally be for basals, and handles Walsh model automatically
     return net_basal_units(dose_type, dose_value, dose_start_date,
                            dose_end_date, scheduled_basal_rate) *\
-        continuous_delivery_insulin_on_board(dose_start_date, dose_end_date,
-                                             date, model, delay, delta)
+        -insulin_sensitivity * continuous_delivery_glucose_effect(
+            dose_start_date, dose_end_date, date, model, delay, delta)
+
+
+def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
+                                       model, delay, delta):
+    """ Calculates the percent of glucose effect at a specific time for
+        a dose given over a period greater than 1.05x the delta
+        (this will almost always be a basal)
+
+    Arguments:
+    dose_start_date -- the date the dose started at (datetime object)
+    dose_end_date -- the date the dose ended at (datetime object)
+    at_date -- date the IOB is being calculated (datetime object)
+    model -- list of insulin model parameters in format [DIA, peak_time]
+    delay -- the time to delay the dose effect
+    delta -- the differential between timeline entries
+
+    Output:
+    Percentage of insulin remaining at the at_date
+    """
+    dose_duration = time_interval_since(dose_end_date, dose_start_date)/60
+    time = time_interval_since(at_date, dose_start_date)/60
+    activity = 0
+    dose_date = 0
+
+    while (dose_date <= min(floor((time + delay) / delta)
+                            * delta, dose_duration)):
+        if dose_duration > 0:
+            segment = (max(0, min(dose_date + delta, dose_duration)
+                           - dose_date) / dose_duration)
+        else:
+            segment = 1
+
+        if len(model) == 1:  # if walsh model
+            activity += segment * (1 - walsh_percent_effect_remaining(
+                (time - delay - dose_date), model[0]))
+
+        else:
+            activity += segment * (1 - percent_effect_remaining(
+                (time - delay - dose_date), model[0], model[1]))
+        dose_date += delta
+    return activity

@@ -34,7 +34,7 @@ def linear_regression(x_list, y_list):
     sum_y_squared = 0.0
     count = len(x_list)
 
-    for i in range(0, len(x_list)):
+    for i in range(0, len(x_list)): # pylint: disable=C0200
         x = x_list[i]
         y = y_list[i]
         sum_x += x
@@ -149,19 +149,19 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
         return ([], [])
 
     date = start_date
-    glucose_effect_dates = []
-    glucose_effect_values = []
+    momentum_effect_dates = []
+    momentum_effect_values = []
 
     while date <= end_date:
         value = (max(0, time_interval_since(date, last_time))
                  * slope)
-        glucose_effect_dates.append(date)
-        glucose_effect_values.append(value)
+        momentum_effect_dates.append(date)
+        momentum_effect_values.append(value)
         date += timedelta(minutes=delta)
 
-    assert len(glucose_effect_dates) == len(glucose_effect_values),\
+    assert len(momentum_effect_dates) == len(momentum_effect_values),\
         "expected output shape to match"
-    return (glucose_effect_dates, glucose_effect_values)
+    return (momentum_effect_dates, momentum_effect_values)
 
 
 def counteraction_effects(dates, glucose_values, displays, provenances,

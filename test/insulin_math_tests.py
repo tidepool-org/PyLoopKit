@@ -333,6 +333,92 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_dates[i], effect_dates[i])
             self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
 
+    def test_glucose_effect_from_short_temp_basal(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("short_basal_dose")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_short_basal_output")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
+
+
+    def test_glucose_effect_from_temp_basal(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("basal_dose")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_basal_output")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+
+    def test_glucose_effect_from_history(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_doses")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_history_output")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+
+    def test_glucose_effect_from_no_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = ([], [], [], [], [])
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(0, len(effect_dates))
+
 
 if __name__ == '__main__':
     unittest.main()

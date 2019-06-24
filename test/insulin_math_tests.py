@@ -19,7 +19,6 @@ from loop_kit_tests import load_fixture
 from insulin_math import dose_entries, is_continuous, insulin_on_board,\
                          glucose_effects
 from exponential_insulin_model import percent_effect_remaining
-from walsh_insulin_model import walsh_percent_effect_remaining  #pylint: disable=W0611
 
 
 class TestInsulinKitFunctions(unittest.TestCase):
@@ -252,7 +251,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
                                percent_effect_remaining(82, 360, 65), 3)
 
     """ Tests for insulin_on_board """
-    """ Test for Walsh
+
     def test_iob_from_bolus(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
@@ -271,7 +270,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 2)
-    """
+
     def test_iob_from_doses_exponential(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
@@ -310,6 +309,87 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
 
+    """ TODO """
+    """ func testNormalizeReservoirDoses() {
+        let input = loadDoseFixture("reservoir_history_with_rewind_and_prime_output")
+        let output = loadDoseFixture("normalized_reservoir_history_output")
+        let basals = loadBasalRateScheduleFixture("basal")
+
+        measure {
+            _ = input.annotated(with: basals)
+        }
+
+        let doses = input.annotated(with: basals)
+
+        XCTAssertEqual(output.count, doses.count)
+
+        for (expected, calculated) in zip(output, doses) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.endDate, calculated.endDate)
+            XCTAssertEqual(expected.value, calculated.value, accuracy: Double(Float.ulpOfOne))
+            XCTAssertEqual(expected.unit, calculated.unit)
+            XCTAssertEqual(expected.scheduledBasalRate, calculated.scheduledBasalRate)
+        }
+    }
+
+    func testNormalizeEdgeCaseDoses() {
+        let input = loadDoseFixture("normalize_edge_case_doses_input")
+        let output = loadDoseFixture("normalize_edge_case_doses_output")
+        let basals = loadBasalRateScheduleFixture("basal")
+
+        measure {
+            _ = input.annotated(with: basals)
+        }
+
+        let doses = input.annotated(with: basals)
+
+        XCTAssertEqual(output.count, doses.count)
+
+        for (expected, calculated) in zip(output, doses) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.endDate, calculated.endDate)
+            XCTAssertEqual(expected.value, calculated.unit == .units ? calculated.netBasalUnits : calculated.netBasalUnitsPerHour)
+            XCTAssertEqual(expected.unit, calculated.unit)
+        }
+    }
+
+    func testReconcileTempBasals() {
+        // Fixture contains numerous overlapping temp basals, as well as a Suspend event interleaved with a temp basal
+        let input = loadDoseFixture("reconcile_history_input")
+        let output = loadDoseFixture("reconcile_history_output").sorted { $0.startDate < $1.startDate }
+
+        let doses = input.reconciled().sorted { $0.startDate < $1.startDate }
+
+        XCTAssertEqual(output.count, doses.count)
+
+        for (expected, calculated) in zip(output, doses) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.endDate, calculated.endDate)
+            XCTAssertEqual(expected.value, calculated.value)
+            XCTAssertEqual(expected.unit, calculated.unit)
+            XCTAssertEqual(expected.syncIdentifier, calculated.syncIdentifier)
+        }
+    }
+
+    func testReconcileResumeBeforeRewind() {
+        let input = loadDoseFixture("reconcile_resume_before_rewind_input")
+        let output = loadDoseFixture("reconcile_resume_before_rewind_output")
+
+        let doses = input.reconciled()
+
+        XCTAssertEqual(output.count, doses.count)
+
+        for (expected, calculated) in zip(output, doses) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.endDate, calculated.endDate)
+            XCTAssertEqual(expected.value, calculated.value)
+            XCTAssertEqual(expected.unit, calculated.unit)
+            XCTAssertEqual(expected.syncIdentifier, calculated.syncIdentifier)
+        }
+    }
+
+    """
+
     def test_glucose_effect_from_bolus(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
@@ -321,6 +401,29 @@ class TestInsulinKitFunctions(unittest.TestCase):
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
+            
+    def test_glucose_effect_from_bolus_exponential(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("bolus_dose")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_bolus_output_exponential")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.MODEL
 
         effect_dates, effect_values = glucose_effects(
             i_types, i_start_dates, i_end_dates, i_values,
@@ -356,7 +459,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_dates[i], effect_dates[i])
             self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
 
-
     def test_glucose_effect_from_temp_basal(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("basal_dose")
@@ -368,6 +470,29 @@ class TestInsulinKitFunctions(unittest.TestCase):
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+
+    def test_glucose_effect_from_temp_basal_exponential(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("basal_dose")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_basal_output_exponential")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.MODEL
 
         effect_dates, effect_values = glucose_effects(
             i_types, i_start_dates, i_end_dates, i_values,
@@ -402,6 +527,29 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], effect_dates[i])
             self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+    
+    def test_glucose_effect_from_history_exponential(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_doses")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_history_output_exponential")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
 
     def test_glucose_effect_from_no_doses(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
@@ -410,7 +558,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
-        model = self.WALSH_MODEL
+        model = self.MODEL
 
         effect_dates, effect_values = glucose_effects(
             i_types, i_start_dates, i_end_dates, i_values,

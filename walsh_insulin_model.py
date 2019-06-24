@@ -20,11 +20,17 @@ def walsh_percent_effect_remaining(minutes, dia):
         minutes -- minutes after insulin delivery
         dia -- duration of insulin action, in hours
     """
+    if minutes <= 0:
+        return 1
+
     dia = round(dia)
     if dia < 3:
         dia = 3
     elif dia > 6:
         dia = 6
+
+    if minutes >= 60*dia:
+        return 0
 
     if dia == 3:
         return -3.2030e-9 * pow(minutes, 4) + 1.354e-6 * pow(minutes, 3)\

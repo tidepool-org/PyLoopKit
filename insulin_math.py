@@ -8,13 +8,14 @@ Created on Thu Jun 20 10:29:59 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/InsulinMath.swift
 """
-# pylint: disable=R0913, R0914
+# pylint: disable=R0913, R0914, C0200
 from math import floor
-from datetime import timedelta
+from datetime import timedelta, datetime
 from date import time_interval_since
 from loop_math import simulation_date_range_for_samples
 from dose_entry import net_basal_units
 from exponential_insulin_model import percent_effect_remaining
+from walsh_insulin_model import walsh_percent_effect_remaining
 
 MAXIMUM_RESERVOIR_DROP_PER_MINUTE = 6.5
 
@@ -109,7 +110,7 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     last_date_value = first_date_value
     last_volume_value = first_volume_value
 
-    for i in range(0, len(unit_volumes)): # pylint: disable=C0200
+    for i in range(0, len(unit_volumes)):  # pylint: disable=C0200
         # Volume and interval validation only applies for values in
         # the specified range
         if reservoir_dates[i] < start_date or reservoir_dates[i] > end:
@@ -161,10 +162,19 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
     Output:
     Tuple in format (times_iob_was_calculated_at, iob_values (U of insulin))
     """
+    assert len(dose_types) == len(start_dates) == len(end_dates) ==\
+        len(values) == len(scheduled_basal_rates),\
+        "expected input shapes to match"
+
     try:
-        (start, end) = simulation_date_range_for_samples(
-            start_times=start_dates, end_times=end_dates, duration=model[0],
-            delay=delay, delta=delta)
+        if len(model) == 1:
+            (start, end) = simulation_date_range_for_samples(
+                start_times=start_dates, end_times=end_dates,
+                duration=model[0]*60, delay=delay, delta=delta)
+        else:
+            (start, end) = simulation_date_range_for_samples(
+                start_times=start_dates, end_times=end_dates,
+                duration=model[0], delay=delay, delta=delta)
     except IndexError:
         return ([], [])
 
@@ -214,6 +224,17 @@ def insulin_on_board_calc(type_, start_date, end_date, value,
     time = time_interval_since(date, start_date)/60
     if time < 0:
         return 0
+    if len(model) == 1:  # walsh model
+        if time_interval_since(end_date, start_date) <= 1.05 * delta:
+            return net_basal_units(type_, value, start_date, end_date,
+                                   scheduled_basal_rate) *\
+                    walsh_percent_effect_remaining((time - delay), model[0])
+        # This will normally be for basals
+        return net_basal_units(type_, value, start_date, end_date,
+                               scheduled_basal_rate) *\
+            continuous_delivery_insulin_on_board(start_date, end_date,
+                                                 date, model, delay, delta)
+
     # Consider doses within the delta time window as momentary
     # This will normally be for boluses
     if time_interval_since(end_date, start_date) <= 1.05 * delta:
@@ -256,8 +277,162 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
                            - dose_date) / dose_duration)
         else:
             segment = 1
-        iob += segment * percent_effect_remaining((time - delay - dose_date),
-                                                  model[0], model[1])
+        if len(model) == 1:  # if walsh model
+            iob += segment * walsh_percent_effect_remaining(
+                (time - delay - dose_date), model[0])
+        else:
+            iob += segment * percent_effect_remaining(
+                (time - delay - dose_date), model[0], model[1])
         dose_date += delta
 
     return iob
+
+
+def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
+                    scheduled_basal_rates, model, sensitivity_start_times,
+                    sensitivity_end_times, sensitivity_values, delay=10,
+                    delta=5):
+    """ Calculates the timeline of glucose effects for a collection of doses
+
+    Arguments:
+    dose_types -- list of types of doses (basal, bolus, etc)
+    dose_start_dates -- list of datetime objects representing the dates
+                       the doses started at
+    dose_end_dates -- list of datetime objects representing the dates
+                       the doses ended at
+    dose_values -- list of insulin values for doses
+    scheduled_basal_rates -- basal rates scheduled during the times of doses
+    model -- list of insulin model parameters in format [DIA, peak_time]
+    sensitivity_start_times -- list of time objects of start times of
+                               given insulin sensitivity values
+    sensitivity_end_times -- list of time objects of start times of
+                             given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+    delay -- the time to delay the dose effect
+    delta -- the differential between timeline entries
+
+    Output:
+    Tuple in format (times_glucose_effect_was_calculated_at,
+                     glucose_effect_values (mg/dL))
+    """
+    if len(model) == 1:
+        (start, end) = simulation_date_range_for_samples(
+            start_times=dose_start_dates, end_times=dose_end_dates,
+            duration=model[0]*60, delay=delay, delta=delta)
+    else:
+        (start, end) = simulation_date_range_for_samples(
+            start_times=dose_start_dates, end_times=dose_end_dates,
+            duration=model[0], delay=delay, delta=delta)
+
+    date = start
+    effect_dates = []
+    effect_values = []
+
+    def find_partial_effect(i):
+        sensitivity = find_sensitivity_at_time(
+            sensitivity_start_times, sensitivity_end_times,
+            sensitivity_values, dose_start_dates[i])
+        return glucose_effect(
+            dose_types[i], dose_start_dates[i], dose_end_dates[i],
+            dose_values[i], scheduled_basal_rates[i], date, model,
+            sensitivity, delay, delta)
+
+    while date <= end:
+
+        effect_sum = 0
+        for i in range(0, len(dose_start_dates)):
+            effect_sum += find_partial_effect(i)
+
+        effect_dates.append(date)
+        effect_values.append(effect_sum)
+        date += timedelta(minutes=delta)
+
+    assert len(effect_dates) == len(effect_values),\
+        "expected output shapes to match"
+    return (effect_dates, effect_values)
+
+
+def find_sensitivity_at_time(sensitivity_start_times, sensitivity_end_times,
+                             sensitivity_values, time_to_check):
+    """ Finds sensitivity setting value at a given time
+
+    Arguments:
+    sensitivity_start_times -- list of time objects of start times of
+                               given insulin sensitivity values
+    sensitivity_end_times -- list of time objects of start times of
+                             given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+    time_to_check -- finding the sensitivity value at this time
+
+    Output:
+    Sensitivity value (mg/dL/U)
+    """
+    assert len(sensitivity_start_times) == len(sensitivity_end_times) ==\
+        len(sensitivity_values), "expected input shapes to match"
+    for i in range(0, len(sensitivity_start_times)):
+        if is_time_between(sensitivity_start_times[i],
+                           sensitivity_end_times[i], time_to_check):
+            return sensitivity_values[i]
+    return None
+
+
+def is_time_between(start, end, time_to_check):
+    """ Check if time is within an interval
+
+    Arguments:
+    start -- time of start of interval
+    end -- time of end of interval
+    time_to_check -- see if this time (or datetime) value is within the
+                     interval
+
+    Output:
+    True if within interval, False if not
+    """
+    # convert from datetime to time if needed so we can compare
+    if isinstance(time_to_check, datetime):
+        time_to_check = time_to_check.time()
+    if start < end:
+        return start <= time_to_check <= end
+    # if it crosses midnight
+    return time_to_check >= start or time_to_check <= end
+
+
+def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
+                   scheduled_basal_rate, date, model,
+                   insulin_sensitivity, delay, delta):
+    """ Calculates the timeline of glucose effects for a collection of doses
+
+    Arguments:
+    dose_type -- types of dose (basal, bolus, etc)
+    dose_start_date -- datetime object representing date doses start at
+    dose_end_date -- datetime object representing date dose ended at
+    dose_value -- insulin value for dose
+    scheduled_basal_rate -- basal rate scheduled during the time of dose
+    date -- datetime object of time to calculate the effect at
+    insulin_sensitivity -- sensitivity (mg/dL/U)
+    delay -- the time to delay the dose effect
+    delta -- the differential between timeline entries
+
+    Output:
+    Glucose effect (mg/dL))
+    """
+    time = time_interval_since(date, dose_start_date)/60
+    if time < 0:
+        return 0
+    # Consider doses within the delta time window as momentary
+    # This will normally be for boluses
+    if time_interval_since(dose_end_date, dose_start_date) <= 1.05 * delta:
+        if len(model) == 1:  # walsh model
+            return net_basal_units(dose_type, dose_value, dose_start_date,
+                                   dose_end_date, scheduled_basal_rate) *\
+                -insulin_sensitivity * (1 - walsh_percent_effect_remaining(
+                    (time - delay), model[0]))
+        return net_basal_units(dose_type, dose_value, dose_start_date,
+                               dose_end_date, scheduled_basal_rate) *\
+            -insulin_sensitivity * (1 - percent_effect_remaining(
+                (time - delay), model[0], model[1]))
+    # This will normally be for basals
+    return net_basal_units(dose_type, dose_value, dose_start_date,
+                           dose_end_date, scheduled_basal_rate) *\
+        continuous_delivery_insulin_on_board(dose_start_date, dose_end_date,
+                                             date, model, delay, delta)

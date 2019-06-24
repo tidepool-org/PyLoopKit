@@ -8,21 +8,30 @@ Created on Thu Jun 20 09:00:27 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/InsulinMathTests.swift
 """
-# pylint: disable= R0201, C0111, W0105, W0612, C0200
+# pylint: disable = R0201, C0111, W0105, W0612, C0200, R0914
 # diable pylint warnings for "method could be function", String statement
 # has no effect, unused variable (for tuple unpacking), enumerate instead
 # of range
 import unittest
-from datetime import datetime
+from datetime import datetime, time
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from insulin_math import dose_entries, is_continuous, insulin_on_board
+from insulin_math import dose_entries, is_continuous, insulin_on_board,\
+                         glucose_effects
 from exponential_insulin_model import percent_effect_remaining
+from walsh_insulin_model import walsh_percent_effect_remaining  #pylint: disable=W0611
 
 
 class TestInsulinKitFunctions(unittest.TestCase):
     """ unittest class to run InsulinKit tests."""
     WITHIN = 30
+
+    MODEL = [360, 75]
+    WALSH_MODEL = [4]
+
+    INSULIN_SENSITIVITY_START_DATES = [time(0, 0)]
+    INSULIN_SENSITIVITY_END_DATES = [time(23, 59)]
+    INSULIN_SENSITIVITY_VALUES = [40]
 
     def load_reservoir_fixture(self, resource_name):
         """ Load reservior data from json file
@@ -243,6 +252,26 @@ class TestInsulinKitFunctions(unittest.TestCase):
                                percent_effect_remaining(82, 360, 65), 3)
 
     """ Tests for insulin_on_board """
+    """ Test for Walsh
+    def test_iob_from_bolus(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("bolus_dose")
+
+        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
+            "iob_from_bolus_240min_output")
+
+        model = [4]
+
+        (dates, insulin_values) = insulin_on_board(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model)
+
+        self.assertEqual(len(out_dates), len(dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], dates[i])
+            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 2)
+    """
     def test_iob_from_doses_exponential(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
@@ -250,7 +279,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
             "iob_from_doses_exponential_output")
 
-        model = [360, 75]
+        model = self.MODEL
 
         (dates, insulin_values) = insulin_on_board(
             i_types, i_start_dates, i_end_dates, i_values,
@@ -269,7 +298,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
             "iob_from_bolus_exponential_output")
 
-        model = [360, 75]
+        model = self.MODEL
 
         (dates, insulin_values) = insulin_on_board(
             i_types, i_start_dates, i_end_dates, i_values,
@@ -280,6 +309,29 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
+
+    def test_glucose_effect_from_bolus(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("bolus_dose")
+
+        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
+            "effect_from_bolus_output")
+
+        sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
+        model = self.WALSH_MODEL
+
+        effect_dates, effect_values = glucose_effects(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model, sensitivity_start_dates,
+            sensitivity_end_dates, sensitivity_values)
+
+        self.assertEqual(len(out_dates), len(effect_dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], effect_dates[i])
+            self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
 
 
 if __name__ == '__main__':

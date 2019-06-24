@@ -46,6 +46,7 @@ def simulation_date_range_for_samples(start_times, end_times, duration, delta,
         # if end_times is an empty list, don't error
         except IndexError:
             continue
+
     return (date_floored_to_time_interval(start or min_date, delta),
             date_ceiled_to_time_interval(end or max_date +
                                          timedelta(minutes=duration+delay),

@@ -8,7 +8,7 @@ Created on Thu Jun 20 09:00:27 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/InsulinMathTests.swift
 """
-# pylint: disable = R0201, C0111, W0105, W0612, C0200, R0914
+# pylint: disable = R0201, C0111, W0105, W0612, C0200, R0914, R0904
 # diable pylint warnings for "method could be function", String statement
 # has no effect, unused variable (for tuple unpacking), enumerate instead
 # of range
@@ -234,32 +234,72 @@ class TestInsulinKitFunctions(unittest.TestCase):
     # did not include testIOBFromSuspend, testIOBFromDoses, and
     # testIOBFromNoDoses because they use the Walsh insulin model
 
-    """ Tests for percent_effect_remaining """
-    def test_insulin_on_board_limits_for_exponential_model(self):
-        # tests for adult curve (peak = 75 mins)
-        self.assertAlmostEqual(1, percent_effect_remaining(-1, 360, 75), 3)
-        self.assertAlmostEqual(1, percent_effect_remaining(0, 360, 75), 3)
-        self.assertAlmostEqual(0, percent_effect_remaining(360, 360, 75), 3)
-        self.assertAlmostEqual(0, percent_effect_remaining(361, 360, 75), 3)
-
-        # test at random point
-        self.assertAlmostEqual(0.5110493617156,
-                               percent_effect_remaining(108, 361, 75), 3)
-
-        # test for child curve (peak = 65 mins)
-        self.assertAlmostEqual(0.6002510111374046,
-                               percent_effect_remaining(82, 360, 65), 3)
-
     """ Tests for insulin_on_board """
 
-    def test_iob_from_bolus(self):
+    """
+    func testIOBFromSuspend() {
+        let input = loadDoseFixture("suspend_dose")
+        let reconciledOutput = loadDoseFixture("suspend_dose_reconciled")
+        let normalizedOutput = loadDoseFixture("suspend_dose_reconciled_normalized")
+        let iobOutput = loadInsulinValueFixture("suspend_dose_reconciled_normalized_iob")
+        let basals = loadBasalRateScheduleFixture("basal")
+        let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
+
+        let reconciled = input.reconciled()
+
+        XCTAssertEqual(reconciledOutput.count, reconciled.count)
+
+        for (expected, calculated) in zip(reconciledOutput, reconciled) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.endDate, calculated.endDate)
+            XCTAssertEqual(expected.value, calculated.value)
+            XCTAssertEqual(expected.unit, calculated.unit)
+        }
+
+        let normalized = reconciled.annotated(with: basals)
+
+        XCTAssertEqual(normalizedOutput.count, normalized.count)
+
+        for (expected, calculated) in zip(normalizedOutput, normalized) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.endDate, calculated.endDate)
+            XCTAssertEqual(expected.value, calculated.netBasalUnitsPerHour, accuracy: Double(Float.ulpOfOne))
+            XCTAssertEqual(expected.unit, calculated.unit)
+        }
+
+        let iob = normalized.insulinOnBoard(model: insulinModel)
+
+        XCTAssertEqual(iobOutput.count, iob.count)
+
+        for (expected, calculated) in zip(iobOutput, iob) {
+            XCTAssertEqual(expected.startDate, calculated.startDate)
+            XCTAssertEqual(expected.value, calculated.value, accuracy: Double(Float.ulpOfOne))
+        }
+    
+    def test_iob_from_suspend(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
-         ) = self.load_dose_fixture("bolus_dose")
+         ) = self.load_dose_fixture("suspend_dose")
+        
+        (r_types, r_start_dates, r_end_dates, r_values, r_scheduled_basal_rates
+         ) = self.load_dose_fixture("suspend_dose_reconciled")
+        
+        (n_types, n_start_dates, n_end_dates, n_values, n_scheduled_basal_rates
+         ) = self.load_dose_fixture("suspend_dose_reconciled_normalized")
 
         (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "iob_from_bolus_240min_output")
+            "suspend_dose_reconciled_normalized_iob")
 
-        model = [4]
+        model = self.WALSH_MODEL
+    """
+
+    def test_iob_from_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_doses")
+
+        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
+            "iob_from_doses_output_new")
+
+        model = self.WALSH_MODEL
 
         (dates, insulin_values) = insulin_on_board(
             i_types, i_start_dates, i_end_dates, i_values,
@@ -269,14 +309,36 @@ class TestInsulinKitFunctions(unittest.TestCase):
 
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], dates[i])
-            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 2)
+            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
+            
+    """
+    func testIOBFromNoDoses() {
+        let input: [DoseEntry] = []
+        let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
+
+        let iob = input.insulinOnBoard(model: insulinModel)
+
+        XCTAssertEqual(0, iob.count)
+    }
+    """
+    def test_iob_from_no_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = ([], [], [], [], [])
+
+        model = self.WALSH_MODEL
+
+        (dates, insulin_values) = insulin_on_board(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model)
+
+        self.assertEqual(0, len(dates))
 
     def test_iob_from_doses_exponential(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
         (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "iob_from_doses_exponential_output")
+            "iob_from_doses_exponential_output_new")
 
         model = self.MODEL
 
@@ -328,6 +390,22 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
+
+        """ Tests for percent_effect_remaining """
+    def test_insulin_on_board_limits_for_exponential_model(self):
+        # tests for adult curve (peak = 75 mins)
+        self.assertAlmostEqual(1, percent_effect_remaining(-1, 360, 75), 3)
+        self.assertAlmostEqual(1, percent_effect_remaining(0, 360, 75), 3)
+        self.assertAlmostEqual(0, percent_effect_remaining(360, 360, 75), 3)
+        self.assertAlmostEqual(0, percent_effect_remaining(361, 360, 75), 3)
+
+        # test at random point
+        self.assertAlmostEqual(0.5110493617156,
+                               percent_effect_remaining(108, 361, 75), 3)
+
+        # test for child curve (peak = 65 mins)
+        self.assertAlmostEqual(0.6002510111374046,
+                               percent_effect_remaining(82, 360, 65), 3)
 
     """ TODO """
     """ func testNormalizeReservoirDoses() {

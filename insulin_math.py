@@ -165,6 +165,9 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values) == len(scheduled_basal_rates),\
         "expected input shapes to match"
+    
+    if not dose_types:
+        return ([], [])
 
     try:
         if len(model) == 1:

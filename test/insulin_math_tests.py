@@ -290,6 +290,26 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 2)
 
+    def test_iob_from_bolus(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("bolus_dose")
+
+        for hour in [2, 3, 4, 5, 5.2, 6, 7]:
+            model = [hour]
+            (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
+                "iob_from_bolus_" + str(int(hour*60)) + "min_output")
+
+            (dates, insulin_values) = insulin_on_board(
+                i_types, i_start_dates, i_end_dates, i_values,
+                i_scheduled_basal_rates, model)
+
+            self.assertEqual(len(out_dates), len(dates))
+
+            for i in range(0, len(out_dates)):
+                self.assertEqual(out_dates[i], dates[i])
+                self.assertAlmostEqual(out_insulin_values[i],
+                                       insulin_values[i], 1)
+
     def test_iob_from_bolus_exponential(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")

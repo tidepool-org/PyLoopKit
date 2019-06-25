@@ -389,7 +389,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
     }
 
     """
-
+    """ Tests for glucose_effect """
     def test_glucose_effect_from_bolus(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
@@ -412,7 +412,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], effect_dates[i])
             self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
-            
+
     def test_glucose_effect_from_bolus_exponential(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
@@ -527,7 +527,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], effect_dates[i])
             self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
-    
+
     def test_glucose_effect_from_history_exponential(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")

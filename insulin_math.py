@@ -407,7 +407,7 @@ def is_time_between(start, end, time_to_check):
 def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
                    scheduled_basal_rate, date, model,
                    insulin_sensitivity, delay, delta):
-    """ Calculates the timeline of glucose effects for a collection of doses
+    """ Calculates the timeline of glucose effects for a specific dose
 
     Arguments:
     dose_type -- types of dose (basal, bolus, etc)
@@ -421,7 +421,7 @@ def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
     delta -- the differential between timeline entries
 
     Output:
-    Glucose effect (mg/dL))
+    Glucose effect (mg/dL)
     """
     time = time_interval_since(date, dose_start_date)/60
     if time < 0:
@@ -440,7 +440,6 @@ def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
                                dose_end_date, scheduled_basal_rate) *\
             -insulin_sensitivity * (1 - percent_effect_remaining(
                 (time - delay), model[0], model[1]))
-
     # This will normally be for basals, and handles Walsh model automatically
     return net_basal_units(dose_type, dose_value, dose_start_date,
                            dose_end_date, scheduled_basal_rate) *\

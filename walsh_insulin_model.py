@@ -11,7 +11,7 @@ WalshInsulinModel.swift
 """
 
 
-def walsh_percent_effect_remaining(minutes, dia):
+def walsh_percent_effect_remaining(minutes, action_duration):
     """ Give percent of insulin remaining for IOB calculations.
         This curve is only included for the purposes of running glucose
         activity tests
@@ -22,15 +22,16 @@ def walsh_percent_effect_remaining(minutes, dia):
     """
     if minutes <= 0:
         return 1
+    if minutes >= action_duration * 60:
+        return 0
 
-    dia = round(dia)
+    dia = round(action_duration)
     if dia < 3:
         dia = 3
     elif dia > 6:
         dia = 6
 
-    if minutes >= 60*dia:
-        return 0
+    minutes = minutes * dia / action_duration
 
     if dia == 3:
         return -3.2030e-9 * pow(minutes, 4) + 1.354e-6 * pow(minutes, 3)\

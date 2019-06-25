@@ -30,6 +30,12 @@ def percent_effect_remaining(time, action_duration, peak_activity_time):
     Output:
     The percentage of total insulin effect remaining
     """
+
+    if time <= 0:
+        return 1
+    if time > action_duration:
+        return 0
+
     tau = (peak_activity_time * (1 - peak_activity_time / action_duration) /
            (1 - 2 * peak_activity_time / action_duration))
     a = 2 * tau / action_duration

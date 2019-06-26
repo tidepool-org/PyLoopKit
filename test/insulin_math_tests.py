@@ -407,50 +407,57 @@ class TestInsulinKitFunctions(unittest.TestCase):
         self.assertAlmostEqual(0.6002510111374046,
                                percent_effect_remaining(82, 360, 65), 3)
 
-    """ TODO """
-    """ func testNormalizeReservoirDoses() {
-        let input = loadDoseFixture("reservoir_history_with_rewind_and_prime_output")
-        let output = loadDoseFixture("normalized_reservoir_history_output")
-        let basals = loadBasalRateScheduleFixture("basal")
+    """ Tests for reconceiled """
+    def test_normalize_reservoir_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("reservoir_history_with_rewind_and_" +
+                                    "prime_output")
 
-        measure {
-            _ = input.annotated(with: basals)
-        }
+        (out_types, out_start_dates, out_end_dates, out_values,
+         out_scheduled_basal_rates) = self.load_dose_fixture(
+            "normalized_reservoir_history_output")
 
-        let doses = input.annotated(with: basals)
+        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
+            "basal")
 
-        XCTAssertEqual(output.count, doses.count)
+        (types, start_dates, end_dates, values, scheduled_basal_rates
+         ) = annotated(i_types, i_start_dates, i_end_dates, i_values,
+                       i_scheduled_basal_rates, start_times, rates, minutes,
+                       convert_to_units_hr=True)
 
-        for (expected, calculated) in zip(output, doses) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.endDate, calculated.endDate)
-            XCTAssertEqual(expected.value, calculated.value, accuracy: Double(Float.ulpOfOne))
-            XCTAssertEqual(expected.unit, calculated.unit)
-            XCTAssertEqual(expected.scheduledBasalRate, calculated.scheduledBasalRate)
-        }
-    }
+        self.assertEqual(len(out_types), len(types))
 
-    func testNormalizeEdgeCaseDoses() {
-        let input = loadDoseFixture("normalize_edge_case_doses_input")
-        let output = loadDoseFixture("normalize_edge_case_doses_output")
-        let basals = loadBasalRateScheduleFixture("basal")
+        for i in range(0, len(out_types)):
+            self.assertEqual(out_start_dates[i], start_dates[i])
+            self.assertEqual(out_end_dates[i], end_dates[i])
+            self.assertAlmostEqual(out_values[i], values[i], 2)
+            self.assertEqual(
+                out_scheduled_basal_rates[i], scheduled_basal_rates[i])
 
-        measure {
-            _ = input.annotated(with: basals)
-        }
+    def test_normalize_edgecase_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalize_edge_case_doses_input")
 
-        let doses = input.annotated(with: basals)
+        (out_types, out_start_dates, out_end_dates, out_values,
+         out_scheduled_basal_rates) = self.load_dose_fixture(
+            "normalize_edge_case_doses_output")
 
-        XCTAssertEqual(output.count, doses.count)
+        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
+            "basal")
 
-        for (expected, calculated) in zip(output, doses) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.endDate, calculated.endDate)
-            XCTAssertEqual(expected.value, calculated.unit == .units ? calculated.netBasalUnits : calculated.netBasalUnitsPerHour)
-            XCTAssertEqual(expected.unit, calculated.unit)
-        }
-    }
+        (types, start_dates, end_dates, values, scheduled_basal_rates
+         ) = annotated(i_types, i_start_dates, i_end_dates, i_values,
+                       i_scheduled_basal_rates, start_times, rates, minutes)
 
+        self.assertEqual(len(out_types), len(types))
+
+        for i in range(0, len(out_types)):
+            self.assertEqual(out_start_dates[i], start_dates[i])
+            self.assertEqual(out_end_dates[i], end_dates[i])
+            self.assertAlmostEqual(out_values[i], values[i] -
+                scheduled_basal_rates[i], 2)
+
+    """
     func testReconcileTempBasals() {
         // Fixture contains numerous overlapping temp basals, as well as a Suspend event interleaved with a temp basal
         let input = loadDoseFixture("reconcile_history_input")

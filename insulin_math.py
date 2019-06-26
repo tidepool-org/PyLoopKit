@@ -11,7 +11,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # pylint: disable=R0913, R0914, C0200
 from math import floor
 from datetime import timedelta, datetime
-from date import time_interval_since
+from date import time_interval_since, time_interval_since_reference_date
 from loop_math import simulation_date_range_for_samples
 from dose_entry import net_basal_units
 from exponential_insulin_model import percent_effect_remaining
@@ -137,6 +137,235 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     return True
 
 
+def annotated(dose_types, start_dates, end_dates, values,
+              scheduled_basal_rates, basal_start_times, basal_rates,
+              basal_minutes, convert_to_units_hr=False):
+    """ Annotates doses with the context of the scheduled basal rates
+
+    Arguments:
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+    dose_start_date -- start date of the range (datetime obj)
+    dose_end_date -- end date of the range (datetime obj)
+
+    Output:
+    5 lists of annotated dose properties
+    """
+    assert len(dose_types) == len(start_dates) == len(end_dates) ==\
+        len(values) == len(scheduled_basal_rates),\
+        "expected input shapes to match"
+
+    assert len(basal_start_times) == len(basal_rates) == len(basal_minutes),\
+        "expected input shapes to match"
+
+    if not dose_types or not basal_start_times:
+        return ([], [], [], [], [])
+
+    output_types = []
+    output_start_dates = []
+    output_end_dates = []
+    output_values = []
+    output_scheduled_basal_rates = []
+
+    for i in range(0, len(dose_types)):
+        (dose_type, start_date, end_date, value, scheduled_basal_rate) =\
+            annotate_individual_dose(
+                dose_types[i], start_dates[i], end_dates[i], values[i],
+                basal_start_times, basal_rates, basal_minutes,
+                convert_to_units_hr)
+
+        output_types.extend(dose_type)
+        output_start_dates.extend(start_date)
+        output_end_dates.extend(end_date)
+        output_values.extend(value)
+        output_scheduled_basal_rates.extend(scheduled_basal_rate)
+
+    assert len(output_types) == len(output_start_dates) ==\
+        len(output_end_dates) == len(output_values) ==\
+        len(output_scheduled_basal_rates), "expected output shapes to match"
+
+    return (output_types, output_start_dates, output_end_dates, output_values,
+            output_scheduled_basal_rates)
+
+
+def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
+                             basal_start_times, basal_rates, basal_minutes,
+                             convert_to_units_hr=False):
+    """ Annotates a dose with the context of the scheduled basal rate
+        If the dose crosses a schedule boundary, it will be split into
+        multiple doses so each dose has a single scheduled basal rate.
+
+        * basal "value" MUST be in units/hr! *
+
+    Arguments:
+    dose_type -- type of dose (basal, bolus, etc)
+    dose_start_date -- start date of the dose (datetime obj)
+    dose_end_date -- end date of the dose (datetime obj)
+    value -- actual basal rate of dose in U/hr (if a basal)
+             or the value of the bolus in U
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+
+
+    Output:
+    Tuple in format (basal_start_times, basal_rates, basal_minutes) within
+    the range of dose_start_date and dose_end_date
+    """
+    if dose_type not in ["Basal", "TempBasal"]:
+        return ([dose_type], [dose_start_date], [dose_end_date], [value],
+                [0])
+
+    output_types = []
+    output_start_dates = []
+    output_end_dates = []
+    output_values = []
+    output_scheduled_basal_rates = []
+
+    # these are the lists containing the scheduled basal value(s) within
+    # the temp basal's duration
+    (sched_basal_starts, sched_basal_ends, sched_basal_rates) = between(
+        basal_start_times, basal_rates, basal_minutes, dose_start_date,
+        dose_end_date)
+
+    for i in range(0, len(sched_basal_starts)):
+        if i == 0:
+            start_date = dose_start_date
+        else:
+            start_date = sched_basal_starts[i]
+
+        if i == len(sched_basal_starts) - 1:
+            end_date = dose_end_date
+        else:
+            end_date = sched_basal_starts[i+1]
+
+        output_types.append(dose_type)
+        output_start_dates.append(start_date)
+        output_end_dates.append(end_date)
+
+        if convert_to_units_hr:
+            output_values.append(
+                value / (time_interval_since(
+                    dose_end_date, dose_start_date)/60/60))
+        else:
+            output_values.append(value)
+        output_scheduled_basal_rates.append(sched_basal_rates[i])
+
+    assert len(output_types) == len(output_start_dates) ==\
+        len(output_end_dates) == len(output_values) ==\
+        len(output_scheduled_basal_rates), "expected output shapes to match"
+    return (output_types, output_start_dates, output_end_dates, output_values,
+            output_scheduled_basal_rates)
+
+
+def between(basal_start_times, basal_rates, basal_minutes, dose_start_date,
+            dose_end_date, repeat_interval=24):
+    """ Returns a slice of scheduled basal rates that occur between two dates
+
+    Arguments:
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+    dose_start_date -- start date of the range (datetime obj)
+    dose_end_date -- end date of the range (datetime obj)
+
+    Output:
+    Tuple in format (basal_start_times, basal_rates, basal_minutes) within
+    the range of dose_start_date and dose_end_date
+    """
+
+    if dose_start_date > dose_end_date:
+        return ([], [], [])
+
+    reference_time_interval = timedelta(
+        hours=basal_start_times[0].hour, minutes=basal_start_times[0].minute,
+        seconds=basal_start_times[0].second)
+    max_time_interval = reference_time_interval + timedelta(
+        hours=repeat_interval)
+
+    start_offset = schedule_offset(dose_start_date, basal_start_times[0])
+    end_offset = start_offset + timedelta(seconds=time_interval_since(
+        dose_end_date, dose_start_date))
+
+    if end_offset > max_time_interval:
+        boundary_date = dose_start_date + (max_time_interval - start_offset)
+        (start_times_1, end_times_1, basal_rates_1) = between(
+            basal_start_times, basal_rates, basal_minutes, dose_start_date,
+            boundary_date)
+        (start_times_2, end_times_2, basal_rates_2) = between(
+            basal_start_times, basal_rates, basal_minutes, boundary_date,
+            dose_end_date)
+
+        return (start_times_1 + start_times_2,
+                end_times_1 + end_times_2,
+                basal_rates_1 + basal_rates_2)
+
+    start_index = 0
+    end_index = len(basal_start_times)
+
+    for (i, start_time) in enumerate(basal_start_times):
+        start_time = timedelta(
+            hours=start_time.hour,
+            minutes=start_time.minute,
+            seconds=start_time.second)
+        if start_offset >= start_time:
+            start_index = i
+        if end_offset < start_time:
+            end_index = i
+            break
+
+    reference_date = dose_start_date - start_offset
+
+    if start_index > end_index:
+        return ([], [], [])
+
+    (output_start_times, output_end_times, output_basal_rates) = ([], [], [])
+
+    for i in range(start_index, end_index):
+        end_time = timedelta(
+            hours=basal_start_times[i+1].hour,
+            minutes=basal_start_times[i+1].minute,
+            seconds=basal_start_times[i+1].second) if i+1 <\
+            len(basal_start_times) else max_time_interval
+
+        output_start_times.append(reference_date + timedelta(
+            hours=basal_start_times[i].hour,
+            minutes=basal_start_times[i].minute,
+            seconds=basal_start_times[i].second))
+
+        output_end_times.append(reference_date + end_time)
+        output_basal_rates.append(basal_rates[i])
+
+    assert len(output_start_times) == len(output_end_times) ==\
+        len(output_basal_rates), "expected output shape to match"
+
+    return (output_start_times, output_end_times, output_basal_rates)
+
+
+def schedule_offset(date_to_offset, reference_time,
+                    repeat_interval=24):
+    """ Returns the time interval for a given date normalized to the span of
+        the schedule items
+
+    Arguments:
+    date_to_offset -- datetime object of the date to convert
+    reference_time -- time object that's normally the first basal dose time in
+                      a basal schedule
+    repeat_interval -- the interval with which the basal schedule repeats
+
+    Output:
+    datetime timedelta object representing offset
+    """
+    reference_time_seconds = (reference_time.hour * 3600 +
+                              reference_time.minute * 60 +
+                              reference_time.second)
+    interval = time_interval_since_reference_date(date_to_offset)
+
+    return timedelta(seconds=(interval-reference_time_seconds) %
+                     (repeat_interval * 60 * 60) + reference_time_seconds)
+
+
 def insulin_on_board(dose_types, start_dates, end_dates, values,
                      scheduled_basal_rates, model, start=None, end=None,
                      delay=10, delta=5):
@@ -165,7 +394,7 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values) == len(scheduled_basal_rates),\
         "expected input shapes to match"
-    
+
     if not dose_types:
         return ([], [])
 
@@ -390,8 +619,8 @@ def is_time_between(start, end, time_to_check):
     """ Check if time is within an interval
 
     Arguments:
-    start -- time of start of interval
-    end -- time of end of interval
+    start -- time (or datetime) of start of interval
+    end -- time (or datetime) of end of interval
     time_to_check -- see if this time (or datetime) value is within the
                      interval
 
@@ -399,8 +628,13 @@ def is_time_between(start, end, time_to_check):
     True if within interval, False if not
     """
     # convert from datetime to time if needed so we can compare
+    if isinstance(start, datetime):
+        start = start.time()
+    if isinstance(end, datetime):
+        end = end.time()
     if isinstance(time_to_check, datetime):
         time_to_check = time_to_check.time()
+
     if start < end:
         return start <= time_to_check <= end
     # if it crosses midnight

@@ -8,16 +8,45 @@ Created on Thu Jun 20 10:29:59 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/InsulinMath.swift
 """
-# pylint: disable=R0913, R0914, R0912, C0200
+# pylint: disable=R0913, R0914, R0912, C0200, R0915
 from math import floor
 from datetime import timedelta, datetime
+
 from date import time_interval_since, time_interval_since_reference_date
 from loop_math import simulation_date_range_for_samples
-from dose_entry import net_basal_units
+from dose_entry import net_basal_units, total_units_given
 from exponential_insulin_model import percent_effect_remaining
 from walsh_insulin_model import walsh_percent_effect_remaining
 
 MAXIMUM_RESERVOIR_DROP_PER_MINUTE = 6.5
+DISTANT_PAST = datetime.fromisoformat("2001-01-01T00:00:00")
+DISTANT_FUTURE = datetime.fromisoformat("2050-01-01T00:00:00")
+
+
+def total_delivery(dose_types, starts, ends, values):
+    """ Calculates the total insulin delivery for a collection of doses
+
+    Arguments:
+    dose_types -- types of doses (basal, bolus, etc)
+    starts -- datetime objects of times doses started at
+    ends -- datetime objects of times doses ended at
+    values -- amount, in U/hr (if a basal) or U (if bolus) of insulin in dose
+
+    Output:
+    The total insulin insulin, in Units
+    """
+    assert len(dose_types) == len(starts) == len(ends) == len(values),\
+        "expected input shapes to match"
+
+    total = 0
+    for i in range(0, len(dose_types)):
+        total += total_units_given(
+            dose_types[i], values[i], starts[i], ends[i])
+
+    if total < 0:
+        return 0
+
+    return total
 
 
 def dose_entries(reservoir_dates, unit_volumes):

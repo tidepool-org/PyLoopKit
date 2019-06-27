@@ -25,8 +25,11 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
     Bolus amount (if a bolus), or basal units given, net of whatever the
     schedule basal is
     """
-    if type_ == "Bolus":
+    if type_.lower() == "bolus":
         return value
+    # don't divide by zero if it's a suspend
+    if type_.lower() == "pumpsuspend":
+        return -scheduled_basal_rate
     hours_ = hours(end, start)
     return (value - scheduled_basal_rate) * hours_
 

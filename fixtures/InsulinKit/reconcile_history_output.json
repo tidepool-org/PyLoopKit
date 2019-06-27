@@ -80,14 +80,6 @@
         "raw" : "TB7"
     },
     {
-        "amount": 24,
-        "description": "BolusWizard: 24g",
-        "end_at": "2016-02-15T15:50:08",
-        "start_at": "2016-02-15T15:50:08",
-        "type": "Meal",
-        "unit": "g"
-    },
-    {
         "amount": 2.4,
         "description": "Normal bolus: 2.4U",
         "end_at": "2016-02-15T15:50:08",
@@ -95,6 +87,14 @@
         "type": "Bolus",
         "unit": "U",
         "raw" : "B9"
+    },
+    {
+        "amount": 24,
+        "description": "BolusWizard: 24g",
+        "end_at": "2016-02-15T15:50:08",
+        "start_at": "2016-02-15T15:50:08",
+        "type": "Meal",
+        "unit": "g"
     },
     {
         "amount": 0.0,
@@ -327,6 +327,15 @@
         "raw" : "TB33"
     },
     {
+        "amount": 0.65,
+        "description": "Normal bolus: 1.15U",
+        "end_at": "2016-02-15T20:18:54",
+        "start_at": "2016-02-15T20:18:54",
+        "type": "Bolus",
+        "unit": "U",
+        "raw" : "B35"
+    },
+    {
         "amount": 0,
         "description": "Pump Suspend",
         "end_at": "2016-02-15T20:25:01",
@@ -343,15 +352,6 @@
         "type": "TempBasal",
         "unit": "U/hour",
         "raw" : "R36"
-    },
-    {
-        "amount": 0.65,
-        "description": "Normal bolus: 1.15U",
-        "end_at": "2016-02-15T20:18:54",
-        "start_at": "2016-02-15T20:18:54",
-        "type": "Bolus",
-        "unit": "U",
-        "raw" : "B35"
     },
     {
         "amount": 2.875,

@@ -3,6 +3,7 @@ channels:
   - defaults
 dependencies:
   - matplotlib
+  - pip
   - numpy=1.16.4=py37hacdab7b_0
   - pandas=0.24.2=py37h0a44026_0
   - pylint=2.3.1=py37_0

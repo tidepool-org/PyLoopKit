@@ -8,7 +8,7 @@ Created on Thu Jun 20 10:29:59 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/InsulinMath.swift
 """
-# pylint: disable=R0913, R0914, C0200
+# pylint: disable=R0913, R0914, R0912, C0200
 from math import floor
 from datetime import timedelta, datetime
 from date import time_interval_since, time_interval_since_reference_date
@@ -137,10 +137,10 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     return True
 
 
-def annotated(dose_types, start_dates, end_dates, values,
-              scheduled_basal_rates, basal_start_times, basal_rates,
-              basal_minutes, convert_to_units_hr=False):
-    """ Annotates doses with the context of the scheduled basal rates
+def reconciled(dose_types, start_dates, end_dates, values,
+               scheduled_basal_rates):
+    """ Maps a timeline of dose entries with overlapping start and end dates
+        to a timeline of doses that represents actual insulin delivery.
 
     Arguments:
     basal_start_times -- list of times the basal rates start at
@@ -148,6 +148,130 @@ def annotated(dose_types, start_dates, end_dates, values,
     basal_minutes -- list of basal lengths (in mins)
     dose_start_date -- start date of the range (datetime obj)
     dose_end_date -- end date of the range (datetime obj)
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+    convert_to_units_hr -- set to True if you want to convert the doses to U/hr
+        (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
+
+    Variables:
+    last_suspend_index -- index of the last suspend entry, relative to the
+                          current search index
+    last_basal -- list with [type, start_date, end_date, value] structure
+
+    Output:
+    Tuple with *four* of the dose properties (does not include scheduled basal
+    rates), reconciled as TempBasal and Bolus records; these lists are
+    *not* always in order of time
+    """
+    # this function does not return a list of scheduled basal rates
+    output_types = []
+    output_starts = []
+    output_ends = []
+    output_values = []
+
+    last_suspend_index = None
+    last_basal = []
+
+    assert len(dose_types) == len(start_dates) == len(end_dates) ==\
+        len(values) == len(scheduled_basal_rates),\
+        "expected input shapes to match"
+
+    for (i, type_) in enumerate(dose_types):
+        if type_.lower() == "bolus":
+            output_types.append(type_)
+            output_starts.append(start_dates[i])
+            output_ends.append(end_dates[i])
+            output_values.append(values[i])
+
+        elif type_.lower() in ["tempbasal", "basalprofilestart"]:
+            if last_basal and not last_suspend_index:
+                last = last_basal
+                end_date = min(last[2], start_dates[i])
+
+                # ignore zero-duration doses
+                if end_date > last[1]:
+                    output_types.append(last[0])
+                    output_starts.append(last[1])
+                    output_ends.append(end_date)
+                    output_values.append(last[3])
+            last_basal = [type_, start_dates[i], end_dates[i],
+                          values[i]]
+
+        elif type_.lower() in ["resume", "pumpresume"]:
+            if last_suspend_index:
+                suspend = last_suspend_index
+
+                output_types.append(dose_types[suspend])
+                output_starts.append(start_dates[suspend])
+                output_ends.append(end_dates[i])
+                output_values.append(values[suspend])
+
+                last_suspend_index = None
+
+                # Continue temp basals that may have started before suspending
+                if last_basal:
+                    last = last_basal
+                    if last[2] > end_dates[i]:
+                        last_basal = [last[0], end_dates[i], last[2], last[3]]
+                    else:
+                        last_basal = []
+
+        elif type_.lower() in ["suspend", "pumpsuspend"]:
+            if last_basal:
+                last = last_basal
+
+                output_types.append(last[0])
+                output_starts.append(last[1])
+                output_ends.append(min(last[2], start_dates[i]))
+                output_values.append(last[3])
+
+                if last[2] <= start_dates[i]:
+                    last_basal = []
+            last_suspend_index = i
+
+        elif type_.lower() == "meal":
+            output_types.append(type_)
+            output_starts.append(start_dates[i])
+            output_ends.append(end_dates[i])
+            output_values.append(values[i])
+
+    if last_suspend_index or last_suspend_index == 0:
+        output_types.append(dose_types[last_suspend_index])
+        output_starts.append(start_dates[last_suspend_index])
+        output_ends.append(end_dates[last_suspend_index])
+        output_values.append(values[last_suspend_index])
+
+    elif last_basal and last[2] > last[1]:
+        # I slightly modified this because it wasn't dealing with the last
+        # basal correctly
+        output_types.append(dose_types[len(dose_types)-1])
+        output_starts.append(start_dates[len(start_dates)-1])
+        output_ends.append(end_dates[len(end_dates)-1])
+        output_values.append(values[len(values)-1])
+
+    assert len(output_types) == len(output_starts) == len(output_ends) ==\
+        len(output_values), "expected output shape to match"
+
+    return (output_types, output_starts, output_ends, output_values)
+
+
+def annotated(dose_types, start_dates, end_dates, values,
+              scheduled_basal_rates, basal_start_times, basal_rates,
+              basal_minutes, convert_to_units_hr=True):
+    """ Annotates doses with the context of the scheduled basal rates
+
+    Arguments:
+    dose_types -- list of types of dose (basal, bolus, etc)
+    dose_start_dates -- start dates of the doses (datetime obj)
+    dose_end_dates -- end dates of the doses (datetime obj)
+    valuse -- actual basal rates of doses in U/hr (if a basal)
+             or the value of the boluses in U
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+    convert_to_units_hr -- set to True if you want to convert the doses to U/hr
+        (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
 
     Output:
     5 lists of annotated dose properties
@@ -191,7 +315,7 @@ def annotated(dose_types, start_dates, end_dates, values,
 
 def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
                              basal_start_times, basal_rates, basal_minutes,
-                             convert_to_units_hr=False):
+                             convert_to_units_hr=True):
     """ Annotates a dose with the context of the scheduled basal rate
         If the dose crosses a schedule boundary, it will be split into
         multiple doses so each dose has a single scheduled basal rate.
@@ -207,13 +331,15 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     basal_start_times -- list of times the basal rates start at
     basal_rates -- list of basal rates(U/hr)
     basal_minutes -- list of basal lengths (in mins)
+    convert_to_units_hr -- set to True if you want to convert a dose to U/hr
+        (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
 
 
     Output:
-    Tuple in format (basal_start_times, basal_rates, basal_minutes) within
-    the range of dose_start_date and dose_end_date
+    Tuple with properties of doses, annotated with the current basal rates
     """
-    if dose_type not in ["Basal", "TempBasal"]:
+    if dose_type.lower() not in ["basalprofilestart", "tempbasal",
+                                 "pumpsuspend"]:
         return ([dose_type], [dose_start_date], [dose_end_date], [value],
                 [0])
 
@@ -246,8 +372,8 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
         if convert_to_units_hr:
             output_values.append(
-                value / (time_interval_since(
-                    dose_end_date, dose_start_date)/60/60))
+                0 if dose_type.lower() == "pumpsuspend" else value /
+                (time_interval_since(dose_end_date, dose_start_date)/60/60))
         else:
             output_values.append(value)
         output_scheduled_basal_rates.append(sched_basal_rates[i])
@@ -255,6 +381,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     assert len(output_types) == len(output_start_dates) ==\
         len(output_end_dates) == len(output_values) ==\
         len(output_scheduled_basal_rates), "expected output shapes to match"
+
     return (output_types, output_start_dates, output_end_dates, output_values,
             output_scheduled_basal_rates)
 

@@ -14,10 +14,11 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # of range
 import unittest
 from datetime import datetime, time
+import numpy
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
 from insulin_math import dose_entries, is_continuous, insulin_on_board,\
-                         glucose_effects
+                         glucose_effects, annotated, reconciled
 from exponential_insulin_model import percent_effect_remaining
 
 
@@ -231,66 +232,54 @@ class TestInsulinKitFunctions(unittest.TestCase):
             i_dates, i_volumes, datetime.fromisoformat("2016-01-30T17:30:00"),
             datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
 
-    # did not include testIOBFromSuspend, testIOBFromDoses, and
-    # testIOBFromNoDoses because they use the Walsh insulin model
-
     """ Tests for insulin_on_board """
 
-    """
-    func testIOBFromSuspend() {
-        let input = loadDoseFixture("suspend_dose")
-        let reconciledOutput = loadDoseFixture("suspend_dose_reconciled")
-        let normalizedOutput = loadDoseFixture("suspend_dose_reconciled_normalized")
-        let iobOutput = loadInsulinValueFixture("suspend_dose_reconciled_normalized_iob")
-        let basals = loadBasalRateScheduleFixture("basal")
-        let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
-
-        let reconciled = input.reconciled()
-
-        XCTAssertEqual(reconciledOutput.count, reconciled.count)
-
-        for (expected, calculated) in zip(reconciledOutput, reconciled) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.endDate, calculated.endDate)
-            XCTAssertEqual(expected.value, calculated.value)
-            XCTAssertEqual(expected.unit, calculated.unit)
-        }
-
-        let normalized = reconciled.annotated(with: basals)
-
-        XCTAssertEqual(normalizedOutput.count, normalized.count)
-
-        for (expected, calculated) in zip(normalizedOutput, normalized) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.endDate, calculated.endDate)
-            XCTAssertEqual(expected.value, calculated.netBasalUnitsPerHour, accuracy: Double(Float.ulpOfOne))
-            XCTAssertEqual(expected.unit, calculated.unit)
-        }
-
-        let iob = normalized.insulinOnBoard(model: insulinModel)
-
-        XCTAssertEqual(iobOutput.count, iob.count)
-
-        for (expected, calculated) in zip(iobOutput, iob) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.value, calculated.value, accuracy: Double(Float.ulpOfOne))
-        }
-    
     def test_iob_from_suspend(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("suspend_dose")
-        
         (r_types, r_start_dates, r_end_dates, r_values, r_scheduled_basal_rates
          ) = self.load_dose_fixture("suspend_dose_reconciled")
-        
         (n_types, n_start_dates, n_end_dates, n_values, n_scheduled_basal_rates
          ) = self.load_dose_fixture("suspend_dose_reconciled_normalized")
-
         (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
             "suspend_dose_reconciled_normalized_iob")
 
+        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
+            "basal")
         model = self.WALSH_MODEL
-    """
+
+        (r_out_types, r_out_start_dates, r_out_end_dates, r_out_values) =\
+            reconciled(
+                i_types, i_start_dates, i_end_dates, i_values,
+                i_scheduled_basal_rates)
+
+        self.assertEqual(len(r_types), len(r_out_types))
+        for i in range(0, len(r_types)):
+            self.assertEqual(r_start_dates[i], r_out_start_dates[i])
+            self.assertEqual(r_end_dates[i], r_out_end_dates[i])
+            self.assertAlmostEqual(r_values[i], r_out_values[i], 2)
+
+        (n_out_types, n_out_start_dates, n_out_end_dates, n_out_values,
+         n_out_scheduled_rates) =\
+            annotated(
+                r_out_types, r_out_start_dates, r_out_end_dates, r_out_values,
+                i_scheduled_basal_rates, start_times, rates, minutes)
+
+        self.assertEqual(len(n_types), len(n_out_types))
+        for i in range(0, len(r_types)):
+            self.assertEqual(n_start_dates[i], n_out_start_dates[i])
+            self.assertEqual(n_end_dates[i], n_out_end_dates[i])
+            self.assertAlmostEqual(n_values[i], n_out_values[i] -
+                                   n_out_scheduled_rates[i], 2)
+
+        (dates, insulin_values) = insulin_on_board(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model)
+
+        self.assertEqual(len(out_dates), len(dates))
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], dates[i])
+            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
 
     def test_iob_from_doses(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
@@ -310,17 +299,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
         for i in range(0, len(out_dates)):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
-            
-    """
-    func testIOBFromNoDoses() {
-        let input: [DoseEntry] = []
-        let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
-        let iob = input.insulinOnBoard(model: insulinModel)
-
-        XCTAssertEqual(0, iob.count)
-    }
-    """
     def test_iob_from_no_doses(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
          ) = ([], [], [], [], [])
@@ -391,6 +370,25 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_dates[i], dates[i])
             self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
 
+    def test_iob_from_reservoir_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_reservoir_history_output")
+
+        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
+            "iob_from_reservoir_output")
+
+        model = self.WALSH_MODEL
+
+        (dates, insulin_values) = insulin_on_board(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates, model)
+
+        self.assertEqual(len(out_dates), len(dates))
+
+        for i in range(0, len(out_dates)):
+            self.assertEqual(out_dates[i], dates[i])
+            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 0)
+
         """ Tests for percent_effect_remaining """
     def test_insulin_on_board_limits_for_exponential_model(self):
         # tests for adult curve (peak = 75 mins)
@@ -415,15 +413,14 @@ class TestInsulinKitFunctions(unittest.TestCase):
 
         (out_types, out_start_dates, out_end_dates, out_values,
          out_scheduled_basal_rates) = self.load_dose_fixture(
-            "normalized_reservoir_history_output")
+             "normalized_reservoir_history_output")
 
         (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
             "basal")
 
         (types, start_dates, end_dates, values, scheduled_basal_rates
          ) = annotated(i_types, i_start_dates, i_end_dates, i_values,
-                       i_scheduled_basal_rates, start_times, rates, minutes,
-                       convert_to_units_hr=True)
+                       i_scheduled_basal_rates, start_times, rates, minutes)
 
         self.assertEqual(len(out_types), len(types))
 
@@ -440,14 +437,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
 
         (out_types, out_start_dates, out_end_dates, out_values,
          out_scheduled_basal_rates) = self.load_dose_fixture(
-            "normalize_edge_case_doses_output")
+             "normalize_edge_case_doses_output")
 
         (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
             "basal")
 
         (types, start_dates, end_dates, values, scheduled_basal_rates
          ) = annotated(i_types, i_start_dates, i_end_dates, i_values,
-                       i_scheduled_basal_rates, start_times, rates, minutes)
+                       i_scheduled_basal_rates, start_times, rates, minutes,
+                       convert_to_units_hr=False)
 
         self.assertEqual(len(out_types), len(types))
 
@@ -455,45 +453,64 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_start_dates[i], start_dates[i])
             self.assertEqual(out_end_dates[i], end_dates[i])
             self.assertAlmostEqual(out_values[i], values[i] -
-                scheduled_basal_rates[i], 2)
+                                   scheduled_basal_rates[i], 2)
 
-    """
-    func testReconcileTempBasals() {
-        // Fixture contains numerous overlapping temp basals, as well as a Suspend event interleaved with a temp basal
-        let input = loadDoseFixture("reconcile_history_input")
-        let output = loadDoseFixture("reconcile_history_output").sorted { $0.startDate < $1.startDate }
+    def test_reconcile_temp_basals(self):
+        # Fixture contains numerous overlapping temp basals, as well as a
+        # Suspend event interleaved with a temp basal
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("reconcile_history_input")
 
-        let doses = input.reconciled().sorted { $0.startDate < $1.startDate }
+        (out_types, out_start_dates, out_end_dates, out_values,
+         out_scheduled_basal_rates) = self.load_dose_fixture(
+             "reconcile_history_output")
 
-        XCTAssertEqual(output.count, doses.count)
+        (types, start_dates, end_dates, values) = reconciled(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates)
 
-        for (expected, calculated) in zip(output, doses) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.endDate, calculated.endDate)
-            XCTAssertEqual(expected.value, calculated.value)
-            XCTAssertEqual(expected.unit, calculated.unit)
-            XCTAssertEqual(expected.syncIdentifier, calculated.syncIdentifier)
-        }
-    }
+        # sort the lists because they're out of order due to all the
+        # meals during temp basals
+        unsort_types = numpy.array(types)
+        start_dates = numpy.array(start_dates)
+        unsort_end_dates = numpy.array(end_dates)
+        unsort_values = numpy.array(values)
 
-    func testReconcileResumeBeforeRewind() {
-        let input = loadDoseFixture("reconcile_resume_before_rewind_input")
-        let output = loadDoseFixture("reconcile_resume_before_rewind_output")
+        sort_ind = start_dates.argsort()
+        types = unsort_types[sort_ind]
+        start_dates.sort()
+        end_dates = unsort_end_dates[sort_ind]
+        values = unsort_values[sort_ind]
 
-        let doses = input.reconciled()
+        self.assertEqual(len(out_types), len(types))
 
-        XCTAssertEqual(output.count, doses.count)
+        for i in range(0, len(out_types)):
 
-        for (expected, calculated) in zip(output, doses) {
-            XCTAssertEqual(expected.startDate, calculated.startDate)
-            XCTAssertEqual(expected.endDate, calculated.endDate)
-            XCTAssertEqual(expected.value, calculated.value)
-            XCTAssertEqual(expected.unit, calculated.unit)
-            XCTAssertEqual(expected.syncIdentifier, calculated.syncIdentifier)
-        }
-    }
+            self.assertEqual(out_start_dates[i], start_dates[i])
+            self.assertEqual(out_end_dates[i], end_dates[i])
+            self.assertAlmostEqual(out_values[i], values[i], 2)
 
-    """
+    def test_reconcile_before_rewind(self):
+        # Fixture contains numerous overlapping temp basals, as well as a
+        # Suspend event interleaved with a temp basal
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("reconcile_resume_before_rewind_input")
+
+        (out_types, out_start_dates, out_end_dates, out_values,
+         out_scheduled_basal_rates) = self.load_dose_fixture(
+             "reconcile_resume_before_rewind_output")
+
+        (types, start_dates, end_dates, values) = reconciled(
+            i_types, i_start_dates, i_end_dates, i_values,
+            i_scheduled_basal_rates)
+
+        self.assertEqual(len(out_types), len(types))
+
+        for i in range(0, len(out_types)):
+            self.assertEqual(out_start_dates[i], start_dates[i])
+            self.assertEqual(out_end_dates[i], end_dates[i])
+            self.assertAlmostEqual(out_values[i], values[i], 2)
+
     """ Tests for glucose_effect """
     def test_glucose_effect_from_bolus(self):
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates

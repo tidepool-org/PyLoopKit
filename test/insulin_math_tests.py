@@ -18,7 +18,8 @@ import numpy
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
 from insulin_math import dose_entries, is_continuous, insulin_on_board,\
-                         glucose_effects, annotated, reconciled
+                         glucose_effects, annotated, reconciled,\
+                         total_delivery, trim, overlay_basal_schedule
 from exponential_insulin_model import percent_effect_remaining
 
 
@@ -32,6 +33,9 @@ class TestInsulinKitFunctions(unittest.TestCase):
     INSULIN_SENSITIVITY_START_DATES = [time(0, 0)]
     INSULIN_SENSITIVITY_END_DATES = [time(23, 59)]
     INSULIN_SENSITIVITY_VALUES = [40]
+
+    TRIM_END_DATE = datetime.fromisoformat("2015-10-15T22:25:50")
+    DISTANT_FUTURE = datetime.fromisoformat("2050-01-01T00:00:00")
 
     def load_reservoir_fixture(self, resource_name):
         """ Load reservior data from json file
@@ -490,7 +494,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(out_end_dates[i], end_dates[i])
             self.assertAlmostEqual(out_values[i], values[i], 2)
 
-    def test_reconcile_before_rewind(self):
+    def test_reconcile_resume_before_rewind(self):
         # Fixture contains numerous overlapping temp basals, as well as a
         # Suspend event interleaved with a temp basal
         (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates

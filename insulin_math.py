@@ -8,9 +8,10 @@ Created on Thu Jun 20 10:29:59 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/InsulinMath.swift
 """
-# pylint: disable=R0913, R0914, R0912, C0200, R0915
+# pylint: disable=R0913, R0914, R0912, C0200, R0915, R1702
 from math import floor
 from datetime import timedelta, datetime
+import sys
 
 from date import time_interval_since, time_interval_since_reference_date
 from loop_math import simulation_date_range_for_samples
@@ -300,7 +301,8 @@ def annotated(dose_types, start_dates, end_dates, values,
     basal_rates -- list of basal rates(U/hr)
     basal_minutes -- list of basal lengths (in mins)
     convert_to_units_hr -- set to True if you want to convert the doses to U/hr
-        (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
+        (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr);
+        this will normally be reservoir values
 
     Output:
     5 lists of annotated dose properties
@@ -415,23 +417,23 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
             output_scheduled_basal_rates)
 
 
-def between(basal_start_times, basal_rates, basal_minutes, dose_start_date,
-            dose_end_date, repeat_interval=24):
+def between(basal_start_times, basal_rates, basal_minutes, start_date,
+            end_date, repeat_interval=24):
     """ Returns a slice of scheduled basal rates that occur between two dates
 
     Arguments:
     basal_start_times -- list of times the basal rates start at
     basal_rates -- list of basal rates(U/hr)
     basal_minutes -- list of basal lengths (in mins)
-    dose_start_date -- start date of the range (datetime obj)
-    dose_end_date -- end date of the range (datetime obj)
+    start_date -- start date of the range (datetime obj)
+    end_date -- end date of the range (datetime obj)
 
     Output:
     Tuple in format (basal_start_times, basal_rates, basal_minutes) within
     the range of dose_start_date and dose_end_date
     """
 
-    if dose_start_date > dose_end_date:
+    if start_date > end_date:
         return ([], [], [])
 
     reference_time_interval = timedelta(
@@ -440,18 +442,18 @@ def between(basal_start_times, basal_rates, basal_minutes, dose_start_date,
     max_time_interval = reference_time_interval + timedelta(
         hours=repeat_interval)
 
-    start_offset = schedule_offset(dose_start_date, basal_start_times[0])
+    start_offset = schedule_offset(start_date, basal_start_times[0])
     end_offset = start_offset + timedelta(seconds=time_interval_since(
-        dose_end_date, dose_start_date))
+        end_date, start_date))
 
     if end_offset > max_time_interval:
-        boundary_date = dose_start_date + (max_time_interval - start_offset)
+        boundary_date = start_date + (max_time_interval - start_offset)
         (start_times_1, end_times_1, basal_rates_1) = between(
-            basal_start_times, basal_rates, basal_minutes, dose_start_date,
+            basal_start_times, basal_rates, basal_minutes, start_date,
             boundary_date)
         (start_times_2, end_times_2, basal_rates_2) = between(
             basal_start_times, basal_rates, basal_minutes, boundary_date,
-            dose_end_date)
+            end_date)
 
         return (start_times_1 + start_times_2,
                 end_times_1 + end_times_2,
@@ -471,7 +473,7 @@ def between(basal_start_times, basal_rates, basal_minutes, dose_start_date,
             end_index = i
             break
 
-    reference_date = dose_start_date - start_offset
+    reference_date = start_date - start_offset
 
     if start_index > end_index:
         return ([], [], [])
@@ -879,3 +881,115 @@ def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
                 (time - delay - dose_date), model[0], model[1]))
         dose_date += delta
     return activity
+
+
+def trim(dose_type, start, end, value, scheduled_basal_rate,
+         start_interval=None, end_interval=None):
+    """ Trim doses to be within a particular interval
+
+    Arguments:
+    dose_type -- type of dose (basal, bolus, etc)
+    start -- datetime object of time dose started at
+    end -- datetime object of time dose ended at
+    value -- amount, in U/hr (if a basal) or U (if bolus) of insulin in dose
+    scheduled_basal_rate -- scheduled basal rate at the dose time
+    start_interval -- start of interval to trim dose (datetime object)
+    end_interval -- end of interval to trim dose (datetime object)
+
+    Output:
+    List with dose properties, trimmed to be in range (start_interval,
+    end_interval). Format: [dose_type, dose_start_date, dose_end_date,
+                            dose_value, dose_scheduled_rate]
+    """
+    start_date = max(start_interval or DISTANT_PAST, start)
+
+    return [dose_type, start_date, max(
+        start_date, min(end_interval or DISTANT_FUTURE, end)), value,
+            scheduled_basal_rate]
+
+
+def overlay_basal_schedule(dose_types, starts, ends, values,
+                           basal_start_times, basal_rates, basal_minutes,
+                           starting_at, ending_at, inserting_basal_entries):
+    """ Applies the current basal schedule to a collection of reconciled doses
+        in chronological order
+
+        The scheduled basal rate is associated doses that override it, for
+        later derivation of net delivery
+
+    Arguments:
+    dose_types -- types of doses (basal, bolus, etc)
+    starts -- datetime objects of times doses started at
+    ends -- datetime objects of times doses ended at
+    values -- amounts, in U/hr (if a basal) or U (if bolus) of insulin in doses
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+    starting_at -- start of interval to overlay the basal schedule
+                   (datetime object)
+    ending_at -- end of interval to overlay the basal schedule
+                 (datetime object)
+    inserting_basal_entries -- whether basal doses should be created from the
+                               schedule. Pass true only for pump models that do
+                               not report their basal rates in event history.
+
+    Output:
+    Tuple with dose properties in range (start_interval,
+    end_interval), overlayed with the basal schedule. It returns *four* dose
+    properties, and does *not* return scheduled_basal_rates
+    """
+    assert len(dose_types) == len(starts) == len(ends) == len(values),\
+        "expected input shapes to match"
+
+    (out_dose_types, out_starts, out_ends, out_values)\
+        = ([], [], [], [])
+
+    last_basal = []
+    if inserting_basal_entries:
+        last_basal = ["tempbasal", starting_at, starting_at, 0]
+
+    for (i, type_) in enumerate(dose_types):
+        if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart"]:
+            if ends[i] > ending_at:
+                continue
+
+            if last_basal:
+                if inserting_basal_entries:
+                    (sched_basal_starts, sched_basal_ends, sched_basal_rates)\
+                        = between(
+                            basal_start_times, basal_rates, basal_minutes,
+                            last_basal[2], starts[i])
+                    for j in range(0, len(sched_basal_starts)):
+                        start = max(last_basal[2], sched_basal_starts[j])
+                        end = min(starts[i], sched_basal_ends[j])
+
+                        if time_interval_since(end, start)\
+                                < sys.float_info.epsilon:
+                            continue
+
+                        out_dose_types.append("BasalProfileStart")
+                        out_starts.append(start)
+                        out_ends.append(end)
+                        out_values.append(sched_basal_rates[j])
+
+            last_basal = [dose_types[i], starts[i], ends[i], values[i]]
+
+            if last_basal:
+                out_dose_types.append(last_basal[0])
+                out_starts.append(last_basal[1])
+                out_ends.append(last_basal[2])
+                out_values.append(last_basal[3])
+
+        elif type_.lower() == "resume":
+            assert "No resume events should be present in reconciled doses"
+
+        elif type_.lower() == "bolus":
+            out_dose_types.append(dose_types[i])
+            out_starts.append(starts[i])
+            out_ends.append(ends[i])
+            out_values.append(values[i])
+
+    assert len(out_dose_types) == len(out_starts) == len(out_ends)\
+        == len(out_values), "expected output shape to match"
+
+    return (out_dose_types, out_starts, out_ends, out_values)

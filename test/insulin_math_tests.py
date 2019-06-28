@@ -693,6 +693,117 @@ class TestInsulinKitFunctions(unittest.TestCase):
 
         self.assertEqual(0, len(effect_dates))
 
+    """ Tests for total_delivery """
+    def test_total_delivery(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalize_edge_case_doses_input")
+
+        total = total_delivery(i_types, i_start_dates, i_end_dates, i_values)
+
+        self.assertAlmostEqual(18.8, total, 2)
+
+    """ Tests for trim """
+    def test_trim_continuing_doses(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_doses")
+
+        # put the dose lists in order of start time
+        unsort_types = numpy.array(i_types)
+        i_start_dates = numpy.array(i_start_dates)
+        unsort_end_dates = numpy.array(i_end_dates)
+        unsort_values = numpy.array(i_values)
+
+        sort_ind = i_start_dates.argsort()
+        i_types = unsort_types[sort_ind]
+        i_start_dates.sort()
+        i_end_dates = unsort_end_dates[sort_ind]
+        i_values = unsort_values[sort_ind]
+
+        assert len(i_types) == len(i_start_dates) == len(i_end_dates)\
+            == len(i_values), "expected fixture to include data for all doses"
+
+        for i in range(0, len(i_types)):
+            trimmed = trim(
+                i_types[i], i_start_dates[i], i_end_dates[i], i_values[i],
+                i_scheduled_basal_rates[i], end_interval=self.TRIM_END_DATE)
+            if i == len(i_types)-1:
+                self.assertEqual(self.TRIM_END_DATE, trimmed[2])
+                self.assertEqual(len(i_types), i+1)
+
+    def test_doses_overlay_basal_profile(self):
+        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+         ) = self.load_dose_fixture("reconcile_history_output")
+
+        # put the dose lists in order of start time
+        unsort_types = numpy.array(i_types)
+        i_start_dates = numpy.array(i_start_dates)
+        unsort_end_dates = numpy.array(i_end_dates)
+        unsort_values = numpy.array(i_values)
+
+        sort_ind = i_start_dates.argsort()
+        i_types = list(unsort_types[sort_ind])
+        i_start_dates.sort()
+        i_end_dates = list(unsort_end_dates[sort_ind])
+        i_values = list(unsort_values[sort_ind])
+
+        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
+            "basal")
+
+        (out_types, out_start_dates, out_end_dates, out_values,
+         out_scheduled_basal_rates) = self.load_dose_fixture(
+             "doses_overlay_basal_profile_output")
+
+        (a_types, a_start_dates, a_end_dates, a_values,
+         a_scheduled_basal_rates) = annotated(
+             i_types, list(i_start_dates), i_end_dates, i_values,
+             i_scheduled_basal_rates, start_times, rates, minutes,
+             convert_to_units_hr=False)
+
+        (types, starts, ends, values) = overlay_basal_schedule(
+            a_types, a_start_dates, a_end_dates, a_values, start_times, rates,
+            minutes, datetime.fromisoformat("2016-02-15T14:01:04"),
+            self.DISTANT_FUTURE, True)
+
+        self.assertEqual(len(out_types), len(types))
+
+        for i in range(0, len(out_types)):
+            self.assertEqual(out_start_dates[i], starts[i])
+            self.assertEqual(out_end_dates[i], ends[i])
+            self.assertEqual(out_values[i], values[i])
+
+        (a_trim_types, a_trim_start_dates, a_trim_end_dates, a_trim_values,
+         a_trim_scheduled_basal_rates) = annotated(
+             i_types[0:len(i_types) - 11],
+             list(i_start_dates)[0:len(i_types) - 11],
+             i_end_dates[0:len(i_types) - 11], i_values[0:len(i_types) - 11],
+             i_scheduled_basal_rates[0:len(i_types) - 11], start_times, rates,
+             minutes, convert_to_units_hr=False)
+
+        (t_types, t_starts, t_ends, t_values) = overlay_basal_schedule(
+            a_trim_types, a_trim_start_dates, a_trim_end_dates, a_trim_values,
+            start_times, rates,
+            minutes, datetime.fromisoformat("2016-02-15T14:01:04"),
+            datetime.fromisoformat("2016-02-15T19:45:00"), True)
+
+        self.assertEqual(len(out_types) - 14, len(t_types))
+        self.assertEqual(
+            datetime.fromisoformat("2016-02-15T19:36:11"),
+            t_ends[len(t_ends)-1])
+
+        (m_types, m_starts, m_ends, m_values) = overlay_basal_schedule(
+            i_types, list(i_start_dates), i_end_dates, i_values,
+            start_times, rates,
+            minutes, datetime.fromisoformat("2016-02-15T15:06:05"),
+            self.DISTANT_FUTURE, True)
+
+        self.assertEqual(len(out_types) - 2, len(m_types))
+        self.assertEqual(
+            datetime.fromisoformat("2016-02-15T14:58:02"),
+            t_ends[0])
+
+    # not including appendedUnion because it's more for dose-management and
+    # not really used
+
 
 if __name__ == '__main__':
     unittest.main()

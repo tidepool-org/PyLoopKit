@@ -38,7 +38,7 @@ def find_full_path(resource_name, extension):
     path to file
     """
     search_dir = os.path.dirname(__file__)
-    for root, dirs, files in os.walk(search_dir):
+    for root, dirs, files in os.walk(search_dir): #pylint: disable=W0612
         for name in files:
             (base, ext) = os.path.splitext(name)
             if base == resource_name and extension == ext:

@@ -12,6 +12,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # disable pylint errors for too many arguments/variables
 import math
 from datetime import timedelta
+
 from date import time_interval_since
 from loop_math import simulation_date_range_for_samples
 
@@ -34,7 +35,7 @@ def linear_regression(x_list, y_list):
     sum_y_squared = 0.0
     count = len(x_list)
 
-    for i in range(0, len(x_list)): # pylint: disable=C0200
+    for i in range(0, len(x_list)):  # pylint: disable=C0200
         x = x_list[i]
         y = y_list[i]
         sum_x += x

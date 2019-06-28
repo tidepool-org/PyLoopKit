@@ -131,6 +131,9 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     except IndexError:
         return False
 
+    if end < start:
+        return False
+
     start_date = start
     # The first value has to be at least as old as the start date
     # as a reference point.
@@ -295,7 +298,7 @@ def annotated(dose_types, start_dates, end_dates, values,
     dose_types -- list of types of dose (basal, bolus, etc)
     dose_start_dates -- start dates of the doses (datetime obj)
     dose_end_dates -- end dates of the doses (datetime obj)
-    valuse -- actual basal rates of doses in U/hr (if a basal)
+    values -- actual basal rates of doses in U/hr (if a basal)
              or the value of the boluses in U
     basal_start_times -- list of times the basal rates start at
     basal_rates -- list of basal rates(U/hr)
@@ -587,7 +590,8 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
         iob_values.append(iob_sum)
         date += timedelta(minutes=delta)
 
-    assert len(iob_dates) == len(iob_values)
+    assert len(iob_dates) == len(iob_values), "expected output shape to match"
+
     return (iob_dates, iob_values)
 
 
@@ -612,8 +616,10 @@ def insulin_on_board_calc(type_, start_date, end_date, value,
     IOB at date
     """
     time = time_interval_since(date, start_date)/60
-    if time < 0:
+
+    if start_date > end_date or time < 0:
         return 0
+
     if len(model) == 1:  # walsh model
         if time_interval_since(end_date, start_date) <= 1.05 * delta:
             return net_basal_units(type_, value, start_date, end_date,
@@ -656,6 +662,9 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
     Percentage of insulin remaining at the at_date
     """
     dose_duration = time_interval_since(end_date, start_date)/60
+    if dose_duration < 0:
+        return 0
+
     time = time_interval_since(at_date, start_date)/60
     iob = 0
     dose_date = 0
@@ -709,7 +718,7 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
         == len(dose_values) == len(scheduled_basal_rates),\
         "expected input shapes to match"
 
-    if not dose_types:
+    if not dose_types:  # if using a Walsh model
         return ([], [])
 
     if len(model) == 1:
@@ -860,6 +869,8 @@ def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
     Percentage of insulin remaining at the at_date
     """
     dose_duration = time_interval_since(dose_end_date, dose_start_date)/60
+    if dose_duration < 0:
+        return 0
     time = time_interval_since(at_date, dose_start_date)/60
     activity = 0
     dose_date = 0

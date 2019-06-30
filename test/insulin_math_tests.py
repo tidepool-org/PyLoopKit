@@ -8,18 +8,19 @@ Created on Thu Jun 20 09:00:27 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/InsulinMathTests.swift
 """
-# pylint: disable = R0201, C0111, W0105, W0612, C0200, R0914, R0904
-# diable pylint warnings for "method could be function", String statement
+# pylint: disable = R0201, C0111, W0105, W0612, C0200, R0914, R0904, C0302
+# disable pylint warnings for "method could be function", String statement
 # has no effect, unused variable (for tuple unpacking), enumerate instead
 # of range
 import unittest
 from datetime import datetime, time
 import numpy
+
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from insulin_math import dose_entries, is_continuous, insulin_on_board,\
-                         glucose_effects, annotated, reconciled,\
-                         total_delivery, trim, overlay_basal_schedule
+from insulin_math import (dose_entries, is_continuous, insulin_on_board,
+                          glucose_effects, annotated, reconciled,
+                          total_delivery, trim, overlay_basal_schedule)
 from exponential_insulin_model import percent_effect_remaining
 
 
@@ -52,8 +53,10 @@ class TestInsulinKitFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        dates = [datetime.fromisoformat(dict_.get("date"))
-                 for dict_ in fixture]
+        dates = [
+            datetime.fromisoformat(dict_.get("date"))
+            for dict_ in fixture
+        ]
         unit_volumes = [dict_.get("amount") for dict_ in fixture]
 
         assert len(dates) == len(unit_volumes),\
@@ -73,15 +76,22 @@ class TestInsulinKitFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        dose_types = [dict_.get("type") or "!" for dict_ in fixture]
-        start_dates = [datetime.fromisoformat(dict_.get("start_at"))
-                       for dict_ in fixture]
-        end_dates = [datetime.fromisoformat(dict_.get("end_at"))
-                     for dict_ in fixture]
+        dose_types = [
+            dict_.get("type") or "!" for dict_ in fixture
+        ]
+        start_dates = [
+            datetime.fromisoformat(dict_.get("start_at"))
+            for dict_ in fixture
+        ]
+        end_dates = [
+            datetime.fromisoformat(dict_.get("end_at"))
+            for dict_ in fixture
+        ]
         values = [dict_.get("amount") for dict_ in fixture]
         # not including description, unit, and raw bc not relevent
-        scheduled_basal_rates = [dict_.get("scheduled") or 0
-                                 for dict_ in fixture]
+        scheduled_basal_rates = [
+            dict_.get("scheduled") or 0 for dict_ in fixture
+        ]
 
         assert len(dose_types) == len(start_dates) == len(end_dates) ==\
             len(values) == len(scheduled_basal_rates),\
@@ -110,8 +120,10 @@ class TestInsulinKitFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        start_dates = [datetime.fromisoformat(dict_.get("date"))
-                       for dict_ in fixture]
+        start_dates = [
+            datetime.fromisoformat(dict_.get("date"))
+            for dict_ in fixture
+        ]
         insulin_values = [dict_.get("value") for dict_ in fixture]
 
         assert len(start_dates) == len(insulin_values),\
@@ -130,8 +142,10 @@ class TestInsulinKitFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        dates = [datetime.fromisoformat(dict_.get("date"))
-                 for dict_ in fixture]
+        dates = [
+            datetime.fromisoformat(dict_.get("date"))
+            for dict_ in fixture
+        ]
         glucose_values = [dict_.get("amount") for dict_ in fixture]
 
         assert len(dates) == len(glucose_values),\
@@ -151,8 +165,10 @@ class TestInsulinKitFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        start_times = [datetime.strptime(dict_.get("start"), "%H:%M:%S").time()
-                       for dict_ in fixture]
+        start_times = [
+            datetime.strptime(dict_.get("start"), "%H:%M:%S").time()
+            for dict_ in fixture
+        ]
         rates = [dict_.get("rate") for dict_ in fixture]
         minutes = [dict_.get("minutes") for dict_ in fixture]
 
@@ -164,314 +180,642 @@ class TestInsulinKitFunctions(unittest.TestCase):
     """ Tests for dose_entries """
     def test_dose_entries_from_reservoir_values(self):
         (i_dates, i_volumes) = self.load_reservoir_fixture(
-            "reservoir_history_with_rewind_and_prime_input")
-        (out_dose_types, out_start_dates, out_end_dates, out_values,
-         out_scheduled_basal_rates) = self.load_dose_fixture(
-             "reservoir_history_with_rewind_and_prime_output")
+            "reservoir_history_with_rewind_and_prime_input"
+        )
+        (out_dose_types,
+         out_start_dates,
+         out_end_dates,
+         out_values,
+         out_scheduled_basal_rates
+         ) = self.load_dose_fixture(
+             "reservoir_history_with_rewind_and_prime_output"
+             )
 
         out_start_dates.reverse()
         out_end_dates.reverse()
         out_values.reverse()
 
-        (dose_types, start_dates, end_dates, values) = dose_entries(
-            i_dates, i_volumes)
+        (dose_types,
+         start_dates,
+         end_dates,
+         values) = dose_entries(
+             i_dates, i_volumes
+         )
 
-        self.assertEqual(len(out_start_dates), len(start_dates))
+        self.assertEqual(
+            len(out_start_dates), len(start_dates)
+        )
+
         for i in range(0, len(out_start_dates)):
-            self.assertEqual(out_start_dates[i], start_dates[i])
-            self.assertEqual(out_end_dates[i], end_dates[i])
-            self.assertAlmostEqual(out_values[i], values[i], 2)
+            self.assertEqual(
+                out_start_dates[i], start_dates[i]
+            )
+            self.assertEqual(
+                out_end_dates[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_values[i], values[i], 2
+            )
 
     """ Tests for is_continuous """
     def test_continuous_reservoir_values(self):
         (i_dates, i_volumes) = self.load_reservoir_fixture(
-            "reservoir_history_with_rewind_and_prime_input")
-        self.assertTrue(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+            "reservoir_history_with_rewind_and_prime_input"
+        )
+        self.assertTrue(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T16:40:00"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
 
         # We don't assert whether it's "stale".
-        self.assertTrue(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
-            datetime.fromisoformat("2016-01-30T22:40:00"), self.WITHIN))
-        self.assertTrue(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
-            datetime.now(), self.WITHIN))
+        self.assertTrue(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T16:40:00"),
+                datetime.fromisoformat("2016-01-30T22:40:00"),
+                self.WITHIN
+            )
+        )
+        self.assertTrue(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T16:40:00"),
+                datetime.now(),
+                self.WITHIN
+            )
+        )
 
         # The values must extend the startDate boundary
-        self.assertFalse(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T15:00:00"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+        self.assertFalse(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T15:00:00"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
 
         # (the boundary condition is GTE)
-        self.assertTrue(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:00:42"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+        self.assertTrue(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T16:00:42"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
 
         # Rises in reservoir volume taint the entire range
-        self.assertFalse(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T15:55:00"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+        self.assertFalse(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T15:55:00"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
 
         # Any values of 0 taint the entire range
         i_dates.append(datetime.fromisoformat("2016-01-30T20:37:00"))
         i_volumes.append(0)
-        self.assertFalse(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+
+        self.assertFalse(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T16:40:00"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
 
         # As long as the 0 is within the date interval bounds
-        self.assertTrue(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T16:40:00"),
-            datetime.fromisoformat("2016-01-30T19:40:00"), self.WITHIN))
+        self.assertTrue(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T16:40:00"),
+                datetime.fromisoformat("2016-01-30T19:40:00"),
+                self.WITHIN
+            )
+        )
 
     def test_non_continuous_reservoir_values(self):
         (i_dates, i_volumes) = self.load_reservoir_fixture(
-            "reservoir_history_with_continuity_holes")
+            "reservoir_history_with_continuity_holes"
+        )
 
-        self.assertTrue(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T18:30:00"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
-        self.assertFalse(is_continuous(
-            i_dates, i_volumes, datetime.fromisoformat("2016-01-30T17:30:00"),
-            datetime.fromisoformat("2016-01-30T20:40:00"), self.WITHIN))
+        self.assertTrue(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T18:30:00"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
+        self.assertFalse(
+            is_continuous(
+                i_dates,
+                i_volumes,
+                datetime.fromisoformat("2016-01-30T17:30:00"),
+                datetime.fromisoformat("2016-01-30T20:40:00"),
+                self.WITHIN
+            )
+        )
 
     """ Tests for insulin_on_board """
 
     def test_iob_from_suspend(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("suspend_dose")
-        (r_types, r_start_dates, r_end_dates, r_values, r_scheduled_basal_rates
-         ) = self.load_dose_fixture("suspend_dose_reconciled")
-        (n_types, n_start_dates, n_end_dates, n_values, n_scheduled_basal_rates
-         ) = self.load_dose_fixture("suspend_dose_reconciled_normalized")
-        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "suspend_dose_reconciled_normalized_iob")
 
-        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
-            "basal")
+        (r_types,
+         r_start_dates,
+         r_end_dates,
+         r_values,
+         r_scheduled_basal_rates
+         ) = self.load_dose_fixture("suspend_dose_reconciled")
+
+        (n_types,
+         n_start_dates,
+         n_end_dates,
+         n_values,
+         n_scheduled_basal_rates
+         ) = self.load_dose_fixture("suspend_dose_reconciled_normalized")
+
+        (out_dates,
+         out_insulin_values
+         ) = self.load_insulin_value_fixture(
+             "suspend_dose_reconciled_normalized_iob"
+             )
+
+        (start_times,
+         rates,
+         minutes
+         ) = self.load_basal_rate_schedule_fixture("basal")
+
         model = self.WALSH_MODEL
 
-        (r_out_types, r_out_start_dates, r_out_end_dates, r_out_values) =\
-            reconciled(
-                i_types, i_start_dates, i_end_dates, i_values,
-                i_scheduled_basal_rates)
+        (r_out_types,
+         r_out_start_dates,
+         r_out_end_dates,
+         r_out_values
+         ) = reconciled(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates
+             )
 
-        self.assertEqual(len(r_types), len(r_out_types))
+        self.assertEqual(
+            len(r_types), len(r_out_types)
+        )
         for i in range(0, len(r_types)):
-            self.assertEqual(r_start_dates[i], r_out_start_dates[i])
-            self.assertEqual(r_end_dates[i], r_out_end_dates[i])
-            self.assertAlmostEqual(r_values[i], r_out_values[i], 2)
+            self.assertEqual(
+                r_start_dates[i], r_out_start_dates[i]
+            )
+            self.assertEqual(
+                r_end_dates[i], r_out_end_dates[i]
+            )
+            self.assertAlmostEqual(
+                r_values[i], r_out_values[i], 2
+            )
 
-        (n_out_types, n_out_start_dates, n_out_end_dates, n_out_values,
-         n_out_scheduled_rates) =\
-            annotated(
-                r_out_types, r_out_start_dates, r_out_end_dates, r_out_values,
-                i_scheduled_basal_rates, start_times, rates, minutes)
+        (n_out_types,
+         n_out_start_dates,
+         n_out_end_dates,
+         n_out_values,
+         n_out_scheduled_rates) = annotated(
+             r_out_types,
+             r_out_start_dates,
+             r_out_end_dates,
+             r_out_values,
+             i_scheduled_basal_rates,
+             start_times,
+             rates,
+             minutes
+             )
 
-        self.assertEqual(len(n_types), len(n_out_types))
+        self.assertEqual(
+            len(n_types), len(n_out_types)
+        )
         for i in range(0, len(r_types)):
-            self.assertEqual(n_start_dates[i], n_out_start_dates[i])
-            self.assertEqual(n_end_dates[i], n_out_end_dates[i])
-            self.assertAlmostEqual(n_values[i], n_out_values[i] -
-                                   n_out_scheduled_rates[i], 2)
+            self.assertEqual(
+                n_start_dates[i], n_out_start_dates[i]
+            )
+            self.assertEqual(
+                n_end_dates[i], n_out_end_dates[i]
+            )
+            self.assertAlmostEqual(
+                n_values[i],
+                n_out_values[i] - n_out_scheduled_rates[i], 2
+            )
 
-        (dates, insulin_values) = insulin_on_board(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model)
+        (dates,
+         insulin_values
+         ) = insulin_on_board(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model
+             )
 
-        self.assertEqual(len(out_dates), len(dates))
+        self.assertEqual(
+            len(out_dates), len(dates)
+        )
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], dates[i])
-            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
+            self.assertEqual(
+                out_dates[i], dates[i]
+            )
+            self.assertAlmostEqual(
+                out_insulin_values[i], insulin_values[i], 1
+            )
 
     def test_iob_from_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "iob_from_doses_output_new")
+        (out_dates,
+         out_insulin_values
+         ) = self.load_insulin_value_fixture(
+             "iob_from_doses_output_new"
+             )
 
         model = self.WALSH_MODEL
 
-        (dates, insulin_values) = insulin_on_board(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model)
+        (dates,
+         insulin_values
+         ) = insulin_on_board(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model
+             )
 
-        self.assertEqual(len(out_dates), len(dates))
+        self.assertEqual(
+            len(out_dates), len(dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], dates[i])
-            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
+            self.assertEqual(
+                out_dates[i], dates[i]
+            )
+            self.assertAlmostEqual(
+                out_insulin_values[i], insulin_values[i], 1
+            )
 
     def test_iob_from_no_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
-         ) = ([], [], [], [], [])
-
         model = self.WALSH_MODEL
 
-        (dates, insulin_values) = insulin_on_board(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model)
+        (dates,
+         insulin_values
+         ) = insulin_on_board([], [], [], [], [], model)
 
         self.assertEqual(0, len(dates))
 
     def test_iob_from_doses_exponential(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "iob_from_doses_exponential_output_new")
+        (out_dates,
+         out_insulin_values
+         ) = self.load_insulin_value_fixture(
+             "iob_from_doses_exponential_output_new"
+             )
 
         model = self.MODEL
 
-        (dates, insulin_values) = insulin_on_board(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model)
+        (dates,
+         insulin_values
+         ) = insulin_on_board(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model
+             )
 
-        self.assertEqual(len(out_dates), len(dates))
+        self.assertEqual(
+            len(out_dates), len(dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], dates[i])
-            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 2)
+            self.assertEqual(
+                out_dates[i], dates[i]
+            )
+            self.assertAlmostEqual(
+                out_insulin_values[i], insulin_values[i], 2
+            )
 
     def test_iob_from_bolus(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
         for hour in [2, 3, 4, 5, 5.2, 6, 7]:
             model = [hour]
-            (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-                "iob_from_bolus_" + str(int(hour*60)) + "min_output")
+            (out_dates,
+             out_insulin_values
+             ) = self.load_insulin_value_fixture(
+                 "iob_from_bolus_" + str(int(hour*60)) + "min_output"
+                 )
 
-            (dates, insulin_values) = insulin_on_board(
-                i_types, i_start_dates, i_end_dates, i_values,
-                i_scheduled_basal_rates, model)
+            (dates,
+             insulin_values
+             ) = insulin_on_board(
+                 i_types,
+                 i_start_dates,
+                 i_end_dates,
+                 i_values,
+                 i_scheduled_basal_rates,
+                 model
+                 )
 
-            self.assertEqual(len(out_dates), len(dates))
+            self.assertEqual(
+                len(out_dates), len(dates)
+            )
 
             for i in range(0, len(out_dates)):
-                self.assertEqual(out_dates[i], dates[i])
-                self.assertAlmostEqual(out_insulin_values[i],
-                                       insulin_values[i], 1)
+                self.assertEqual(
+                    out_dates[i], dates[i]
+                )
+                self.assertAlmostEqual(
+                    out_insulin_values[i], insulin_values[i], 1
+                )
 
     def test_iob_from_bolus_exponential(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
-        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "iob_from_bolus_exponential_output")
+        (out_dates,
+         out_insulin_values
+         ) = self.load_insulin_value_fixture(
+             "iob_from_bolus_exponential_output"
+             )
 
         model = self.MODEL
 
-        (dates, insulin_values) = insulin_on_board(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model)
+        (dates,
+         insulin_values
+         ) = insulin_on_board(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model
+             )
 
-        self.assertEqual(len(out_dates), len(dates))
+        self.assertEqual(
+            len(out_dates), len(dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], dates[i])
-            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 1)
+            self.assertEqual(
+                out_dates[i], dates[i]
+            )
+            self.assertAlmostEqual(
+                out_insulin_values[i], insulin_values[i], 1
+            )
 
     def test_iob_from_reservoir_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_reservoir_history_output")
 
-        (out_dates, out_insulin_values) = self.load_insulin_value_fixture(
-            "iob_from_reservoir_output")
+        (out_dates,
+         out_insulin_values
+         ) = self.load_insulin_value_fixture("iob_from_reservoir_output")
 
         model = self.WALSH_MODEL
 
-        (dates, insulin_values) = insulin_on_board(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model)
+        (dates,
+         insulin_values
+         ) = insulin_on_board(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model
+             )
 
-        self.assertEqual(len(out_dates), len(dates))
+        self.assertEqual(
+            len(out_dates), len(dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], dates[i])
-            self.assertAlmostEqual(out_insulin_values[i], insulin_values[i], 0)
+            self.assertEqual(
+                out_dates[i], dates[i]
+            )
+            self.assertAlmostEqual(
+                out_insulin_values[i], insulin_values[i], 0
+            )
 
         """ Tests for percent_effect_remaining """
     def test_insulin_on_board_limits_for_exponential_model(self):
         # tests for adult curve (peak = 75 mins)
-        self.assertAlmostEqual(1, percent_effect_remaining(-1, 360, 75), 3)
-        self.assertAlmostEqual(1, percent_effect_remaining(0, 360, 75), 3)
-        self.assertAlmostEqual(0, percent_effect_remaining(360, 360, 75), 3)
-        self.assertAlmostEqual(0, percent_effect_remaining(361, 360, 75), 3)
+        self.assertAlmostEqual(
+            1, percent_effect_remaining(-1, 360, 75), 3
+        )
+        self.assertAlmostEqual(
+            1, percent_effect_remaining(0, 360, 75), 3
+        )
+        self.assertAlmostEqual(
+            0, percent_effect_remaining(360, 360, 75), 3
+        )
+        self.assertAlmostEqual(
+            0, percent_effect_remaining(361, 360, 75), 3
+        )
 
         # test at random point
-        self.assertAlmostEqual(0.5110493617156,
-                               percent_effect_remaining(108, 361, 75), 3)
+        self.assertAlmostEqual(
+            0.5110493617156, percent_effect_remaining(108, 361, 75), 3
+        )
 
         # test for child curve (peak = 65 mins)
-        self.assertAlmostEqual(0.6002510111374046,
-                               percent_effect_remaining(82, 360, 65), 3)
+        self.assertAlmostEqual(
+            0.6002510111374046, percent_effect_remaining(82, 360, 65), 3
+        )
 
     """ Tests for reconceiled """
     def test_normalize_reservoir_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
-         ) = self.load_dose_fixture("reservoir_history_with_rewind_and_" +
-                                    "prime_output")
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
+         ) = self.load_dose_fixture(
+             "reservoir_history_with_rewind_and_prime_output"
+             )
 
-        (out_types, out_start_dates, out_end_dates, out_values,
-         out_scheduled_basal_rates) = self.load_dose_fixture(
-             "normalized_reservoir_history_output")
+        (out_types,
+         out_start_dates,
+         out_end_dates,
+         out_values,
+         out_scheduled_basal_rates
+         ) = self.load_dose_fixture(
+             "normalized_reservoir_history_output"
+             )
 
-        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
-            "basal")
+        (start_times,
+         rates,
+         minutes
+         ) = self.load_basal_rate_schedule_fixture("basal")
 
-        (types, start_dates, end_dates, values, scheduled_basal_rates
-         ) = annotated(i_types, i_start_dates, i_end_dates, i_values,
-                       i_scheduled_basal_rates, start_times, rates, minutes)
+        (types,
+         start_dates,
+         end_dates,
+         values,
+         scheduled_basal_rates
+         ) = annotated(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             start_times,
+             rates,
+             minutes
+             )
 
-        self.assertEqual(len(out_types), len(types))
+        self.assertEqual(
+            len(out_types), len(types)
+        )
 
         for i in range(0, len(out_types)):
-            self.assertEqual(out_start_dates[i], start_dates[i])
-            self.assertEqual(out_end_dates[i], end_dates[i])
-            self.assertAlmostEqual(out_values[i], values[i], 2)
             self.assertEqual(
-                out_scheduled_basal_rates[i], scheduled_basal_rates[i])
+                out_start_dates[i], start_dates[i]
+            )
+            self.assertEqual(
+                out_end_dates[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_values[i], values[i], 2
+            )
+            self.assertEqual(
+                out_scheduled_basal_rates[i], scheduled_basal_rates[i]
+            )
 
     def test_normalize_edgecase_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalize_edge_case_doses_input")
 
-        (out_types, out_start_dates, out_end_dates, out_values,
-         out_scheduled_basal_rates) = self.load_dose_fixture(
-             "normalize_edge_case_doses_output")
+        (out_types,
+         out_start_dates,
+         out_end_dates,
+         out_values,
+         out_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalize_edge_case_doses_output")
 
-        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
-            "basal")
+        (start_times,
+         rates,
+         minutes
+         ) = self.load_basal_rate_schedule_fixture("basal")
 
-        (types, start_dates, end_dates, values, scheduled_basal_rates
-         ) = annotated(i_types, i_start_dates, i_end_dates, i_values,
-                       i_scheduled_basal_rates, start_times, rates, minutes,
-                       convert_to_units_hr=False)
+        (types,
+         start_dates,
+         end_dates,
+         values,
+         scheduled_basal_rates
+         ) = annotated(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             start_times,
+             rates,
+             minutes,
+             convert_to_units_hr=False
+             )
 
-        self.assertEqual(len(out_types), len(types))
+        self.assertEqual(
+            len(out_types), len(types)
+        )
 
         for i in range(0, len(out_types)):
-            self.assertEqual(out_start_dates[i], start_dates[i])
-            self.assertEqual(out_end_dates[i], end_dates[i])
-            self.assertAlmostEqual(out_values[i], values[i] -
-                                   scheduled_basal_rates[i], 2)
+            self.assertEqual(
+                out_start_dates[i], start_dates[i]
+            )
+            self.assertEqual(
+                out_end_dates[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_values[i], values[i] - scheduled_basal_rates[i], 2
+            )
 
     def test_reconcile_temp_basals(self):
         # Fixture contains numerous overlapping temp basals, as well as a
         # Suspend event interleaved with a temp basal
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_history_input")
 
-        (out_types, out_start_dates, out_end_dates, out_values,
-         out_scheduled_basal_rates) = self.load_dose_fixture(
-             "reconcile_history_output")
+        (out_types,
+         out_start_dates,
+         out_end_dates,
+         out_values,
+         out_scheduled_basal_rates
+         ) = self.load_dose_fixture("reconcile_history_output")
 
-        (types, start_dates, end_dates, values) = reconciled(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates)
+        (types,
+         start_dates,
+         end_dates,
+         values
+         ) = reconciled(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates
+             )
 
         # sort the lists because they're out of order due to all the
         # meals during temp basals
@@ -486,225 +830,417 @@ class TestInsulinKitFunctions(unittest.TestCase):
         end_dates = unsort_end_dates[sort_ind]
         values = unsort_values[sort_ind]
 
-        self.assertEqual(len(out_types), len(types))
+        self.assertEqual(
+            len(out_types), len(types)
+        )
 
         for i in range(0, len(out_types)):
-
-            self.assertEqual(out_start_dates[i], start_dates[i])
-            self.assertEqual(out_end_dates[i], end_dates[i])
-            self.assertAlmostEqual(out_values[i], values[i], 2)
+            self.assertEqual(
+                out_start_dates[i], start_dates[i]
+            )
+            self.assertEqual(
+                out_end_dates[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_values[i], values[i], 2
+            )
 
     def test_reconcile_resume_before_rewind(self):
         # Fixture contains numerous overlapping temp basals, as well as a
         # Suspend event interleaved with a temp basal
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_resume_before_rewind_input")
 
-        (out_types, out_start_dates, out_end_dates, out_values,
-         out_scheduled_basal_rates) = self.load_dose_fixture(
-             "reconcile_resume_before_rewind_output")
+        (out_types,
+         out_start_dates,
+         out_end_dates,
+         out_values,
+         out_scheduled_basal_rates
+         ) = self.load_dose_fixture("reconcile_resume_before_rewind_output")
 
-        (types, start_dates, end_dates, values) = reconciled(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates)
+        (types,
+         start_dates,
+         end_dates,
+         values
+         ) = reconciled(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates
+             )
 
-        self.assertEqual(len(out_types), len(types))
+        self.assertEqual(
+            len(out_types), len(types)
+        )
 
         for i in range(0, len(out_types)):
-            self.assertEqual(out_start_dates[i], start_dates[i])
-            self.assertEqual(out_end_dates[i], end_dates[i])
-            self.assertAlmostEqual(out_values[i], values[i], 2)
+            self.assertEqual(
+                out_start_dates[i], start_dates[i]
+            )
+            self.assertEqual(
+                out_end_dates[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_values[i], values[i], 2
+            )
 
     """ Tests for glucose_effect """
     def test_glucose_effect_from_bolus(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_bolus_output")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture("effect_from_bolus_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.WALSH_MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], 0
+            )
 
     def test_glucose_effect_from_bolus_exponential(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_bolus_output_exponential")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture(
+             "effect_from_bolus_output_exponential"
+             )
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], 0
+            )
 
     def test_glucose_effect_from_short_temp_basal(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("short_basal_dose")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_short_basal_output")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture("effect_from_short_basal_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.WALSH_MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], 0)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], 0
+            )
 
     def test_glucose_effect_from_temp_basal(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("basal_dose")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_basal_output")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture("effect_from_basal_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.WALSH_MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], -1
+            )
 
     def test_glucose_effect_from_temp_basal_exponential(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("basal_dose")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_basal_output_exponential")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture(
+             "effect_from_basal_output_exponential"
+             )
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], -1
+            )
 
     def test_glucose_effect_from_history(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_history_output")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture("effect_from_history_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.WALSH_MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], -1
+            )
 
     def test_glucose_effect_from_history_exponential(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates, out_effect_values) = self.load_glucose_effect_fixture(
-            "effect_from_history_output_exponential")
+        (out_dates,
+         out_effect_values
+         ) = self.load_glucose_effect_fixture(
+             "effect_from_history_output_exponential"
+             )
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(len(out_dates), len(effect_dates))
+        self.assertEqual(
+            len(out_dates), len(effect_dates)
+        )
 
         for i in range(0, len(out_dates)):
-            self.assertEqual(out_dates[i], effect_dates[i])
-            self.assertAlmostEqual(out_effect_values[i], effect_values[i], -1)
+            self.assertEqual(
+                out_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                out_effect_values[i], effect_values[i], -1
+            )
 
     def test_glucose_effect_from_no_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
-         ) = ([], [], [], [], [])
-
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
         sensitivity_end_dates = self.INSULIN_SENSITIVITY_END_DATES
         sensitivity_values = self.INSULIN_SENSITIVITY_VALUES
         model = self.MODEL
 
-        effect_dates, effect_values = glucose_effects(
-            i_types, i_start_dates, i_end_dates, i_values,
-            i_scheduled_basal_rates, model, sensitivity_start_dates,
-            sensitivity_end_dates, sensitivity_values)
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             [], [], [], [], [],
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
 
-        self.assertEqual(0, len(effect_dates))
+        self.assertEqual(
+            0, len(effect_dates)
+        )
 
     """ Tests for total_delivery """
     def test_total_delivery(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalize_edge_case_doses_input")
 
-        total = total_delivery(i_types, i_start_dates, i_end_dates, i_values)
+        total = total_delivery(
+            i_types,
+            i_start_dates,
+            i_end_dates,
+            i_values
+        )
 
         self.assertAlmostEqual(18.8, total, 2)
 
     """ Tests for trim """
     def test_trim_continuing_doses(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
         # put the dose lists in order of start time
@@ -722,16 +1258,24 @@ class TestInsulinKitFunctions(unittest.TestCase):
         assert len(i_types) == len(i_start_dates) == len(i_end_dates)\
             == len(i_values), "expected fixture to include data for all doses"
 
-        for i in range(0, len(i_types)):
-            trimmed = trim(
-                i_types[i], i_start_dates[i], i_end_dates[i], i_values[i],
-                i_scheduled_basal_rates[i], end_interval=self.TRIM_END_DATE)
-            if i == len(i_types)-1:
-                self.assertEqual(self.TRIM_END_DATE, trimmed[2])
-                self.assertEqual(len(i_types), i+1)
+        trimmed = trim(
+            i_types[len(i_types)-1],
+            i_start_dates[len(i_types)-1],
+            i_end_dates[len(i_types)-1],
+            i_values[len(i_types)-1],
+            i_scheduled_basal_rates[len(i_types)-1],
+            end_interval=self.TRIM_END_DATE
+        )
+        self.assertEqual(
+            self.TRIM_END_DATE, trimmed[2]
+        )
 
     def test_doses_overlay_basal_profile(self):
-        (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_history_output")
 
         # put the dose lists in order of start time
@@ -746,60 +1290,132 @@ class TestInsulinKitFunctions(unittest.TestCase):
         i_end_dates = list(unsort_end_dates[sort_ind])
         i_values = list(unsort_values[sort_ind])
 
-        (start_times, rates, minutes) = self.load_basal_rate_schedule_fixture(
-            "basal")
+        (start_times,
+         rates,
+         minutes
+         ) = self.load_basal_rate_schedule_fixture("basal")
 
-        (out_types, out_start_dates, out_end_dates, out_values,
-         out_scheduled_basal_rates) = self.load_dose_fixture(
-             "doses_overlay_basal_profile_output")
+        (out_types,
+         out_start_dates,
+         out_end_dates,
+         out_values,
+         out_scheduled_basal_rates
+         ) = self.load_dose_fixture("doses_overlay_basal_profile_output")
 
-        (a_types, a_start_dates, a_end_dates, a_values,
-         a_scheduled_basal_rates) = annotated(
-             i_types, list(i_start_dates), i_end_dates, i_values,
-             i_scheduled_basal_rates, start_times, rates, minutes,
-             convert_to_units_hr=False)
+        (a_types,
+         a_start_dates,
+         a_end_dates,
+         a_values,
+         a_scheduled_basal_rates
+         ) = annotated(
+             i_types,
+             list(i_start_dates),
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             start_times,
+             rates,
+             minutes,
+             convert_to_units_hr=False
+             )
 
-        (types, starts, ends, values) = overlay_basal_schedule(
-            a_types, a_start_dates, a_end_dates, a_values, start_times, rates,
-            minutes, datetime.fromisoformat("2016-02-15T14:01:04"),
-            self.DISTANT_FUTURE, True)
+        (types,
+         starts,
+         ends,
+         values
+         ) = overlay_basal_schedule(
+             a_types,
+             a_start_dates,
+             a_end_dates,
+             a_values,
+             start_times,
+             rates,
+             minutes,
+             datetime.fromisoformat("2016-02-15T14:01:04"),
+             self.DISTANT_FUTURE,
+             True
+             )
 
-        self.assertEqual(len(out_types), len(types))
+        self.assertEqual(
+            len(out_types), len(types)
+        )
 
         for i in range(0, len(out_types)):
-            self.assertEqual(out_start_dates[i], starts[i])
-            self.assertEqual(out_end_dates[i], ends[i])
-            self.assertEqual(out_values[i], values[i])
+            self.assertEqual(
+                out_start_dates[i], starts[i]
+            )
+            self.assertEqual(
+                out_end_dates[i], ends[i]
+            )
+            self.assertEqual(
+                out_values[i], values[i]
+            )
 
-        (a_trim_types, a_trim_start_dates, a_trim_end_dates, a_trim_values,
-         a_trim_scheduled_basal_rates) = annotated(
+        (a_trim_types,
+         a_trim_start_dates,
+         a_trim_end_dates,
+         a_trim_values,
+         a_trim_scheduled_basal_rates
+         ) = annotated(
              i_types[0:len(i_types) - 11],
              list(i_start_dates)[0:len(i_types) - 11],
-             i_end_dates[0:len(i_types) - 11], i_values[0:len(i_types) - 11],
-             i_scheduled_basal_rates[0:len(i_types) - 11], start_times, rates,
-             minutes, convert_to_units_hr=False)
+             i_end_dates[0:len(i_types) - 11],
+             i_values[0:len(i_types) - 11],
+             i_scheduled_basal_rates[0:len(i_types) - 11],
+             start_times,
+             rates,
+             minutes,
+             convert_to_units_hr=False
+             )
 
-        (t_types, t_starts, t_ends, t_values) = overlay_basal_schedule(
-            a_trim_types, a_trim_start_dates, a_trim_end_dates, a_trim_values,
-            start_times, rates,
-            minutes, datetime.fromisoformat("2016-02-15T14:01:04"),
-            datetime.fromisoformat("2016-02-15T19:45:00"), True)
+        (t_types,
+         t_starts,
+         t_ends,
+         t_values
+         ) = overlay_basal_schedule(
+             a_trim_types,
+             a_trim_start_dates,
+             a_trim_end_dates,
+             a_trim_values,
+             start_times,
+             rates,
+             minutes,
+             datetime.fromisoformat("2016-02-15T14:01:04"),
+             datetime.fromisoformat("2016-02-15T19:45:00"),
+             True
+             )
 
-        self.assertEqual(len(out_types) - 14, len(t_types))
+        self.assertEqual(
+            len(out_types) - 14, len(t_types)
+        )
         self.assertEqual(
             datetime.fromisoformat("2016-02-15T19:36:11"),
-            t_ends[len(t_ends)-1])
+            t_ends[len(t_ends)-1]
+        )
 
-        (m_types, m_starts, m_ends, m_values) = overlay_basal_schedule(
-            i_types, list(i_start_dates), i_end_dates, i_values,
-            start_times, rates,
-            minutes, datetime.fromisoformat("2016-02-15T15:06:05"),
-            self.DISTANT_FUTURE, True)
+        (m_types,
+         m_starts,
+         m_ends,
+         m_values
+         ) = overlay_basal_schedule(
+             i_types,
+             list(i_start_dates),
+             i_end_dates,
+             i_values,
+             start_times,
+             rates,
+             minutes,
+             datetime.fromisoformat("2016-02-15T15:06:05"),
+             self.DISTANT_FUTURE,
+             True
+             )
 
-        self.assertEqual(len(out_types) - 2, len(m_types))
         self.assertEqual(
-            datetime.fromisoformat("2016-02-15T14:58:02"),
-            t_ends[0])
+            len(out_types) - 2, len(m_types)
+        )
+        self.assertEqual(
+            datetime.fromisoformat("2016-02-15T14:58:02"), t_ends[0]
+        )
 
     # not including appendedUnion because it's more for dose-management and
     # not really used

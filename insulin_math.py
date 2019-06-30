@@ -8,7 +8,7 @@ Created on Thu Jun 20 10:29:59 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/InsulinMath.swift
 """
-# pylint: disable=R0913, R0914, R0912, C0200, R0915, R1702
+# pylint: disable=R0913, R0914, R0912, C0200, R0915, R1702, C0302, R0911
 from math import floor
 from datetime import timedelta, datetime
 import sys
@@ -42,7 +42,11 @@ def total_delivery(dose_types, starts, ends, values):
     total = 0
     for i in range(0, len(dose_types)):
         total += total_units_given(
-            dose_types[i], values[i], starts[i], ends[i])
+            dose_types[i],
+            values[i],
+            starts[i],
+            ends[i]
+        )
 
     if total < 0:
         return 0
@@ -78,7 +82,10 @@ def dose_entries(reservoir_dates, unit_volumes):
 
     for i in range(1, len(reservoir_dates)):
         volume_drop = previous_unit_volume - unit_volumes[i]
-        duration = time_interval_since(reservoir_dates[i], previous_date)/60
+        duration = time_interval_since(
+            reservoir_dates[i],
+            previous_date
+        )/60
 
         if (duration > 0 and 0 <= volume_drop <=
                 MAXIMUM_RESERVOIR_DROP_PER_MINUTE * duration):
@@ -286,7 +293,11 @@ def reconciled(dose_types, start_dates, end_dates, values,
     assert len(output_types) == len(output_starts) == len(output_ends) ==\
         len(output_values), "expected output shape to match"
 
-    return (output_types, output_starts, output_ends, output_values)
+    return (output_types,
+            output_starts,
+            output_ends,
+            output_values
+            )
 
 
 def annotated(dose_types, start_dates, end_dates, values,
@@ -327,11 +338,16 @@ def annotated(dose_types, start_dates, end_dates, values,
     output_scheduled_basal_rates = []
 
     for i in range(0, len(dose_types)):
-        (dose_type, start_date, end_date, value, scheduled_basal_rate) =\
-            annotate_individual_dose(
-                dose_types[i], start_dates[i], end_dates[i], values[i],
-                basal_start_times, basal_rates, basal_minutes,
-                convert_to_units_hr)
+        (dose_type,
+         start_date,
+         end_date,
+         value,
+         scheduled_basal_rate
+         ) = annotate_individual_dose(
+             dose_types[i], start_dates[i], end_dates[i], values[i],
+             basal_start_times, basal_rates, basal_minutes,
+             convert_to_units_hr
+             )
 
         output_types.extend(dose_type)
         output_start_dates.extend(start_date)
@@ -343,8 +359,12 @@ def annotated(dose_types, start_dates, end_dates, values,
         len(output_end_dates) == len(output_values) ==\
         len(output_scheduled_basal_rates), "expected output shapes to match"
 
-    return (output_types, output_start_dates, output_end_dates, output_values,
-            output_scheduled_basal_rates)
+    return (output_types,
+            output_start_dates,
+            output_end_dates,
+            output_values,
+            output_scheduled_basal_rates
+            )
 
 
 def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
@@ -385,9 +405,16 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
     # these are the lists containing the scheduled basal value(s) within
     # the temp basal's duration
-    (sched_basal_starts, sched_basal_ends, sched_basal_rates) = between(
-        basal_start_times, basal_rates, basal_minutes, dose_start_date,
-        dose_end_date)
+    (sched_basal_starts,
+     sched_basal_ends,
+     sched_basal_rates
+     ) = between(
+         basal_start_times,
+         basal_rates,
+         basal_minutes,
+         dose_start_date,
+         dose_end_date
+         )
 
     for i in range(0, len(sched_basal_starts)):
         if i == 0:
@@ -410,14 +437,19 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
                 (time_interval_since(dose_end_date, dose_start_date)/60/60))
         else:
             output_values.append(value)
+
         output_scheduled_basal_rates.append(sched_basal_rates[i])
 
     assert len(output_types) == len(output_start_dates) ==\
         len(output_end_dates) == len(output_values) ==\
         len(output_scheduled_basal_rates), "expected output shapes to match"
 
-    return (output_types, output_start_dates, output_end_dates, output_values,
-            output_scheduled_basal_rates)
+    return (output_types,
+            output_start_dates,
+            output_end_dates,
+            output_values,
+            output_scheduled_basal_rates
+            )
 
 
 def between(basal_start_times, basal_rates, basal_minutes, start_date,
@@ -440,27 +472,48 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
         return ([], [], [])
 
     reference_time_interval = timedelta(
-        hours=basal_start_times[0].hour, minutes=basal_start_times[0].minute,
-        seconds=basal_start_times[0].second)
-    max_time_interval = reference_time_interval + timedelta(
-        hours=repeat_interval)
+        hours=basal_start_times[0].hour,
+        minutes=basal_start_times[0].minute,
+        seconds=basal_start_times[0].second
+    )
+    max_time_interval = (
+        reference_time_interval
+        + timedelta(hours=repeat_interval)
+    )
 
     start_offset = schedule_offset(start_date, basal_start_times[0])
-    end_offset = start_offset + timedelta(seconds=time_interval_since(
-        end_date, start_date))
+    end_offset = (
+        start_offset
+        + timedelta(seconds=time_interval_since(end_date, start_date))
+    )
 
     if end_offset > max_time_interval:
         boundary_date = start_date + (max_time_interval - start_offset)
-        (start_times_1, end_times_1, basal_rates_1) = between(
-            basal_start_times, basal_rates, basal_minutes, start_date,
-            boundary_date)
-        (start_times_2, end_times_2, basal_rates_2) = between(
-            basal_start_times, basal_rates, basal_minutes, boundary_date,
-            end_date)
+        (start_times_1,
+         end_times_1,
+         basal_rates_1
+         ) = between(
+             basal_start_times,
+             basal_rates,
+             basal_minutes,
+             start_date,
+             boundary_date
+             )
+        (start_times_2,
+         end_times_2,
+         basal_rates_2
+         ) = between(
+             basal_start_times,
+             basal_rates,
+             basal_minutes,
+             boundary_date,
+             end_date
+             )
 
         return (start_times_1 + start_times_2,
                 end_times_1 + end_times_2,
-                basal_rates_1 + basal_rates_2)
+                basal_rates_1 + basal_rates_2
+                )
 
     start_index = 0
     end_index = len(basal_start_times)
@@ -469,7 +522,8 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
         start_time = timedelta(
             hours=start_time.hour,
             minutes=start_time.minute,
-            seconds=start_time.second)
+            seconds=start_time.second
+        )
         if start_offset >= start_time:
             start_index = i
         if end_offset < start_time:
@@ -484,16 +538,19 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     (output_start_times, output_end_times, output_basal_rates) = ([], [], [])
 
     for i in range(start_index, end_index):
-        end_time = timedelta(
+        end_time = (timedelta(
             hours=basal_start_times[i+1].hour,
             minutes=basal_start_times[i+1].minute,
-            seconds=basal_start_times[i+1].second) if i+1 <\
-            len(basal_start_times) else max_time_interval
+            seconds=basal_start_times[i+1].second) if i+1 <
+                    len(basal_start_times) else max_time_interval)
 
-        output_start_times.append(reference_date + timedelta(
-            hours=basal_start_times[i].hour,
-            minutes=basal_start_times[i].minute,
-            seconds=basal_start_times[i].second))
+        output_start_times.append(
+            reference_date + timedelta(
+                hours=basal_start_times[i].hour,
+                minutes=basal_start_times[i].minute,
+                seconds=basal_start_times[i].second
+            )
+        )
 
         output_end_times.append(reference_date + end_time)
         output_basal_rates.append(basal_rates[i])
@@ -518,13 +575,15 @@ def schedule_offset(date_to_offset, reference_time,
     Output:
     datetime timedelta object representing offset
     """
-    reference_time_seconds = (reference_time.hour * 3600 +
-                              reference_time.minute * 60 +
-                              reference_time.second)
+    reference_time_seconds = (reference_time.hour * 3600
+                              + reference_time.minute * 60
+                              + reference_time.second
+                             )
     interval = time_interval_since_reference_date(date_to_offset)
 
-    return timedelta(seconds=(interval-reference_time_seconds) %
-                     (repeat_interval * 60 * 60) + reference_time_seconds)
+    return timedelta(seconds=(interval-reference_time_seconds)
+                     % (repeat_interval * 60 * 60)
+                     + reference_time_seconds)
 
 
 def insulin_on_board(dose_types, start_dates, end_dates, values,
@@ -561,13 +620,23 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
 
     try:
         if len(model) == 1:
-            (start, end) = simulation_date_range_for_samples(
-                start_times=start_dates, end_times=end_dates,
-                duration=model[0]*60, delay=delay, delta=delta)
+            (start, end
+             ) = simulation_date_range_for_samples(
+                 start_times=start_dates,
+                 end_times=end_dates,
+                 duration=model[0]*60,
+                 delay=delay,
+                 delta=delta
+                 )
         else:
-            (start, end) = simulation_date_range_for_samples(
-                start_times=start_dates, end_times=end_dates,
-                duration=model[0], delay=delay, delta=delta)
+            (start, end
+             ) = simulation_date_range_for_samples(
+                 start_times=start_dates,
+                 end_times=end_dates,
+                 duration=model[0],
+                 delay=delay,
+                 delta=delta
+                 )
     except IndexError:
         return ([], [])
 
@@ -577,8 +646,16 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
 
     def find_partial_iob(i):
         return insulin_on_board_calc(
-            dose_types[i], start_dates[i], end_dates[i], values[i],
-            scheduled_basal_rates[i], date, model, delay, delta)
+            dose_types[i],
+            start_dates[i],
+            end_dates[i],
+            values[i],
+            scheduled_basal_rates[i],
+            date,
+            model,
+            delay,
+            delta
+            )
 
     while date <= end:
 
@@ -622,26 +699,59 @@ def insulin_on_board_calc(type_, start_date, end_date, value,
 
     if len(model) == 1:  # walsh model
         if time_interval_since(end_date, start_date) <= 1.05 * delta:
-            return net_basal_units(type_, value, start_date, end_date,
-                                   scheduled_basal_rate) *\
-                    walsh_percent_effect_remaining((time - delay), model[0])
+            return net_basal_units(
+                type_,
+                value,
+                start_date,
+                end_date,
+                scheduled_basal_rate
+                ) * walsh_percent_effect_remaining(
+                    (time - delay),
+                    model[0]
+                    )
         # This will normally be for basals
-        return net_basal_units(type_, value, start_date, end_date,
-                               scheduled_basal_rate) *\
-            continuous_delivery_insulin_on_board(start_date, end_date,
-                                                 date, model, delay, delta)
+        return net_basal_units(
+            type_,
+            value,
+            start_date,
+            end_date,
+            scheduled_basal_rate) * continuous_delivery_insulin_on_board(
+                start_date,
+                end_date,
+                date,
+                model,
+                delay,
+                delta
+                )
 
     # Consider doses within the delta time window as momentary
     # This will normally be for boluses
     if time_interval_since(end_date, start_date)/60 <= 1.05 * delta:
-        return net_basal_units(type_, value, start_date, end_date,
-                               scheduled_basal_rate) *\
-                percent_effect_remaining((time - delay), model[0], model[1])
+        return net_basal_units(
+            type_,
+            value,
+            start_date,
+            end_date,
+            scheduled_basal_rate
+            ) * percent_effect_remaining(
+                (time - delay),
+                model[0],
+                model[1]
+                )
     # This will normally be for basals
-    return net_basal_units(type_, value, start_date, end_date,
-                           scheduled_basal_rate) *\
-        continuous_delivery_insulin_on_board(start_date, end_date,
-                                             date, model, delay, delta)
+    return net_basal_units(
+        type_,
+        value,
+        start_date,
+        end_date,
+        scheduled_basal_rate) * continuous_delivery_insulin_on_board(
+            start_date,
+            end_date,
+            date,
+            model,
+            delay,
+            delta
+            )
 
 
 def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
@@ -662,6 +772,7 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
     Percentage of insulin remaining at the at_date
     """
     dose_duration = time_interval_since(end_date, start_date)/60
+
     if dose_duration < 0:
         return 0
 
@@ -669,19 +780,28 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
     iob = 0
     dose_date = 0
 
-    while (dose_date <= min(floor((time + delay) / delta)
-                            * delta, dose_duration)):
+    while (dose_date <= min(floor((time + delay) / delta) * delta,
+                            dose_duration)):
         if dose_duration > 0:
-            segment = (max(0, min(dose_date + delta, dose_duration)
-                           - dose_date) / dose_duration)
+            segment = (max(
+                0,
+                min(dose_date + delta,
+                    dose_duration
+                    )
+                - dose_date) / dose_duration)
         else:
             segment = 1
         if len(model) == 1:  # if walsh model
             iob += segment * walsh_percent_effect_remaining(
-                (time - delay - dose_date), model[0])
+                (time - delay - dose_date),
+                model[0]
+                )
         else:
             iob += segment * percent_effect_remaining(
-                (time - delay - dose_date), model[0], model[1])
+                (time - delay - dose_date),
+                model[0],
+                model[1]
+                )
         dose_date += delta
 
     return iob
@@ -723,12 +843,20 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
 
     if len(model) == 1:
         (start, end) = simulation_date_range_for_samples(
-            start_times=dose_start_dates, end_times=dose_end_dates,
-            duration=model[0]*60, delay=delay, delta=delta)
+            start_times=dose_start_dates,
+            end_times=dose_end_dates,
+            duration=model[0]*60,
+            delay=delay,
+            delta=delta
+        )
     else:
         (start, end) = simulation_date_range_for_samples(
-            start_times=dose_start_dates, end_times=dose_end_dates,
-            duration=model[0], delay=delay, delta=delta)
+            start_times=dose_start_dates,
+            end_times=dose_end_dates,
+            duration=model[0],
+            delay=delay,
+            delta=delta
+        )
 
     date = start
     effect_dates = []
@@ -736,12 +864,23 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
 
     def find_partial_effect(i):
         sensitivity = find_sensitivity_at_time(
-            sensitivity_start_times, sensitivity_end_times,
-            sensitivity_values, dose_start_dates[i])
+            sensitivity_start_times,
+            sensitivity_end_times,
+            sensitivity_values,
+            dose_start_dates[i]
+        )
         return glucose_effect(
-            dose_types[i], dose_start_dates[i], dose_end_dates[i],
-            dose_values[i], scheduled_basal_rates[i], date, model,
-            sensitivity, delay, delta)
+            dose_types[i],
+            dose_start_dates[i],
+            dose_end_dates[i],
+            dose_values[i],
+            scheduled_basal_rates[i],
+            date,
+            model,
+            sensitivity,
+            delay,
+            delta
+        )
 
     while date <= end:
 
@@ -775,11 +914,15 @@ def find_sensitivity_at_time(sensitivity_start_times, sensitivity_end_times,
     """
     assert len(sensitivity_start_times) == len(sensitivity_end_times) ==\
         len(sensitivity_values), "expected input shapes to match"
+
     for i in range(0, len(sensitivity_start_times)):
-        if is_time_between(sensitivity_start_times[i],
-                           sensitivity_end_times[i], time_to_check):
+        if is_time_between(
+                sensitivity_start_times[i],
+                sensitivity_end_times[i],
+                time_to_check
+                ):
             return sensitivity_values[i]
-    return None
+    return 0
 
 
 def is_time_between(start, end, time_to_check):
@@ -832,23 +975,48 @@ def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
         return 0
     # Consider doses within the delta time window as momentary
     # This will normally be for boluses
-    if time_interval_since(dose_end_date, dose_start_date)/60 <= 1.05 * delta:
+    if time_interval_since(
+                dose_end_date,
+                dose_start_date
+            )/60 <= 1.05 * delta: # pylint: disable=C0330
 
         if len(model) == 1:  # walsh model
-            return net_basal_units(dose_type, dose_value, dose_start_date,
-                                   dose_end_date, scheduled_basal_rate) *\
-                -insulin_sensitivity * (1 - walsh_percent_effect_remaining(
-                    (time - delay), model[0]))
+            return net_basal_units(
+                dose_type, dose_value,
+                dose_start_date,
+                dose_end_date,
+                scheduled_basal_rate
+                ) * -insulin_sensitivity * (1 - walsh_percent_effect_remaining(
+                    (time - delay),
+                    model[0]
+                    ))
 
-        return net_basal_units(dose_type, dose_value, dose_start_date,
-                               dose_end_date, scheduled_basal_rate) *\
-            -insulin_sensitivity * (1 - percent_effect_remaining(
-                (time - delay), model[0], model[1]))
+        return net_basal_units(
+            dose_type,
+            dose_value,
+            dose_start_date,
+            dose_end_date,
+            scheduled_basal_rate
+            ) * -insulin_sensitivity * (1 - percent_effect_remaining(
+                (time - delay),
+                model[0],
+                model[1]
+                ))
     # This will normally be for basals, and handles Walsh model automatically
-    return net_basal_units(dose_type, dose_value, dose_start_date,
-                           dose_end_date, scheduled_basal_rate) *\
-        -insulin_sensitivity * continuous_delivery_glucose_effect(
-            dose_start_date, dose_end_date, date, model, delay, delta)
+    return net_basal_units(
+        dose_type,
+        dose_value,
+        dose_start_date,
+        dose_end_date,
+        scheduled_basal_rate
+        ) * -insulin_sensitivity * continuous_delivery_glucose_effect(
+            dose_start_date,
+            dose_end_date,
+            date,
+            model,
+            delay,
+            delta
+            )
 
 
 def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
@@ -871,25 +1039,38 @@ def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
     dose_duration = time_interval_since(dose_end_date, dose_start_date)/60
     if dose_duration < 0:
         return 0
+
     time = time_interval_since(at_date, dose_start_date)/60
     activity = 0
     dose_date = 0
 
-    while (dose_date <= min(floor((time + delay) / delta)
-                            * delta, dose_duration)):
+    while (dose_date <= min(
+            floor((time + delay) / delta) * delta,
+            dose_duration)):
         if dose_duration > 0:
-            segment = (max(0, min(dose_date + delta, dose_duration)
-                           - dose_date) / dose_duration)
+            segment = (max(0,
+                           min(dose_date + delta,
+                               dose_duration
+                               )
+                           - dose_date
+                           ) / dose_duration
+                      )
         else:
             segment = 1
 
         if len(model) == 1:  # if walsh model
             activity += segment * (1 - walsh_percent_effect_remaining(
-                (time - delay - dose_date), model[0]))
+                (time - delay - dose_date),
+                model[0])
+                                  )
 
         else:
             activity += segment * (1 - percent_effect_remaining(
-                (time - delay - dose_date), model[0], model[1]))
+                (time - delay - dose_date),
+                model[0],
+                model[1]
+                )
+                                  )
         dose_date += delta
     return activity
 
@@ -914,9 +1095,12 @@ def trim(dose_type, start, end, value, scheduled_basal_rate,
     """
     start_date = max(start_interval or DISTANT_PAST, start)
 
-    return [dose_type, start_date, max(
-        start_date, min(end_interval or DISTANT_FUTURE, end)), value,
-            scheduled_basal_rate]
+    return [dose_type,
+            start_date,
+            max(start_date, min(end_interval or DISTANT_FUTURE, end)),
+            value,
+            scheduled_basal_rate
+            ]
 
 
 def overlay_basal_schedule(dose_types, starts, ends, values,
@@ -952,12 +1136,15 @@ def overlay_basal_schedule(dose_types, starts, ends, values,
     assert len(dose_types) == len(starts) == len(ends) == len(values),\
         "expected input shapes to match"
 
-    (out_dose_types, out_starts, out_ends, out_values)\
-        = ([], [], [], [])
+    (out_dose_types, out_starts, out_ends, out_values) = ([], [], [], [])
 
     last_basal = []
     if inserting_basal_entries:
-        last_basal = ["tempbasal", starting_at, starting_at, 0]
+        last_basal = ["tempbasal",
+                      starting_at,
+                      starting_at,
+                      0
+                      ]
 
     for (i, type_) in enumerate(dose_types):
         if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart"]:
@@ -966,13 +1153,23 @@ def overlay_basal_schedule(dose_types, starts, ends, values,
 
             if last_basal:
                 if inserting_basal_entries:
-                    (sched_basal_starts, sched_basal_ends, sched_basal_rates)\
-                        = between(
-                            basal_start_times, basal_rates, basal_minutes,
-                            last_basal[2], starts[i])
+                    (sched_basal_starts,
+                     sched_basal_ends,
+                     sched_basal_rates
+                     ) = between(
+                         basal_start_times,
+                         basal_rates,
+                         basal_minutes,
+                         last_basal[2],
+                         starts[i]
+                         )
                     for j in range(0, len(sched_basal_starts)):
-                        start = max(last_basal[2], sched_basal_starts[j])
-                        end = min(starts[i], sched_basal_ends[j])
+                        start = max(last_basal[2],
+                                    sched_basal_starts[j]
+                                    )
+                        end = min(starts[i],
+                                  sched_basal_ends[j]
+                                  )
 
                         if time_interval_since(end, start)\
                                 < sys.float_info.epsilon:

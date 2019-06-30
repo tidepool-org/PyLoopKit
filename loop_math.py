@@ -33,14 +33,19 @@ def simulation_date_range_for_samples(start_times, end_times, duration, delta,
     """
     if not start_times:
         raise ValueError
+
     if start is not None and end is not None:
         return(date_floored_to_time_interval(start, delta),
-               date_ceiled_to_time_interval(end, delta))
+               date_ceiled_to_time_interval(end, delta)
+               )
+
     min_date = start_times[0]
     max_date = min_date
+
     for i in range(0, len(start_times)):
         if start_times[i] < min_date:
             min_date = start_times[i]
+
         try:
             if end_times[i] > max_date:
                 max_date = end_times[i]
@@ -51,4 +56,5 @@ def simulation_date_range_for_samples(start_times, end_times, duration, delta,
     return (date_floored_to_time_interval(start or min_date, delta),
             date_ceiled_to_time_interval(end or max_date
                                          + timedelta(minutes=duration+delay),
-                                         delta))
+                                         delta)
+            )

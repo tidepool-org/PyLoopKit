@@ -37,7 +37,8 @@ def percent_effect_remaining(time, action_duration, peak_activity_time):
         return 0
 
     tau = (peak_activity_time * (1 - peak_activity_time / action_duration) /
-           (1 - 2 * peak_activity_time / action_duration))
+           (1 - 2 * peak_activity_time / action_duration)
+           )
     a = 2 * tau / action_duration
     S = 1 / (1 - a + (1 + a) * math.exp(-action_duration / tau))
 

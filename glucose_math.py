@@ -132,19 +132,22 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
 
     if (len(date_list) <= 2 or not is_continuous(date_list)
             or is_calibrated(display_list)
-            or not has_single_provenance(provenance_list)):
+            or not has_single_provenance(provenance_list)
+       ):
         return ([], [])
 
     first_time = date_list[0]
     last_time = date_list[-1]
-    (start_date, end_date) = simulation_date_range_for_samples([last_time], [],
-                                                               duration, delta)
+    (start_date, end_date) = simulation_date_range_for_samples(
+        [last_time], [], duration, delta
+    )
 
     def create_times(time):
         return abs(time_interval_since(time, first_time))
 
-    slope = linear_regression(list(map(create_times, date_list)),
-                              glucose_value_list)
+    slope = linear_regression(
+        list(map(create_times, date_list)), glucose_value_list
+    )
 
     if math.isnan(slope) or math.isinf(slope):
         return ([], [])
@@ -154,8 +157,7 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
     momentum_effect_values = []
 
     while date <= end_date:
-        value = (max(0, time_interval_since(date, last_time))
-                 * slope)
+        value = (max(0, time_interval_since(date, last_time)) * slope)
         momentum_effect_dates.append(date)
         momentum_effect_values.append(value)
         date += timedelta(minutes=delta)
@@ -209,7 +211,10 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
 
         if time_interval <= 4:
             continue
-        if (not start_prov == provenances[i] or start_display or displays[i]):
+        if (not start_prov == provenances[i]
+                or start_display
+                or displays[i]
+           ):
             start_glucose = glucose_values[i]
             start_date = dates[i]
             start_prov = provenances[i]
@@ -229,6 +234,7 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
             if (not start_effect_date and effect_dates[j] >= start_date):
                 start_effect_date = effect_dates[j]
                 start_effect_value = effect_values[j]
+
             elif (not end_effect_date and effect_dates[j] >= dates[i]):
                 end_effect_date = effect_dates[j]
                 end_effect_value = effect_values[j]

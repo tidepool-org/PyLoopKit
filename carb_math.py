@@ -12,9 +12,13 @@ import sys
 from datetime import timedelta
 
 from insulin_math import find_ratio_at_time
-from date import time_interval_since
+from date import (time_interval_since,
+                  date_floored_to_time_interval,
+                  date_ceiled_to_time_interval)
 
 
+# TODO: check out the structure of the timeline with longer entries
+# (aka are the sub-sublists needed)
 def map_(
         carb_entry_starts, carb_entry_quantities, carb_entry_absorptions,
         effect_starts, effect_ends, effect_values,
@@ -44,7 +48,7 @@ def map_(
     effect_values -- list of carb effects (mg/dL)
 
     carb_ratio_starts -- list of start times of carb ratios (time objects)
-    carb_ratios -- list of carb ratios (G/U)
+    carb_ratios -- list of carb ratios (g/U)
 
     sensitivity_starts -- list of time objects of start times of
                           given insulin sensitivity values
@@ -307,6 +311,7 @@ def map_(
             time,
             builder_max_absorb_times[builder_index]
         )
+
         return ([observed_timeline_starts[builder_index],
                  observed_timeline_ends[builder_index],
                  observed_timeline_carb_values[builder_index]
@@ -371,3 +376,267 @@ def linear_percent_absorption_at_time(time, absorption_time):
     if time < absorption_time:
         return time / absorption_time
     return 1
+
+
+def parabolic_absorbed_carbs(total, time, absorption_time):
+    """
+    Find absorbed carbs using a parabolic model
+
+    Parameters:
+    total -- total grams of carbs
+    time -- relative time after eating (in minutes)
+    absorption_time --  time for carbs to completely absorb (in minutes)
+
+    Output:
+    Grams of absorbed carbs
+    """
+    return total * parabolic_percent_absorption_at_time(time,
+                                                        absorption_time
+                                                        )
+
+
+def parabolic_percent_absorption_at_time(time, absorption_time):
+    """
+    Find percent of absorbed carbs using a parabolic model
+
+    Parameters:
+    time -- relative time after eating (in minutes)
+    absorption_time --  time for carbs to completely absorb (in minutes)
+
+    Output:
+    Percent of absorbed carbs
+    """
+    if time < 0:
+        return 0
+
+    if time <= absorption_time / 2:
+        return 2 / pow(absorption_time, 2) * pow(time, 2)
+
+    if time < absorption_time:
+        return -1 + 4 / absorption_time * (time - pow(time, 2)
+                                           / (2 * absorption_time)
+                                           )
+    return 1
+
+
+def simulation_date_range(
+        start_times,
+        end_times,
+        absorption_times,
+        default_absorption_time,
+        delay,
+        delta,
+        start=None,
+        end=None
+        ):
+    """ Create date range based on carb data and user-specified parameters
+
+    Arguments:
+    start_times -- list of datetime object(s) of starts
+    end_times -- list of datetime object(s) of ends
+    absorption_times -- list of absorption times (in minutes)
+    default_absorption_time -- length of interval
+    delay -- additional time added to interval
+    delta -- what to round to
+    start -- specified start date
+    end -- specified end date
+
+    Output:
+    tuple with (start_time, end_time) structure
+    """
+    if not start_times:
+        raise ValueError
+
+    if start is not None and end is not None:
+        return(date_floored_to_time_interval(start, delta),
+               date_ceiled_to_time_interval(end, delta)
+               )
+
+    min_date = start_times[0]
+    max_date = min_date
+
+    for i in range(0, len(start_times)):
+        if start_times[i] < min_date:
+            min_date = start_times[i]
+
+        try:
+            end_date = end_times[i] + timedelta(
+                absorption_times or default_absorption_time
+                + delay
+            )
+        except IndexError:
+            end_date = start_times[i] + timedelta(
+                minutes=(
+                    (absorption_times[i] or default_absorption_time)
+                    + delay)
+            )
+        if end_date > max_date:
+            max_date = end_date
+
+    return (date_floored_to_time_interval(start or min_date, delta),
+            date_ceiled_to_time_interval(end or max_date, delta)
+            )
+
+
+def glucose_effects(
+        carb_starts, carb_quantities, carb_absorptions,
+        carb_ratio_starts, carb_ratios,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        default_absorption_time,
+        delay=10,
+        delta=5,
+        start=None,
+        end=None
+        ):
+    """
+    Find the expected effects of carbohydate consumption on blood glucose
+
+    Arguments:
+    carb_starts -- list of times of carb entry (datetime objects)
+    carb_quantities -- list of grams of carbs eaten
+    carb_absorptions -- list of lengths of absorption times (mins)
+
+    carb_ratio_starts -- list of start times of carb ratios (time objects)
+    carb_ratios -- list of carb ratios (g/U)
+
+    sensitivity_starts -- list of time objects of start times of
+                          given insulin sensitivity values
+    sensitivity_ends -- list of time objects of start times of
+                        given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+    delay -- the time to delay the carb effect
+    delta -- the differential between timeline entries
+    start -- datetime to start calculation of glucose effects
+    end -- datetime to stop calculation of glucose effects
+
+    Output:
+    Two lists in format (effect_start_dates, effect_values)
+    """
+    assert len(carb_starts) == len(carb_quantities)\
+        == len(carb_absorptions), "expected input shapes to match"
+
+    assert len(carb_ratio_starts) == len(carb_ratios),\
+        "expected input shapes to match"
+
+    assert len(sensitivity_starts) == len(sensitivity_ends)\
+        == len(sensitivity_values), "expected input shapes to match"
+
+    if not carb_starts or not carb_ratio_starts or not sensitivity_starts:
+        return ([], [], [])
+
+    (start, end) = simulation_date_range(
+        carb_starts,
+        [],
+        carb_absorptions,
+        default_absorption_time,
+        delay=delay,
+        delta=delta,
+        start=start,
+        end=end
+        )
+
+    date = start
+    effect_start_dates = []
+    effect_values = []
+
+    def find_partial_effect(i):
+        insulin_sensitivity = find_ratio_at_time(
+            sensitivity_starts,
+            sensitivity_ends,
+            sensitivity_values,
+            carb_starts[i]
+            )
+        carb_ratio = find_ratio_at_time(
+            carb_ratio_starts,
+            [],
+            carb_ratios,
+            carb_starts[i]
+            )
+        return glucose_effect(
+            carb_starts[i],
+            carb_quantities[i],
+            date,
+            carb_ratio,
+            insulin_sensitivity,
+            default_absorption_time,
+            delay,
+            carb_absorptions[i]
+            )
+
+    while date <= end:
+        effect_sum = 0
+        for i in range(0, len(carb_starts)):
+            effect_sum += find_partial_effect(i)
+
+        effect_start_dates.append(date)
+        effect_values.append(effect_sum)
+        date += timedelta(minutes=delta)
+
+    assert len(effect_start_dates) == len(effect_values),\
+        "expected output shapes to match"
+    return (effect_start_dates, effect_values)
+
+
+def glucose_effect(
+        carb_start, carb_value,
+        at_date,
+        carb_ratio,
+        insulin_sensitivity,
+        default_absorption_time,
+        delay,
+        carb_absorption_time=None
+        ):
+    """
+    Find partial effect of carbohydate consumption on blood glucose
+
+    Arguments:
+    carb_starts -- time of carb entry (datetime objects)
+    carb_value -- grams of carbs eaten
+
+    at_date -- date to calculate the glucose effect (datetime object)
+
+    carb_ratio -- ratio (g of carbs/U)
+    insulin_sensitivity -- sensitivity (mg/dL/U)
+
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+
+    delay -- the time to delay the carb effect
+    carb_absorption_time -- time carbs will take to absorb (mins)
+
+    Output:
+    Glucose effect (mg/dL/min)
+    """
+
+    return insulin_sensitivity / carb_ratio * absorbed_carbs(
+        carb_start,
+        carb_value,
+        carb_absorption_time or default_absorption_time,
+        at_date,
+        delay
+        )
+
+
+def absorbed_carbs(start_date, carb_value, absorption_time, at_date, delay):
+    """
+    Find absorbed carbs using a parabolic model
+
+    Parameters:
+    start_date -- date of carb consumption (datetime object)
+    carb_value -- carbs consumed
+    absorption_time --  time for carbs to completely absorb (in minutes)
+    at_date -- date to calculate the absorbed carbs (datetime object)
+
+    Output:
+    Grams of absorbed carbs
+    """
+    time = time_interval_since(at_date, start_date) / 60
+
+    return parabolic_absorbed_carbs(
+        carb_value,
+        time - delay,
+        absorption_time
+        )

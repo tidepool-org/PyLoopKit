@@ -810,7 +810,7 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
 def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
                     scheduled_basal_rates, model, sensitivity_start_times,
                     sensitivity_end_times, sensitivity_values, delay=10,
-                    delta=5):
+                    delta=5, start=None, end=None):
     """ Calculates the timeline of glucose effects for a collection of doses
 
     Arguments:
@@ -821,12 +821,15 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
                        the doses ended at
     dose_values -- list of insulin values for doses
     scheduled_basal_rates -- basal rates scheduled during the times of doses
+
     model -- list of insulin model parameters in format [DIA, peak_time]
+
     sensitivity_start_times -- list of time objects of start times of
                                given insulin sensitivity values
     sensitivity_end_times -- list of time objects of start times of
                              given insulin sensitivity values
     sensitivity_values -- list of sensitivities (mg/dL/U)
+
     delay -- the time to delay the dose effect
     delta -- the differential between timeline entries
 
@@ -842,20 +845,24 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
         return ([], [])
 
     if len(model) == 1:  # if using a Walsh model
-        (start, end) = simulation_date_range_for_samples(
+        start, end = simulation_date_range_for_samples(
             start_times=dose_start_dates,
             end_times=dose_end_dates,
             duration=model[0]*60,
             delay=delay,
-            delta=delta
+            delta=delta,
+            start=start,
+            end=end
         )
     else:
-        (start, end) = simulation_date_range_for_samples(
+        start, end = simulation_date_range_for_samples(
             start_times=dose_start_dates,
             end_times=dose_end_dates,
             duration=model[0],
             delay=delay,
-            delta=delta
+            delta=delta,
+            start=start,
+            end=end
         )
 
     date = start

@@ -8,13 +8,13 @@ Created on Fri Jun 28 13:35:51 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/CarbMathTests.swift
 """
-# pylint: disable=R0201, C0111
+# pylint: disable=R0201, C0111, C0200, W0105
 import unittest
 from datetime import datetime, time
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from carb_math import map_
+from carb_math import map_, glucose_effects
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -88,18 +88,18 @@ class TestCarbKitFunctions(unittest.TestCase):
             else None for dict_ in fixture
         ]
 
-        return (carb_values, start_dates, absorption_times)
+        return (start_dates, carb_values, absorption_times)
 
-    def load_effect_output_fixture(self, name):
+    def load_effect_output_fixture(self):
         """ Load glucose effects from json file
-
-        Arguments:
-        name -- name of file without the extension
 
         Output:
         2 lists in (date, glucose_value) format
         """
-        fixture = load_fixture(name, ".json")
+        fixture = load_fixture(
+            "carb_effect_from_history_output",
+            ".json"
+        )
 
         dates = [
             datetime.fromisoformat(dict_.get("date"))
@@ -191,6 +191,38 @@ class TestCarbKitFunctions(unittest.TestCase):
 
         self.assertEqual(len(absorptions), 1)
         self.assertEqual(absorptions[0][6], 0)
+
+    """ Tests for glucose_effects (in carb_math) """
+    def test_carb_effect_from_history(self):
+        input_ = self.load_history_fixture("carb_effect_from_history_input")
+        (expected_dates,
+         expected_values
+         ) = self.load_effect_output_fixture()
+
+        carb_ratio_tuple = self.load_schedules()
+
+        (effect_starts,
+         effect_values
+         ) = glucose_effects(
+             *input_,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             180
+             )
+
+        self.assertEqual(
+            len(expected_dates), len(effect_starts)
+        )
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], effect_starts[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 1
+            )
 
 
 if __name__ == '__main__':

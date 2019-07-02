@@ -105,8 +105,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          ) = self.load_input_fixture(
              "momentum_effect_bouncing_glucose_input"
              )
-        (out_date_list,
-         out_glucose_list
+        (expected_date_list,
+         expected_glucose_list
          ) = self.load_output_fixture(
              "momentum_effect_bouncing_glucose_output"
              )
@@ -121,14 +121,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_date_list), len(glucose_effect_dates)
+            len(expected_date_list), len(glucose_effect_dates)
         )
-        for i in range(0, len(out_date_list)):
+        for i in range(0, len(expected_date_list)):
             self.assertEqual(
-                out_date_list[i], glucose_effect_dates[i]
+                expected_date_list[i], glucose_effect_dates[i]
             )
             self.assertAlmostEqual(
-                glucose_effect_values[i], out_glucose_list[i], 2
+                glucose_effect_values[i], expected_glucose_list[i], 2
             )
 
     def test_momentum_effect_for_rising_glucose(self):
@@ -138,8 +138,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          providence_list
          ) = self.load_input_fixture("momentum_effect_rising_glucose_input")
 
-        (out_date_list,
-         out_glucose_list
+        (expected_date_list,
+         expected_glucose_list
          ) = self.load_output_fixture("momentum_effect_rising_glucose_output")
 
         (glucose_effect_dates,
@@ -152,14 +152,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_date_list), len(glucose_effect_dates)
+            len(expected_date_list), len(glucose_effect_dates)
         )
-        for i in range(0, len(out_date_list)):
+        for i in range(0, len(expected_date_list)):
             self.assertEqual(
-                out_date_list[i], glucose_effect_dates[i]
+                expected_date_list[i], glucose_effect_dates[i]
             )
             self.assertAlmostEqual(
-                glucose_effect_values[i], out_glucose_list[i], 2
+                glucose_effect_values[i], expected_glucose_list[i], 2
             )
 
     def test_momentum_effect_for_rising_glucose_doubles(self):
@@ -170,8 +170,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          ) = self.load_input_fixture(
              "momentum_effect_rising_glucose_double_entries_input"
              )
-        (out_date_list,
-         out_glucose_list
+        (expected_date_list,
+         expected_glucose_list
          ) = self.load_output_fixture(
              "momentum_effect_rising_glucose_output"
              )
@@ -186,14 +186,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_date_list), len(glucose_effect_dates)
+            len(expected_date_list), len(glucose_effect_dates)
         )
-        for i in range(0, len(out_date_list)):
+        for i in range(0, len(expected_date_list)):
             self.assertEqual(
-                out_date_list[i], glucose_effect_dates[i]
+                expected_date_list[i], glucose_effect_dates[i]
             )
             self.assertAlmostEqual(
-                glucose_effect_values[i], out_glucose_list[i], 2
+                glucose_effect_values[i], expected_glucose_list[i], 2
             )
 
     def test_momentum_effect_for_falling_glucose(self):
@@ -203,8 +203,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          providence_list
          ) = self.load_input_fixture("momentum_effect_falling_glucose_input")
 
-        (out_date_list,
-         out_glucose_list
+        (expected_date_list,
+         expected_glucose_list
          ) = self.load_output_fixture(
              "momentum_effect_falling_glucose_output"
              )
@@ -219,14 +219,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_date_list), len(glucose_effect_dates)
+            len(expected_date_list), len(glucose_effect_dates)
         )
-        for i in range(0, len(out_date_list)):
+        for i in range(0, len(expected_date_list)):
             self.assertEqual(
-                out_date_list[i], glucose_effect_dates[i]
+                expected_date_list[i], glucose_effect_dates[i]
             )
             self.assertAlmostEqual(
-                glucose_effect_values[i], out_glucose_list[i], 2
+                glucose_effect_values[i], expected_glucose_list[i], 2
             )
 
     def test_momentum_effect_for_falling_glucose_duplicates(self):
@@ -237,8 +237,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          ) = self.load_input_fixture(
              "momentum_effect_falling_glucose_duplicate_input"
              )
-        (out_date_list,
-         out_glucose_list
+        (expected_date_list,
+         expected_glucose_list
          ) = self.load_output_fixture(
              "momentum_effect_falling_glucose_output"
              )
@@ -253,14 +253,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_date_list), len(glucose_effect_dates)
+            len(expected_date_list), len(glucose_effect_dates)
         )
-        for i in range(0, len(out_date_list)):
+        for i in range(0, len(expected_date_list)):
             self.assertEqual(
-                out_date_list[i], glucose_effect_dates[i]
+                expected_date_list[i], glucose_effect_dates[i]
             )
             self.assertAlmostEqual(
-                glucose_effect_values[i], out_glucose_list[i], 2
+                glucose_effect_values[i], expected_glucose_list[i], 2
             )
 
     def test_momentum_effect_for_stable_glucose(self):
@@ -270,8 +270,8 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          providence_list
          ) = self.load_input_fixture("momentum_effect_stable_glucose_input")
 
-        (out_date_list,
-         out_glucose_list
+        (expected_date_list,
+         expected_glucose_list
          ) = self.load_output_fixture("momentum_effect_stable_glucose_output")
 
         (glucose_effect_dates,
@@ -284,14 +284,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_date_list), len(glucose_effect_dates)
+            len(expected_date_list), len(glucose_effect_dates)
         )
-        for i in range(0, len(out_date_list)):
+        for i in range(0, len(expected_date_list)):
             self.assertEqual(
-                out_date_list[i], glucose_effect_dates[i]
+                expected_date_list[i], glucose_effect_dates[i]
             )
             self.assertAlmostEqual(
-                glucose_effect_values[i], out_glucose_list[i], 2
+                glucose_effect_values[i], expected_glucose_list[i], 2
             )
 
     def test_momentum_effect_for_duplicate_glucose(self):
@@ -321,7 +321,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
             0, len(glucose_effect_dates)
         )
 
-    def test_momentum_effect_for_spaced_out_glucose(self):
+    def test_momentum_effect_for_spaced_expected_glucose(self):
         (i_date_list,
          i_glucose_list,
          display_list,
@@ -413,9 +413,9 @@ class TestGlucoseKitFunctions(unittest.TestCase):
          effect_glucoses
          ) = self.load_output_fixture("momentum_effect_stable_glucose_output")
 
-        (o_start_dates,
-         o_end_dates,
-         o_velocities
+        (expected_start_dates,
+         expected_end_dates,
+         expected_velocities
          ) = self.load_effect_velocity_fixture(
              "counteraction_effect_falling_glucose_output"
              )
@@ -433,14 +433,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(o_start_dates), len(start_dates)
+            len(expected_start_dates), len(start_dates)
         )
-        for i in range(0, len(o_start_dates)):
+        for i in range(0, len(expected_start_dates)):
             self.assertEqual(
-                o_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertAlmostEqual(
-                o_velocities[i], velocities[i], 2
+                expected_velocities[i], velocities[i], 2
             )
 
     def test_counteraction_effects_for_falling_glucose_duplicates(self):
@@ -458,9 +458,9 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              "counteraction_effect_falling_glucose_insulin"
              )
 
-        (o_start_dates,
-         o_end_dates,
-         o_velocities
+        (expected_start_dates,
+         expected_end_dates,
+         expected_velocities
          ) = self.load_effect_velocity_fixture(
              "counteraction_effect_falling_glucose_output"
              )
@@ -478,14 +478,14 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(o_start_dates), len(start_dates)
+            len(expected_start_dates), len(start_dates)
         )
-        for i in range(0, len(o_start_dates)):
+        for i in range(0, len(expected_start_dates)):
             self.assertEqual(
-                o_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertAlmostEqual(
-                o_velocities[i], velocities[i], 2
+                expected_velocities[i], velocities[i], 2
             )
 
     def test_counteraction_effects_for_falling_glucose_almost_duplicates(self):
@@ -503,9 +503,9 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              "counteraction_effect_falling_glucose_insulin"
              )
 
-        (o_start_dates,
-         o_end_dates,
-         o_velocities
+        (expected_start_dates,
+         expected_end_dates,
+         expected_velocities
          ) = self.load_effect_velocity_fixture(
              "counteraction_effect_falling_glucose_almost_duplicates_output"
              )
@@ -523,15 +523,15 @@ class TestGlucoseKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(o_start_dates), len(start_dates)
+            len(expected_start_dates), len(start_dates)
         )
 
-        for i in range(0, len(o_start_dates)):
+        for i in range(0, len(expected_start_dates)):
             self.assertEqual(
-                o_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertAlmostEqual(
-                o_velocities[i], velocities[i], 2
+                expected_velocities[i], velocities[i], 2
             )
 
     def test_counteraction_effects_for_no_glucose(self):

@@ -182,18 +182,18 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_dates, i_volumes) = self.load_reservoir_fixture(
             "reservoir_history_with_rewind_and_prime_input"
         )
-        (out_dose_types,
-         out_start_dates,
-         out_end_dates,
-         out_values,
-         out_scheduled_basal_rates
+        (expected_dose_types,
+         expected_start_dates,
+         expected_end_dates,
+         expected_values,
+         expected_scheduled_basal_rates
          ) = self.load_dose_fixture(
              "reservoir_history_with_rewind_and_prime_output"
              )
 
-        out_start_dates.reverse()
-        out_end_dates.reverse()
-        out_values.reverse()
+        expected_start_dates.reverse()
+        expected_end_dates.reverse()
+        expected_values.reverse()
 
         (dose_types,
          start_dates,
@@ -203,18 +203,18 @@ class TestInsulinKitFunctions(unittest.TestCase):
          )
 
         self.assertEqual(
-            len(out_start_dates), len(start_dates)
+            len(expected_start_dates), len(start_dates)
         )
 
-        for i in range(0, len(out_start_dates)):
+        for i in range(0, len(expected_start_dates)):
             self.assertEqual(
-                out_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertEqual(
-                out_end_dates[i], end_dates[i]
+                expected_end_dates[i], end_dates[i]
             )
             self.assertAlmostEqual(
-                out_values[i], values[i], 2
+                expected_values[i], values[i], 2
             )
 
     """ Tests for is_continuous """
@@ -457,8 +457,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates,
-         out_insulin_values
+        (expected_dates,
+         expected_insulin_values
          ) = self.load_insulin_value_fixture(
              "iob_from_doses_output_new"
              )
@@ -477,15 +477,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(dates)
+            len(expected_dates), len(dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], dates[i]
+                expected_dates[i], dates[i]
             )
             self.assertAlmostEqual(
-                out_insulin_values[i], insulin_values[i], 1
+                expected_insulin_values[i], insulin_values[i], 1
             )
 
     def test_iob_from_no_doses(self):
@@ -505,8 +505,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates,
-         out_insulin_values
+        (expected_dates,
+         expected_insulin_values
          ) = self.load_insulin_value_fixture(
              "iob_from_doses_exponential_output_new"
              )
@@ -525,15 +525,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(dates)
+            len(expected_dates), len(dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], dates[i]
+                expected_dates[i], dates[i]
             )
             self.assertAlmostEqual(
-                out_insulin_values[i], insulin_values[i], 2
+                expected_insulin_values[i], insulin_values[i], 2
             )
 
     def test_iob_from_bolus(self):
@@ -546,8 +546,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
 
         for hour in [2, 3, 4, 5, 5.2, 6, 7]:
             model = [hour]
-            (out_dates,
-             out_insulin_values
+            (expected_dates,
+             expected_insulin_values
              ) = self.load_insulin_value_fixture(
                  "iob_from_bolus_" + str(int(hour*60)) + "min_output"
                  )
@@ -564,15 +564,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
                  )
 
             self.assertEqual(
-                len(out_dates), len(dates)
+                len(expected_dates), len(dates)
             )
 
-            for i in range(0, len(out_dates)):
+            for i in range(0, len(expected_dates)):
                 self.assertEqual(
-                    out_dates[i], dates[i]
+                    expected_dates[i], dates[i]
                 )
                 self.assertAlmostEqual(
-                    out_insulin_values[i], insulin_values[i], 1
+                    expected_insulin_values[i], insulin_values[i], 1
                 )
 
     def test_iob_from_bolus_exponential(self):
@@ -583,8 +583,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
-        (out_dates,
-         out_insulin_values
+        (expected_dates,
+         expected_insulin_values
          ) = self.load_insulin_value_fixture(
              "iob_from_bolus_exponential_output"
              )
@@ -603,15 +603,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(dates)
+            len(expected_dates), len(dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], dates[i]
+                expected_dates[i], dates[i]
             )
             self.assertAlmostEqual(
-                out_insulin_values[i], insulin_values[i], 1
+                expected_insulin_values[i], insulin_values[i], 1
             )
 
     def test_iob_from_reservoir_doses(self):
@@ -622,8 +622,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_reservoir_history_output")
 
-        (out_dates,
-         out_insulin_values
+        (expected_dates,
+         expected_insulin_values
          ) = self.load_insulin_value_fixture("iob_from_reservoir_output")
 
         model = self.WALSH_MODEL
@@ -640,15 +640,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(dates)
+            len(expected_dates), len(dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], dates[i]
+                expected_dates[i], dates[i]
             )
             self.assertAlmostEqual(
-                out_insulin_values[i], insulin_values[i], 0
+                expected_insulin_values[i], insulin_values[i], 0
             )
 
         """ Tests for percent_effect_remaining """
@@ -688,11 +688,11 @@ class TestInsulinKitFunctions(unittest.TestCase):
              "reservoir_history_with_rewind_and_prime_output"
              )
 
-        (out_types,
-         out_start_dates,
-         out_end_dates,
-         out_values,
-         out_scheduled_basal_rates
+        (expected_types,
+         expected_start_dates,
+         expected_end_dates,
+         expected_values,
+         expected_scheduled_basal_rates
          ) = self.load_dose_fixture(
              "normalized_reservoir_history_output"
              )
@@ -719,21 +719,21 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_types), len(types)
+            len(expected_types), len(types)
         )
 
-        for i in range(0, len(out_types)):
+        for i in range(0, len(expected_types)):
             self.assertEqual(
-                out_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertEqual(
-                out_end_dates[i], end_dates[i]
+                expected_end_dates[i], end_dates[i]
             )
             self.assertAlmostEqual(
-                out_values[i], values[i], 2
+                expected_values[i], values[i], 2
             )
             self.assertEqual(
-                out_scheduled_basal_rates[i], scheduled_basal_rates[i]
+                expected_scheduled_basal_rates[i], scheduled_basal_rates[i]
             )
 
     def test_normalize_edgecase_doses(self):
@@ -744,11 +744,11 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalize_edge_case_doses_input")
 
-        (out_types,
-         out_start_dates,
-         out_end_dates,
-         out_values,
-         out_scheduled_basal_rates
+        (expected_types,
+         expected_start_dates,
+         expected_end_dates,
+         expected_values,
+         expected_scheduled_basal_rates
          ) = self.load_dose_fixture("normalize_edge_case_doses_output")
 
         (start_times,
@@ -774,18 +774,18 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_types), len(types)
+            len(expected_types), len(types)
         )
 
-        for i in range(0, len(out_types)):
+        for i in range(0, len(expected_types)):
             self.assertEqual(
-                out_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertEqual(
-                out_end_dates[i], end_dates[i]
+                expected_end_dates[i], end_dates[i]
             )
             self.assertAlmostEqual(
-                out_values[i], values[i] - scheduled_basal_rates[i], 2
+                expected_values[i], values[i] - scheduled_basal_rates[i], 2
             )
 
     def test_reconcile_temp_basals(self):
@@ -798,11 +798,11 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_history_input")
 
-        (out_types,
-         out_start_dates,
-         out_end_dates,
-         out_values,
-         out_scheduled_basal_rates
+        (expected_types,
+         expected_start_dates,
+         expected_end_dates,
+         expected_values,
+         expected_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_history_output")
 
         (types,
@@ -831,18 +831,18 @@ class TestInsulinKitFunctions(unittest.TestCase):
         values = unsort_values[sort_ind]
 
         self.assertEqual(
-            len(out_types), len(types)
+            len(expected_types), len(types)
         )
 
-        for i in range(0, len(out_types)):
+        for i in range(0, len(expected_types)):
             self.assertEqual(
-                out_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertEqual(
-                out_end_dates[i], end_dates[i]
+                expected_end_dates[i], end_dates[i]
             )
             self.assertAlmostEqual(
-                out_values[i], values[i], 2
+                expected_values[i], values[i], 2
             )
 
     def test_reconcile_resume_before_rewind(self):
@@ -855,11 +855,11 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_resume_before_rewind_input")
 
-        (out_types,
-         out_start_dates,
-         out_end_dates,
-         out_values,
-         out_scheduled_basal_rates
+        (expected_types,
+         expected_start_dates,
+         expected_end_dates,
+         expected_values,
+         expected_scheduled_basal_rates
          ) = self.load_dose_fixture("reconcile_resume_before_rewind_output")
 
         (types,
@@ -875,18 +875,18 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_types), len(types)
+            len(expected_types), len(types)
         )
 
-        for i in range(0, len(out_types)):
+        for i in range(0, len(expected_types)):
             self.assertEqual(
-                out_start_dates[i], start_dates[i]
+                expected_start_dates[i], start_dates[i]
             )
             self.assertEqual(
-                out_end_dates[i], end_dates[i]
+                expected_end_dates[i], end_dates[i]
             )
             self.assertAlmostEqual(
-                out_values[i], values[i], 2
+                expected_values[i], values[i], 2
             )
 
     """ Tests for glucose_effect """
@@ -898,8 +898,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture("effect_from_bolus_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
@@ -922,15 +922,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], 0
+                expected_effect_values[i], effect_values[i], 0
             )
 
     def test_glucose_effect_from_bolus_exponential(self):
@@ -941,8 +941,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("bolus_dose")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture(
              "effect_from_bolus_output_exponential"
              )
@@ -967,15 +967,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], 0
+                expected_effect_values[i], effect_values[i], 0
             )
 
     def test_glucose_effect_from_short_temp_basal(self):
@@ -985,8 +985,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_values, i_scheduled_basal_rates
          ) = self.load_dose_fixture("short_basal_dose")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture("effect_from_short_basal_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
@@ -1009,15 +1009,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], 0
+                expected_effect_values[i], effect_values[i], 0
             )
 
     def test_glucose_effect_from_temp_basal(self):
@@ -1028,8 +1028,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("basal_dose")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture("effect_from_basal_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
@@ -1052,15 +1052,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], -1
+                expected_effect_values[i], effect_values[i], -1
             )
 
     def test_glucose_effect_from_temp_basal_exponential(self):
@@ -1071,8 +1071,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("basal_dose")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture(
              "effect_from_basal_output_exponential"
              )
@@ -1097,15 +1097,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], -1
+                expected_effect_values[i], effect_values[i], -1
             )
 
     def test_glucose_effect_from_history(self):
@@ -1116,8 +1116,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture("effect_from_history_output")
 
         sensitivity_start_dates = self.INSULIN_SENSITIVITY_START_DATES
@@ -1140,15 +1140,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], -1
+                expected_effect_values[i], effect_values[i], -1
             )
 
     def test_glucose_effect_from_history_exponential(self):
@@ -1159,8 +1159,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
          i_scheduled_basal_rates
          ) = self.load_dose_fixture("normalized_doses")
 
-        (out_dates,
-         out_effect_values
+        (expected_dates,
+         expected_effect_values
          ) = self.load_glucose_effect_fixture(
              "effect_from_history_output_exponential"
              )
@@ -1185,15 +1185,15 @@ class TestInsulinKitFunctions(unittest.TestCase):
              )
 
         self.assertEqual(
-            len(out_dates), len(effect_dates)
+            len(expected_dates), len(effect_dates)
         )
 
-        for i in range(0, len(out_dates)):
+        for i in range(0, len(expected_dates)):
             self.assertEqual(
-                out_dates[i], effect_dates[i]
+                expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                out_effect_values[i], effect_values[i], -1
+                expected_effect_values[i], effect_values[i], -1
             )
 
     def test_glucose_effect_from_no_doses(self):

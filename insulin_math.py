@@ -838,10 +838,10 @@ def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
         == len(dose_values) == len(scheduled_basal_rates),\
         "expected input shapes to match"
 
-    if not dose_types:  # if using a Walsh model
+    if not dose_types:
         return ([], [])
 
-    if len(model) == 1:
+    if len(model) == 1:  # if using a Walsh model
         (start, end) = simulation_date_range_for_samples(
             start_times=dose_start_dates,
             end_times=dose_end_dates,

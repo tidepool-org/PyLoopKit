@@ -908,15 +908,17 @@ def find_ratio_at_time(sensitivity_start_times, sensitivity_end_times,
                              given insulin sensitivity values
     sensitivity_values -- list of sensitivities (mg/dL/U)
     time_to_check -- finding the sensitivity value at this time
-    type_ -- type of ratio ("isf" or "cr")
+    type_ -- type of ratio ("isf" for insulin sensitivity or
+                            "cr" for carb ratio)
 
     Output:
-    Sensitivity value (mg/dL/U)
+    Sensitivity value (mg/dL/U) or carb ratio (G/U)
     """
-    assert len(sensitivity_start_times) == len(sensitivity_end_times) ==\
-        len(sensitivity_values), "expected input shapes to match"
-
     assert type_.lower() in ["isf", "cr"], "expected type to be ISF or CR"
+
+    if type_.lower == "isf":
+        assert len(sensitivity_start_times) == len(sensitivity_end_times) ==\
+            len(sensitivity_values), "expected input shapes to match"
 
     for i in range(0, len(sensitivity_start_times)):
         if type_.lower == "isf":
@@ -929,7 +931,7 @@ def find_ratio_at_time(sensitivity_start_times, sensitivity_end_times,
         else:
             if is_time_between(
                     sensitivity_start_times[i],
-                    (sensitivity_end_times[i+1]
+                    (sensitivity_start_times[i+1]
                      if i+1 < len(sensitivity_start_times)
                      else sensitivity_end_times[0]
                     ),

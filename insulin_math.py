@@ -940,7 +940,7 @@ def find_ratio_at_time(sensitivity_start_times, sensitivity_end_times,
                     sensitivity_start_times[i],
                     (sensitivity_start_times[i+1]
                      if i+1 < len(sensitivity_start_times)
-                     else sensitivity_end_times[0]
+                     else sensitivity_start_times[0]
                     ),
                     time_to_check
                     ):  # pylint: disable=C0330

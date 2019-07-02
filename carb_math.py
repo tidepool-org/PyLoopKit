@@ -174,8 +174,11 @@ def map_(
             )
 
             # Once 100% of the carbs are observed, track the endDate
-            # TODO: if having trouble debugging, try + Double(Float.ulpOfOne)
-            if observed_effects[entry_index] >= entry_effects[entry_index]:
+            if (
+                 observed_effects[entry_index]
+                 > entry_effects[entry_index]
+                    ):
+                print(observed_effects[entry_index], entry_effects[entry_index])
                 observed_completion_dates[entry_index] = end
 
     for index in range(0, len(effect_starts)):
@@ -282,7 +285,7 @@ def map_(
                                     if min_absorption_rate > 0
                                     else 0)
         absorption = [
-            entry_grams,
+            observed_grams,
             clamped_grams,
             entry_grams,
             entry_grams - clamped_grams,

@@ -46,6 +46,18 @@ def map_(
     carb_ratio_starts -- list of start times of carb ratios (time objects)
     carb_ratios -- list of carb ratios (G/U)
 
+    sensitivity_starts -- list of time objects of start times of
+                          given insulin sensitivity values
+    sensitivity_ends -- list of time objects of start times of
+                        given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+
+    absorption_time_overrun -- multiplier to determine absorption time
+                               from the specified absorption time
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+    delay -- the time to delay the carb effect
+
     Output:
     3 lists in format (absorption_results, absorption_timelines, carb_entries)
         - lists are matched by index

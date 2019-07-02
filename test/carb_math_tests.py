@@ -14,7 +14,7 @@ from datetime import datetime, time
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from carb_math import map_, glucose_effects
+from carb_math import map_, glucose_effects, carbs_on_board
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -222,6 +222,34 @@ class TestCarbKitFunctions(unittest.TestCase):
             )
             self.assertAlmostEqual(
                 expected_values[i], effect_values[i], 1
+            )
+
+    """ Tests for non-dynamic COB """
+    def test_carbs_on_board_from_history(self):
+        input_ = self.load_history_fixture("carb_effect_from_history_input")
+        (expected_dates,
+         expected_values
+         ) = self.load_cob_output_fixture("carbs_on_board_output")
+
+        (cob_starts,
+         cob_values
+         ) = carbs_on_board(
+             *input_,
+             default_absorption_time=180,
+             delay=10,
+             delta=5
+             )
+
+        self.assertEqual(
+            len(expected_dates), len(cob_starts)
+        )
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], cob_starts[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], cob_values[i], 1
             )
 
 

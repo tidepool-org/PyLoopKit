@@ -478,6 +478,118 @@ def simulation_date_range(
             )
 
 
+def carbs_on_board(
+        carb_starts, carb_quantities, carb_absorptions,
+        default_absorption_time,
+        delay=10,
+        delta=5,
+        start=None,
+        end=None
+        ):
+    """
+    Find the carbs on board non-dynamically
+
+    Arguments:
+    carb_starts -- list of times of carb entry (datetime objects)
+    carb_quantities -- list of grams of carbs eaten
+    carb_absorptions -- list of lengths of absorption times (mins)
+
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+    delay -- the time to delay the carb effect
+    delta -- the differential between timeline entries
+    start -- datetime to start calculation of glucose effects
+    end -- datetime to stop calculation of glucose effects
+
+    Output:
+    Two lists in format (carb on board start dates, carb on board values)
+    """
+    assert len(carb_starts) == len(carb_quantities)\
+        == len(carb_absorptions), "expected input shapes to match"
+
+    if not carb_starts:
+        return ([], [])
+
+    (start, end) = simulation_date_range(
+        carb_starts,
+        [],
+        carb_absorptions,
+        default_absorption_time,
+        delay=delay,
+        delta=delta,
+        start=start,
+        end=end
+        )
+
+    date = start
+    cob_start_dates = []
+    cob_values = []
+
+    def find_partial_effect(i):
+        return carbs_on_board_helper(
+            carb_starts[i],
+            carb_quantities[i],
+            date,
+            default_absorption_time,
+            delay,
+            carb_absorptions[i]
+            )
+
+    while date <= end:
+        cob_sum = 0
+        for i in range(0, len(carb_starts)):
+            cob_sum += find_partial_effect(i)
+
+        cob_start_dates.append(date)
+        cob_values.append(cob_sum)
+        date += timedelta(minutes=delta)
+
+    assert len(cob_start_dates) == len(cob_values),\
+        "expected output shapes to match"
+    return (cob_start_dates, cob_values)
+
+
+def carbs_on_board_helper(
+        carb_start,
+        carb_value,
+        at_time,
+        default_absorption_time,
+        delay,
+        carb_absorption_time=None
+        ):
+    """
+    Find partial COB for a particular carb entry
+
+    Arguments:
+    carb_start -- time of carb entry (datetime objects)
+    carb_value -- grams of carbs eaten
+
+    at_date -- date to calculate the glucose effect (datetime object)
+
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+
+    delay -- the time to delay the carb effect
+    carb_absorption_time -- time carbs will take to absorb (mins)
+
+    Output:
+    Carbohydrate value (g)
+    """
+    time = time_interval_since(at_time, carb_start) / 60
+
+    if time >= 0:
+        value = (carb_value
+                 * (1 - parabolic_percent_absorption_at_time(
+                     time - delay,
+                     carb_absorption_time or default_absorption_time
+                     )
+                    )
+                 )
+    else:
+        value = 0
+    return value
+
+
 def glucose_effects(
         carb_starts, carb_quantities, carb_absorptions,
         carb_ratio_starts, carb_ratios,
@@ -525,7 +637,7 @@ def glucose_effects(
         == len(sensitivity_values), "expected input shapes to match"
 
     if not carb_starts or not carb_ratio_starts or not sensitivity_starts:
-        return ([], [], [])
+        return ([], [])
 
     (start, end) = simulation_date_range(
         carb_starts,
@@ -593,7 +705,7 @@ def glucose_effect(
     Find partial effect of carbohydate consumption on blood glucose
 
     Arguments:
-    carb_starts -- time of carb entry (datetime objects)
+    carb_start -- time of carb entry (datetime objects)
     carb_value -- grams of carbs eaten
 
     at_date -- date to calculate the glucose effect (datetime object)

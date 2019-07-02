@@ -14,7 +14,8 @@ from datetime import datetime, time
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from carb_math import map_, glucose_effects, carbs_on_board
+from carb_math import (map_, glucose_effects, carbs_on_board,
+                       dynamic_carbs_on_board)
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -173,8 +174,10 @@ class TestCarbKitFunctions(unittest.TestCase):
         carb_entry_absorptions = [120]
 
         (absorptions,
-         timelines,  # pylint: disable=W0612
-         entries  # pylint: disable=W0612
+         entries,  # pylint: disable=W0612
+         timeline_starts,  # pylint: disable=W0612
+         timeline_ends,  # pylint: disable=W0612
+         timeline_values,  # pylint: disable=W0612
          ) = map_(
              carb_entry_starts,
              carb_entry_quantities,

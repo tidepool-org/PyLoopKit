@@ -150,9 +150,9 @@ def map_(
     observed_effects = [0 for i in builder_entry_indexes]
     observed_completion_dates = [None for i in builder_entry_indexes]
     #   TODO: figure out how to represent without sublists
-    observed_timeline_starts = [[] for i in builder_entry_indexes]
-    observed_timeline_ends = [[] for i in builder_entry_indexes]
-    observed_timeline_carb_values = [[] for i in builder_entry_indexes]
+    observed_timeline_starts = []
+    observed_timeline_ends = []
+    observed_timeline_carb_values = []
 
     assert len(builder_entry_indexes) == len(builder_carb_sensitivities)\
         == len(builder_max_absorb_times) == len(builder_max_end_dates)\
@@ -167,9 +167,9 @@ def map_(
         if not observed_completion_dates[entry_index]:
             # Continue recording the timeline until
             # 100% of the carbs have been observed
-            observed_timeline_starts[entry_index].append(start)
-            observed_timeline_ends[entry_index].append(end)
-            observed_timeline_carb_values[entry_index].append(
+            observed_timeline_starts.append(start)
+            observed_timeline_ends.append(end)
+            observed_timeline_carb_values.append(
                 effect / builder_carb_sensitivities[entry_index]
             )
 
@@ -315,15 +315,24 @@ def map_(
             builder_max_absorb_times[builder_index]
         )
 
-        return ([observed_timeline_starts[builder_index],
-                 observed_timeline_ends[builder_index],
-                 observed_timeline_carb_values[builder_index]
-                 ] if (
-                     observed_effects[builder_index]
-                     / builder_carb_sensitivities[builder_index]
-                     >= min_predicted_grams
-                     )
-                else None)
+        if (
+                observed_effects[builder_index]
+                / builder_carb_sensitivities[builder_index]
+                >= min_predicted_grams
+                ):
+            timeline_starts.append(
+                observed_timeline_starts[builder_index]
+            )
+            timeline_ends.append(
+                observed_timeline_ends[builder_index]
+            )
+            timeline_values.append(
+                observed_timeline_carb_values[builder_index]
+            )
+        else:
+            timeline_starts.append(None)
+            timeline_ends.append(None)
+            timeline_values.append(None)
 
     def entry_properties(i):
         return [builder_carb_sensitivities[i],
@@ -335,17 +344,25 @@ def map_(
 
     entries = []
     absorptions = []
-    timelines = []
-    # TODO: possibily refactor without sublists
+    timeline_starts = []
+    timeline_ends = []
+    timeline_values = []
+
     for i in builder_entry_indexes:
         absorptions.append(absorption_result(i))
-        timelines.append(clamped_timeline(i))
+        clamped_timeline(i)
         entries.append(entry_properties(i))
 
-    assert len(absorptions) == len(timelines) == len(entries),\
-        "expect output shapes to match"
+    assert len(absorptions) == len(timeline_starts) == len(timeline_ends)\
+        == len(timeline_values) == len(entries),\
+        "expected output shapes to match"
 
-    return (absorptions, timelines, entries)
+    return (absorptions,
+            entries,
+            timeline_starts,
+            timeline_ends,
+            timeline_values
+            )
 
 
 def linearly_absorbed_carbs(total, time, absorption_time):

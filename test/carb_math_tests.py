@@ -14,8 +14,8 @@ from datetime import datetime, time
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from carb_math import (map_, glucose_effects, carbs_on_board,
-                       dynamic_carbs_on_board)
+from carb_math import (map_, glucose_effects, carbs_on_board)
+                       #, dynamic_carbs_on_board)
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -174,10 +174,8 @@ class TestCarbKitFunctions(unittest.TestCase):
         carb_entry_absorptions = [120]
 
         (absorptions,
-         entries,  # pylint: disable=W0612
-         timeline_starts,  # pylint: disable=W0612
-         timeline_ends,  # pylint: disable=W0612
-         timeline_values,  # pylint: disable=W0612
+         timelines,
+         entries  # pylint: disable=W0612
          ) = map_(
              carb_entry_starts,
              carb_entry_quantities,
@@ -254,6 +252,45 @@ class TestCarbKitFunctions(unittest.TestCase):
             self.assertAlmostEqual(
                 expected_values[i], cob_values[i], 1
             )
+
+    def test_dynamic_absorption_none_observed(self):
+        input_ice = self.load_ice_input_fixture("ice_35_min_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_entry_fixture()
+
+        carb_ratio_tuple = self.load_schedules()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[2]]
+        carb_entry_quantities = [carb_values[2]]
+        carb_entry_absorptions = [carb_absorptions[2]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_cob_output_fixture("ice_35_min_none_output")
+        (absorptions,
+         timelines,
+         entries,  # pylint: disable=W0612
+         ) = map_(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times[1] / default_absorption_times[0],
+             default_absorption_times[1],
+             0
+             )
+
+        self.assertEqual(len(absorptions), 1)
+        self.assertEqual(absorptions[0][6], 240)
 
 
 if __name__ == '__main__':

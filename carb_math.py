@@ -150,9 +150,9 @@ def map_(
     observed_effects = [0 for i in builder_entry_indexes]
     observed_completion_dates = [None for i in builder_entry_indexes]
     #   TODO: figure out how to represent without sublists
-    observed_timeline_starts = []
-    observed_timeline_ends = []
-    observed_timeline_carb_values = []
+    observed_timeline_starts = [[] for i in builder_entry_indexes]
+    observed_timeline_ends = [[] for i in builder_entry_indexes]
+    observed_timeline_carb_values = [[] for i in builder_entry_indexes]
 
     assert len(builder_entry_indexes) == len(builder_carb_sensitivities)\
         == len(builder_max_absorb_times) == len(builder_max_end_dates)\
@@ -167,9 +167,9 @@ def map_(
         if not observed_completion_dates[entry_index]:
             # Continue recording the timeline until
             # 100% of the carbs have been observed
-            observed_timeline_starts.append(start)
-            observed_timeline_ends.append(end)
-            observed_timeline_carb_values.append(
+            observed_timeline_starts[entry_index].append(start)
+            observed_timeline_ends[entry_index].append(end)
+            observed_timeline_carb_values[entry_index].append(
                 effect / builder_carb_sensitivities[entry_index]
             )
 
@@ -315,24 +315,15 @@ def map_(
             builder_max_absorb_times[builder_index]
         )
 
-        if (
-                observed_effects[builder_index]
-                / builder_carb_sensitivities[builder_index]
-                >= min_predicted_grams
-                ):
-            timeline_starts.append(
-                observed_timeline_starts[builder_index]
-            )
-            timeline_ends.append(
-                observed_timeline_ends[builder_index]
-            )
-            timeline_values.append(
-                observed_timeline_carb_values[builder_index]
-            )
-        else:
-            timeline_starts.append(None)
-            timeline_ends.append(None)
-            timeline_values.append(None)
+        return ([observed_timeline_starts[builder_index],
+                 observed_timeline_ends[builder_index],
+                 observed_timeline_carb_values[builder_index]
+                 ] if (
+                     observed_effects[builder_index]
+                     / builder_carb_sensitivities[builder_index]
+                     >= min_predicted_grams
+                     )
+                else None)
 
     def entry_properties(i):
         return [builder_carb_sensitivities[i],
@@ -344,25 +335,17 @@ def map_(
 
     entries = []
     absorptions = []
-    timeline_starts = []
-    timeline_ends = []
-    timeline_values = []
-
+    timelines = []
+    # TODO: possibily refactor without sublists
     for i in builder_entry_indexes:
         absorptions.append(absorption_result(i))
-        clamped_timeline(i)
+        timelines.append(clamped_timeline(i))
         entries.append(entry_properties(i))
 
-    assert len(absorptions) == len(timeline_starts) == len(timeline_ends)\
-        == len(timeline_values) == len(entries),\
-        "expected output shapes to match"
+    assert len(absorptions) == len(timelines) == len(entries),\
+        "expect output shapes to match"
 
-    return (absorptions,
-            entries,
-            timeline_starts,
-            timeline_ends,
-            timeline_values
-            )
+    return (absorptions, timelines, entries)
 
 
 def linearly_absorbed_carbs(total, time, absorption_time):
@@ -710,6 +693,85 @@ def glucose_effects(
     assert len(effect_start_dates) == len(effect_values),\
         "expected output shapes to match"
     return (effect_start_dates, effect_values)
+
+"""
+func dynamicCarbsOnBoard(at date: Date, defaultAbsorptionTime: TimeInterval, delay: TimeInterval,
+                             delta: TimeInterval) -> Double {
+        guard date >= startDate - delta,
+            let absorption = absorption
+        else {
+            // We have to have absorption info for dynamic calculation
+            return entry.carbsOnBoard(at: date, defaultAbsorptionTime: defaultAbsorptionTime, delay: delay)
+        }
+
+        let unit = HKUnit.gram()
+
+        guard let observedTimeline = observedTimeline else {
+            // Less than minimum observed; calc based on min absorption rate
+            let total = absorption.total.doubleValue(for: unit)
+            let time = date.timeIntervalSince(startDate) - delay
+            let absorptionTime = absorption.estimatedDate.duration
+
+            return LinearAbsorption.unabsorbedCarbs(of: total, atTime: time, absorptionTime: absorptionTime)
+        }
+
+        guard let end = observedTimeline.last?.endDate, date <= end else {
+            // Predicted absorption for remaining carbs, post-observation
+            let total = absorption.remaining.doubleValue(for: unit)
+            let time = date.timeIntervalSince(absorption.observedDate.end)
+            let absorptionTime = absorption.estimatedTimeRemaining
+
+            return LinearAbsorption.unabsorbedCarbs(of: total, atTime: time, absorptionTime: absorptionTime)
+        }
+
+        // Observed absorption
+        // TODO: This creates an O(n^2) situation for COB timelines
+        let total = entry.quantity.doubleValue(for: unit)
+        return max(observedTimeline.filter({ $0.endDate <= date }).reduce(total) { (total, value) -> Double in
+            return total - value.quantity.doubleValue(for: unit)
+        }, 0)
+    }
+"""
+def dynamic_carbs_on_board(
+        carb_start,
+        carb_value,
+        absorption_dict,
+        observed_timeline,
+        at_date,
+        default_absorption_time,
+        delay,
+        carb_absorption_time=None
+        ):
+
+    """
+         carb_start,
+        carb_value,
+        at_time,
+        default_absorption_time,
+        delay,
+        carb_absorption_time=None
+    """
+    if date < carb_start - delta or not absorption_dict:
+        # We have to have absorption info for dynamic calculation
+        return carbs_on_board_helper(
+            carb_start,
+            carb_value,
+            at_date,
+            default_absorption_time,
+            delay,
+            carb_absorption_time
+            )
+    if not observed_timeline:
+        # Less than minimum observed; calc based on min absorption rate
+        time = time_interval_since(at_date, carb_start) / 60 - delay
+        return linear_unabsorbed_carbs(
+            carb_value,
+            time,
+            carb_absorption_time or default_absorption_time
+            )
+
+    if observed_timeline[len(observed_timeline)-1]:
+        pass
 
 
 def glucose_effect(

@@ -15,10 +15,9 @@ from insulin_math import find_ratio_at_time
 from date import (time_interval_since,
                   date_floored_to_time_interval,
                   date_ceiled_to_time_interval)
+import carb_status
 
 
-# TODO: check out the structure of the timeline with longer entries
-# (aka are the sub-sublists needed)
 def map_(
         carb_entry_starts, carb_entry_quantities, carb_entry_absorptions,
         effect_starts, effect_ends, effect_values,
@@ -75,11 +74,11 @@ def map_(
                           (4) observed absorption start,
                           (5) observed absorption end,
                           (6) estimated time remaining]
-        - absorption_timelines: 3 sublists, matched by index
+        - absorption_timelines: each index is a list of timeline values
             - structure: [(0) timeline start times,
                           (1) timeline end times,
-                          (2) effect value during timeline interval (mg/dL)]
-        - carb_entries: 5 sublists, matched by index
+                          (2) absorbed value during timeline interval (g)]
+        - carb_entries: each index is a list of carb entry values
             - these lists are values that were calculated during map_ runtime
             - structure: [(0) carb sensitivities (mg/dL/G of carbohydrate),
                           (1) maximum carb absorption times (min),
@@ -149,7 +148,7 @@ def map_(
 
     observed_effects = [0 for i in builder_entry_indexes]
     observed_completion_dates = [None for i in builder_entry_indexes]
-    #   TODO: figure out how to represent without sublists
+
     observed_timeline_starts = [None for i in builder_entry_indexes]
     observed_timeline_ends = [None for i in builder_entry_indexes]
     observed_timeline_carb_values = [None for i in builder_entry_indexes]
@@ -178,7 +177,6 @@ def map_(
                     observed_effects[entry_index]
                     > entry_effects[entry_index]
                 ):
-                print(observed_effects[entry_index], entry_effects[entry_index])
                 observed_completion_dates[entry_index] = end
 
     for index in range(0, len(effect_starts)):
@@ -336,7 +334,7 @@ def map_(
     entries = []
     absorptions = []
     timelines = []
-    # TODO: possibily refactor without sublists
+
     for i in builder_entry_indexes:
         absorptions.append(absorption_result(i))
         timelines.append(clamped_timeline(i))
@@ -361,6 +359,24 @@ def linearly_absorbed_carbs(total, time, absorption_time):
     Grams of absorbed carbs
     """
     return total * linear_percent_absorption_at_time(time, absorption_time)
+
+
+def linear_unabsorbed_carbs(total, time, absorption_time):
+    """
+    Find unabsorbed carbs using a linear model
+
+    Parameters:
+    total -- total grams of carbs
+    time -- relative time after eating (in minutes)
+    absorption_time --  time for carbs to completely absorb (in minutes)
+
+    Output:
+    Grams of unabsorbed carbs
+    """
+    return total * (1 - linear_percent_absorption_at_time(time,
+                                                          absorption_time
+                                                          )
+                    )
 
 
 def linear_percent_absorption_at_time(time, absorption_time):
@@ -591,6 +607,89 @@ def carbs_on_board_helper(
     else:
         value = 0
     return value
+
+
+def dynamic_carbs_on_board(
+        carb_starts, carb_quantities, carb_absorptions,
+        absorptions, timelines,
+        default_absorption_time,
+        delay=10,
+        delta=5,
+        start=None,
+        end=None
+        ):
+    """
+    Find the carbs on board *dynamically*
+
+    Arguments:
+    carb_starts -- list of times of carb entry (datetime objects)
+    carb_quantities -- list of grams of carbs eaten
+    carb_absorptions -- list of lengths of absorption times (mins)
+
+    absorptions -- list of lists of absorption information
+                   (computed via map_)
+    timelines -- list of lists of carb absorption timelines
+                 (computed via map_)
+
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+    delay -- the time to delay the carb effect
+    delta -- the differential between timeline entries
+    start -- datetime to start calculation of glucose effects
+    end -- datetime to stop calculation of glucose effects
+
+    Output:
+    Two lists in format (carb on board start dates, carb on board values)
+    """
+    assert len(carb_starts) == len(carb_quantities)\
+        == len(carb_absorptions), "expected input shapes to match"
+
+    assert len(absorptions) == len(timelines),\
+        "expected input shapes to match"
+
+    if not carb_starts or not absorptions:
+        return ([], [])
+
+    (start, end) = simulation_date_range(
+        carb_starts,
+        [],
+        carb_absorptions,
+        default_absorption_time,
+        delay=delay,
+        delta=delta,
+        start=start,
+        end=end
+        )
+
+    date = start
+    cob_dates = []
+    cob_values = []
+
+    def find_partial_cob(i):
+        return carb_status.dynamic_carbs_on_board_helper(
+            carb_starts[i],
+            carb_quantities[i],
+            absorptions[i],
+            timelines[i],
+            date,
+            default_absorption_time,
+            delay,
+            delta,
+            carb_absorptions[i]
+            )
+
+    while date <= end:
+        cob_sum = 0
+        for i in range(0, len(carb_starts)):
+            cob_sum += find_partial_cob(i)
+
+        cob_dates.append(date)
+        cob_values.append(cob_sum)
+        date += timedelta(minutes=delta)
+
+    assert len(cob_dates) == len(cob_values),\
+        "expected output shapes to match"
+    return (cob_dates, cob_values)
 
 
 def glucose_effects(

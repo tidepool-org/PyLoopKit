@@ -10,12 +10,12 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 """
 # pylint: disable=R0201, C0111, C0200, W0105
 import unittest
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from carb_math import (map_, glucose_effects, carbs_on_board)
-                       #, dynamic_carbs_on_board)
+from carb_math import (map_, glucose_effects, carbs_on_board,
+                       dynamic_carbs_on_board)
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -253,6 +253,7 @@ class TestCarbKitFunctions(unittest.TestCase):
                 expected_values[i], cob_values[i], 1
             )
 
+    """ Tests for dynamic COB """
     def test_dynamic_absorption_none_observed(self):
         input_ice = self.load_ice_input_fixture("ice_35_min_input")
 
@@ -272,6 +273,7 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_cob_output_fixture("ice_35_min_none_output")
+
         (absorptions,
          timelines,
          entries,  # pylint: disable=W0612
@@ -291,6 +293,34 @@ class TestCarbKitFunctions(unittest.TestCase):
 
         self.assertEqual(len(absorptions), 1)
         self.assertEqual(absorptions[0][6], 240)
+
+        (cob_dates,
+         cob_values
+         ) = dynamic_carbs_on_board(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             absorptions,
+             timelines,
+             default_absorption_times[1],
+             delay=10,
+             delta=5,
+             start=input_ice[0][0],
+             end=(
+                 input_ice[0][0]
+                 + timedelta(hours=6)
+                 )
+             )
+
+        assert len(expected_dates) == len(cob_dates)
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], cob_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], cob_values[i], 1
+            )
 
 
 if __name__ == '__main__':

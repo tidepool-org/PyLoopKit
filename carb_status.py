@@ -52,8 +52,6 @@ def dynamic_carbs_on_board_helper(
     if (at_date < carb_start - timedelta(minutes=delta)
             or not absorption_dict
        ):
-
-
         # We have to have absorption info for dynamic calculation
         return carb_math.carbs_on_board_helper(
             carb_start,
@@ -63,22 +61,29 @@ def dynamic_carbs_on_board_helper(
             delay,
             carb_absorption_time
             )
-    if not observed_timeline:
+    if observed_timeline and None in observed_timeline[0]:
         # Less than minimum observed; calc based on min absorption rate
         time = time_interval_since(at_date, carb_start) / 60 - delay
-
+        estimated_date_duration = (
+            time_interval_since(
+                absorption_dict[5],
+                absorption_dict[4]
+                ) / 60
+            + absorption_dict[6]
+        )
         return carb_math.linear_unabsorbed_carbs(
-            carb_value,
+            absorption_dict[2],
             time,
-            carb_absorption_time or default_absorption_time
+            estimated_date_duration
             )
 
-    if (not observed_timeline[len(observed_timeline)-1]
-            or at_date > observed_timeline[len(observed_timeline) - 1]
+    if (not observed_timeline  # no absorption was observed (empty list)
+            or not observed_timeline[len(observed_timeline)-1]
+            or at_date > observed_timeline[len(observed_timeline) - 1][1]
        ):
         # Predict absorption for remaining carbs, post-observation
         total = absorption_dict[3]  # these are the still-unabsorbed carbs
-        time = time_interval_since(at_date, absorption_dict[4]) / 60
+        time = time_interval_since(at_date, absorption_dict[5]) / 60
         absorption_time = absorption_dict[6]
 
         return carb_math.linear_unabsorbed_carbs(
@@ -89,7 +94,6 @@ def dynamic_carbs_on_board_helper(
 
     # Observed absorption
     total = carb_value
-
     def partial_absorption(dict_):
         if dict_[1] > at_date:
             return 0

@@ -8,7 +8,7 @@ Created on Fri Jun 28 13:35:51 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/CarbMathTests.swift
 """
-# pylint: disable=R0201, C0111, C0200, W0105
+# pylint: disable=R0201, C0111, C0200, W0105, R0914
 import unittest
 from datetime import datetime, time, timedelta
 
@@ -161,7 +161,7 @@ class TestCarbKitFunctions(unittest.TestCase):
 
         return (start_dates, end_dates, ice_values)
 
-    """ Tests for map_ """
+    """ Tests for map_  """
     def test_carb_effect_with_zero_entry(self):
         input_ice = self.load_ice_input_fixture("ice_35_min_input")
 
@@ -254,6 +254,7 @@ class TestCarbKitFunctions(unittest.TestCase):
             )
 
     """ Tests for dynamic COB """
+
     def test_dynamic_absorption_none_observed(self):
         input_ice = self.load_ice_input_fixture("ice_35_min_input")
 
@@ -293,6 +294,10 @@ class TestCarbKitFunctions(unittest.TestCase):
 
         self.assertEqual(len(absorptions), 1)
         self.assertEqual(absorptions[0][6], 240)
+        self.assertEqual(
+            absorptions[0][4],
+            datetime.fromisoformat("2015-10-15 23:00:00")
+        )
 
         (cob_dates,
          cob_values
@@ -314,6 +319,214 @@ class TestCarbKitFunctions(unittest.TestCase):
 
         assert len(expected_dates) == len(cob_dates)
 
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], cob_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], cob_values[i], 1
+            )
+
+    def test_dynamic_absorption_partially_observed(self):
+        input_ice = self.load_ice_input_fixture("ice_35_min_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_entry_fixture()
+
+        carb_ratio_tuple = self.load_schedules()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[0]]
+        carb_entry_quantities = [carb_values[0]]
+        carb_entry_absorptions = [carb_absorptions[0]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_cob_output_fixture("ice_35_min_partial_output")
+
+        (absorptions,
+         timelines,
+         entries,  # pylint: disable=W0612
+         ) = map_(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times[1] / default_absorption_times[0],
+             default_absorption_times[1],
+             0
+             )
+
+        self.assertEqual(len(absorptions), 1)
+        self.assertAlmostEqual(absorptions[0][6], 8509/60, 2)
+
+        (cob_dates,
+         cob_values
+         ) = dynamic_carbs_on_board(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             absorptions,
+             timelines,
+             default_absorption_times[1],
+             delay=10,
+             delta=5,
+             start=input_ice[0][0],
+             end=(
+                 input_ice[0][0]
+                 + timedelta(hours=6)
+                 )
+             )
+
+        assert len(expected_dates) == len(cob_dates)
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], cob_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], cob_values[i], 1
+            )
+
+    def test_dynamic_absorption_fully_observed(self):
+        input_ice = self.load_ice_input_fixture("ice_1_hour_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_entry_fixture()
+
+        carb_ratio_tuple = self.load_schedules()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[0]]
+        carb_entry_quantities = [carb_values[0]]
+        carb_entry_absorptions = [carb_absorptions[0]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_cob_output_fixture("ice_1_hour_output")
+
+        (absorptions,
+         timelines,
+         entries,  # pylint: disable=W0612
+         ) = map_(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times[1] / default_absorption_times[0],
+             default_absorption_times[1],
+             0
+             )
+
+        self.assertEqual(len(absorptions), 1)
+        self.assertIsNotNone(absorptions[0])
+
+        # No remaining absorption
+        self.assertEqual(absorptions[0][6], 0)
+
+        # All should be absorbed
+        self.assertEqual(absorptions[0][0], 44)
+
+        (cob_dates,
+         cob_values
+         ) = dynamic_carbs_on_board(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             absorptions,
+             timelines,
+             default_absorption_times[1],
+             delay=10,
+             delta=5,
+             start=input_ice[0][0],
+             end=(
+                 input_ice[0][0]
+                 + timedelta(hours=6)
+                 )
+             )
+
+        assert len(expected_dates) == len(cob_dates)
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], cob_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], cob_values[i], 1
+            )
+
+    def test_dynamic_absorption_never_fully_observed(self):
+        input_ice = self.load_ice_input_fixture("ice_slow_absorption")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_entry_fixture()
+
+        carb_ratio_tuple = self.load_schedules()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[1]]
+        carb_entry_quantities = [carb_values[1]]
+        carb_entry_absorptions = [carb_absorptions[1]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_cob_output_fixture("ice_slow_absorption_output")
+
+        (absorptions,
+         timelines,
+         entries,  # pylint: disable=W0612
+         ) = map_(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times[1] / default_absorption_times[0],
+             default_absorption_times[1],
+             0
+             )
+
+        self.assertEqual(len(absorptions), 1)
+        self.assertIsNotNone(absorptions[0])
+        self.assertAlmostEqual(absorptions[0][6], 10488/60, 2)
+
+        (cob_dates,
+         cob_values
+         ) = dynamic_carbs_on_board(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             absorptions,
+             timelines,
+             default_absorption_times[1],
+             delay=10,
+             delta=5,
+             start=input_ice[0][0],
+             end=(
+                 input_ice[0][0]
+                 + timedelta(hours=18)
+                 )
+             )
+
+        assert len(expected_dates) == len(cob_dates)
         for i in range(0, len(expected_dates)):
             self.assertEqual(
                 expected_dates[i], cob_dates[i]

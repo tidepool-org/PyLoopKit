@@ -25,7 +25,8 @@ def map_(
         sensitivity_starts, sensitivity_ends, sensitivity_values,
         absorption_time_overrun,
         default_absorption_time,
-        delay
+        delay,
+        delta=5
         ):
     """
     Maps a sorted timeline of carb entries to the observed absorbed
@@ -60,6 +61,7 @@ def map_(
     default_absorption_time -- absorption time to use for unspecified
                                carb entries
     delay -- the time to delay the carb effect
+    delta -- time interval between glucose values
 
     Output:
     3 lists in format (absorption_results, absorption_timelines, carb_entries)
@@ -74,7 +76,8 @@ def map_(
                           (4) observed absorption start,
                           (5) observed absorption end,
                           (6) estimated time remaining]
-        - absorption_timelines: each index is a list of timeline values
+        - absorption_timelines: each index is a list that contains
+                                lists of timeline values
             - structure: [(0) timeline start times,
                           (1) timeline end times,
                           (2) absorbed value during timeline interval (g)]
@@ -137,7 +140,13 @@ def map_(
         ]
 
     last_effect_dates = [
-        effect_ends[len(effect_ends)-1]
+        min(
+            builder_max_end_dates[i],
+            max(
+                effect_ends[len(effect_ends)-1],
+                carb_entry_starts[i]
+            )
+        )
         for i in builder_entry_indexes
         ]
 
@@ -149,16 +158,17 @@ def map_(
     observed_effects = [0 for i in builder_entry_indexes]
     observed_completion_dates = [None for i in builder_entry_indexes]
 
-    observed_timeline_starts = [None for i in builder_entry_indexes]
-    observed_timeline_ends = [None for i in builder_entry_indexes]
-    observed_timeline_carb_values = [None for i in builder_entry_indexes]
+    observed_timeline_starts = [[] for i in builder_entry_indexes]
+    observed_timeline_ends = [[] for i in builder_entry_indexes]
+    observed_timeline_carb_values = [[] for i in builder_entry_indexes]
 
     assert len(builder_entry_indexes) == len(builder_carb_sensitivities)\
         == len(builder_max_absorb_times) == len(builder_max_end_dates)\
         == len(last_effect_dates), "expected shapes to match"
 
     def add_next_effect(entry_index, effect, start, end):
-        if carb_entry_starts[entry_index] < start:
+
+        if start < carb_entry_starts[entry_index]:
             return
 
         observed_effects[entry_index] += effect
@@ -166,16 +176,16 @@ def map_(
         if not observed_completion_dates[entry_index]:
             # Continue recording the timeline until
             # 100% of the carbs have been observed
-            observed_timeline_starts[entry_index] = start
-            observed_timeline_ends[entry_index] = end
-            observed_timeline_carb_values[entry_index] = (
+            observed_timeline_starts[entry_index].append(start)
+            observed_timeline_ends[entry_index].append(end)
+            observed_timeline_carb_values[entry_index].append(
                 effect / builder_carb_sensitivities[entry_index]
             )
 
             # Once 100% of the carbs are observed, track the endDate
             if (
-                    observed_effects[entry_index]
-                    > entry_effects[entry_index]
+                    observed_effects[entry_index] + sys.float_info.epsilon
+                    >= entry_effects[entry_index]
                 ):
                 observed_completion_dates[entry_index] = end
 
@@ -195,7 +205,7 @@ def map_(
         # Ignore velocities < 0 when estimating carb absorption.
         # These are most likely the result of insulin absorption increases
         # such as during activity
-        effect_value = max(0, effect_values[index])
+        effect_value = max(0, effect_values[index]) * delta
 
         def reduce_func(previous, index_):
             return previous + (carb_entry_quantities[index_]
@@ -203,11 +213,9 @@ def map_(
                                )
         # Sum the minimum absorption rates of each active entry to
         # determine how to split the active effects
-
-        # ! had to implement my own reduce function bc
-        # ! reduce wasn't working correctly for lists with one value
         previous = 0
         total_rate = 0
+
         for i in active_builders:
             rate_increase = reduce_func(previous, i)
             total_rate += rate_increase
@@ -217,8 +225,9 @@ def map_(
             entry_effect = (carb_entry_quantities[b_index]
                             * builder_carb_sensitivities[b_index]
                            )
-            remaining_effect = max(entry_effect, 0)
+            remaining_effect = max(entry_effect - observed_effects[b_index], 0)
             # Apply a portion of the effect to this entry
+
             partial_effect_value = min(remaining_effect,
                                        (carb_entry_quantities[b_index]
                                         / builder_max_absorb_times[b_index]
@@ -226,6 +235,7 @@ def map_(
                                        if total_rate != 0 and effect_value != 0
                                        else 0
                                        )
+
             total_rate -= (carb_entry_quantities[b_index]
                            / builder_max_absorb_times[b_index]
                            )
@@ -282,6 +292,7 @@ def map_(
                                     / min_absorption_rate
                                     if min_absorption_rate > 0
                                     else 0)
+
         absorption = [
             observed_grams,
             clamped_grams,
@@ -313,15 +324,21 @@ def map_(
             builder_max_absorb_times[builder_index]
         )
 
-        return ([observed_timeline_starts[builder_index],
-                 observed_timeline_ends[builder_index],
-                 observed_timeline_carb_values[builder_index]
-                 ] if (
-                     observed_effects[builder_index]
-                     / builder_carb_sensitivities[builder_index]
-                     >= min_predicted_grams
-                     )
-                else None)
+        output = []
+        for i in range(0, len(observed_timeline_starts[builder_index])):
+            output.append(
+                [
+                    observed_timeline_starts[builder_index][i],
+                    observed_timeline_ends[builder_index][i],
+                    observed_timeline_carb_values[builder_index][i]
+                ] if (
+                    observed_effects[builder_index]
+                    / builder_carb_sensitivities[builder_index]
+                    >= min_predicted_grams
+                    )
+                else [None, None, None])
+
+        return output
 
     def entry_properties(i):
         return [builder_carb_sensitivities[i],

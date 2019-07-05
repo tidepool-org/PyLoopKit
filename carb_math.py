@@ -7,7 +7,7 @@ Created on Fri Jun 28 13:46:36 2019
 https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/CarbKit/CarbMath.swift
 """
-# pylint: disable=R0913, C0200, C0301, R0914, R0915
+# pylint: disable=R0913, C0200, C0301, R0914, R0915, C0302
 import sys
 from datetime import timedelta
 
@@ -78,8 +78,8 @@ def map_(
                           (6) estimated time remaining]
         - absorption_timelines: each index is a list that contains
                                 lists of timeline values
-            - structure: [(0) timeline start times,
-                          (1) timeline end times,
+            - structure: [(0) timeline start time,
+                          (1) timeline end time,
                           (2) absorbed value during timeline interval (g)]
         - carb_entries: each index is a list of carb entry values
             - these lists are values that were calculated during map_ runtime
@@ -755,7 +755,10 @@ def glucose_effects(
     assert len(sensitivity_starts) == len(sensitivity_ends)\
         == len(sensitivity_values), "expected input shapes to match"
 
-    if not carb_starts or not carb_ratio_starts or not sensitivity_starts:
+    if (not carb_starts
+            or not carb_ratio_starts
+            or not sensitivity_starts
+       ):
         return ([], [])
 
     (start, end) = simulation_date_range(
@@ -851,7 +854,131 @@ def glucose_effect(
         )
 
 
-def absorbed_carbs(start_date, carb_value, absorption_time, at_date, delay):
+def dynamic_glucose_effects(
+        carb_starts, carb_quantities, carb_absorptions,
+        absorptions, timelines,
+        carb_ratio_starts, carb_ratios,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        default_absorption_time,
+        delay=10,
+        delta=5,
+        start=None,
+        end=None
+        ):
+    """
+    Find the expected effects of carbohydate consumption on blood glucose
+    dynamically
+
+    Arguments:
+    carb_starts -- list of times of carb entry (datetime objects)
+    carb_quantities -- list of grams of carbs eaten
+    carb_absorptions -- list of lengths of absorption times (mins)
+
+    absorptions -- list of lists of absorption information
+                   (computed via map_)
+    timelines -- list of lists of carb absorption timelines
+                 (computed via map_)
+
+    carb_ratio_starts -- list of start times of carb ratios (time objects)
+    carb_ratios -- list of carb ratios (g/U)
+
+
+    sensitivity_starts -- list of time objects of start times of
+                          given insulin sensitivity values
+    sensitivity_ends -- list of time objects of start times of
+                        given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+
+    default_absorption_time -- absorption time to use for unspecified
+                               carb entries
+    delay -- the time to delay the carb effect
+    delta -- the differential between timeline entries
+    start -- datetime to start calculation of glucose effects
+    end -- datetime to stop calculation of glucose effects
+
+    Output:
+    Two lists in format (effect_start_dates, effect_values)
+    """
+    assert len(carb_starts) == len(carb_quantities)\
+        == len(carb_absorptions), "expected input shapes to match"
+
+    assert len(carb_ratio_starts) == len(carb_ratios),\
+        "expected input shapes to match"
+
+    assert len(sensitivity_starts) == len(sensitivity_ends)\
+        == len(sensitivity_values), "expected input shapes to match"
+
+    assert len(absorptions) == len(timelines),\
+        "expected input shapes to match"
+
+    if (not carb_starts
+            or not carb_ratio_starts
+            or not sensitivity_starts
+            or not absorptions
+       ):
+        return ([], [])
+
+    (start, end) = simulation_date_range(
+        carb_starts,
+        [],
+        carb_absorptions,
+        default_absorption_time,
+        delay=delay,
+        delta=delta,
+        start=start,
+        end=end
+        )
+
+    date = start
+    effect_start_dates = []
+    effect_values = []
+
+    def find_partial_effect(i):
+        insulin_sensitivity = find_ratio_at_time(
+            sensitivity_starts,
+            sensitivity_ends,
+            sensitivity_values,
+            carb_starts[i]
+            )
+        carb_ratio = find_ratio_at_time(
+            carb_ratio_starts,
+            [],
+            carb_ratios,
+            carb_starts[i]
+            )
+        csf = insulin_sensitivity / carb_ratio
+        return csf * carb_status.dynamic_absorbed_carbs(
+            carb_starts[i],
+            carb_quantities[i],
+            absorptions[i],
+            timelines[i],
+            date,
+            carb_absorptions[i] or default_absorption_time,
+            delay,
+            delta,
+        )
+
+    while date <= end:
+        effect_sum = 0
+        for i in range(0, len(carb_starts)):
+            effect_sum += find_partial_effect(i)
+
+        effect_start_dates.append(date)
+        effect_values.append(effect_sum)
+        date += timedelta(minutes=delta)
+
+    assert len(effect_start_dates) == len(effect_values),\
+        "expected output shapes to match"
+    return (effect_start_dates, effect_values)
+
+
+def absorbed_carbs(
+        start_date,
+        carb_value,
+        absorption_time,
+        at_date,
+        delay
+        ):
     """
     Find absorbed carbs using a parabolic model
 

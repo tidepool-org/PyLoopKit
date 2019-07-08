@@ -13,7 +13,8 @@ from datetime import datetime
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from loop_math import predict_glucose
+from loop_math import predict_glucose, decay_effect
+from date import time_interval_since
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -347,6 +348,91 @@ class TestCarbKitFunctions(unittest.TestCase):
                 expected_values[i], predicted_values[i], 3
             )
 
+    def test_decay_effect(self):
+        glucose_date = datetime(2016, 2, 1, 10, 13, 20)
+        glucose_value = 100
+        starting_effect = 2
+
+        (dates,
+         values
+         ) = decay_effect(
+             glucose_date, glucose_value,
+             starting_effect,
+             30
+             )
+
+        self.assertEqual(
+            [100, 110, 118, 124, 128, 130, 130],
+            values
+        )
+
+        start_date = dates[0]
+        time_deltas = []
+
+        for time in dates:
+            time_deltas.append(
+                time_interval_since(time, start_date) / 60
+            )
+
+        self.assertEqual(
+            [0, 5, 10, 15, 20, 25, 30],
+            time_deltas
+        )
+
+        (dates,
+         values
+         ) = decay_effect(
+             glucose_date, glucose_value,
+             -0.5,
+             30
+             )
+        self.assertEqual(
+            [100, 97.5, 95.5, 94, 93, 92.5, 92.5],
+            values
+        )
+
+    def test_decay_effect_with_even_glucose(self):
+        glucose_date = datetime(2016, 2, 1, 10, 15, 0)
+        glucose_value = 100
+        starting_effect = 2
+
+        (dates,
+         values
+         ) = decay_effect(
+             glucose_date, glucose_value,
+             starting_effect,
+             30
+             )
+
+        self.assertEqual(
+            [100, 110, 118, 124, 128, 130],
+            values
+        )
+
+        start_date = dates[0]
+        time_deltas = []
+
+        for time in dates:
+            time_deltas.append(
+                time_interval_since(time, start_date) / 60
+            )
+
+        self.assertEqual(
+            [0, 5, 10, 15, 20, 25],
+            time_deltas
+        )
+
+        (dates,
+         values
+         ) = decay_effect(
+             glucose_date, glucose_value,
+             -0.5,
+             30
+             )
+        self.assertEqual(
+            [100, 97.5, 95.5, 94, 93, 92.5],
+            values
+        )
 
 if __name__ == '__main__':
     unittest.main()

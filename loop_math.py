@@ -16,12 +16,13 @@ from date import (date_floored_to_time_interval,
                   date_ceiled_to_time_interval, time_interval_since)
 
 
-def predict_glucose(starting_date, starting_glucose,
-                    momentum_dates=[], momentum_values=None,
-                    carb_effect_dates=[], carb_effect_values=None,
-                    insulin_effect_dates=[], insulin_effect_values=None,
-                    correction_effect_dates=[], correction_effect_values=None
-                    ):
+def predict_glucose(
+        starting_date, starting_glucose,
+        momentum_dates=[], momentum_values=None,
+        carb_effect_dates=[], carb_effect_values=None,
+        insulin_effect_dates=[], insulin_effect_values=None,
+        correction_effect_dates=[], correction_effect_values=None
+        ):
     """ Calculates a timeline of predicted glucose values
         from a variety of effects timelines.
 
@@ -198,8 +199,73 @@ def predict_glucose(starting_date, starting_glucose,
     return (predicted_dates, predicted_values)
 
 
-def simulation_date_range_for_samples(start_times, end_times, duration, delta,
-                                      start=None, end=None, delay=0):
+def decay_effect(
+        glucose_date, glucose_value,
+        rate,
+        duration,
+        delta=5
+        ):
+    """ Calculates a timeline of glucose effects by applying a
+        linear decay to a rate of change.
+
+    Arguments:
+    glucose_date -- time of glucose value (datetime)
+    glucose_value -- value at the time of glucose_date
+    rate -- the glucose velocity
+    duration -- the duration the effect should continue before ending
+    delta -- the time differential for the returned values
+
+    Output:
+    Glucose effects in format (effect_date, effect_value)
+    """
+    (start_date,
+     end_date
+     ) = simulation_date_range_for_samples(
+         [glucose_date],
+         [],
+         duration,
+         delta
+         )
+
+    # The starting rate, which we will decay to 0 over the specified duration
+    intercept = rate
+    last_value = glucose_value
+    effect_dates = [start_date]
+    effect_values = [glucose_value]
+
+    date = decay_start_date = start_date + timedelta(minutes=delta)
+    slope = (-intercept
+             / (duration - delta)
+             )
+
+    while date < end_date:
+        value = (
+            last_value
+            + (intercept
+               + slope * time_interval_since(
+                   date, decay_start_date
+                   )
+               / 60) * delta
+                )
+
+        effect_dates.append(date)
+        effect_values.append(value)
+
+        last_value = value
+        date = date + timedelta(minutes=delta)
+
+    return (effect_dates, effect_values)
+
+
+def simulation_date_range_for_samples(
+        start_times,
+        end_times,
+        duration,
+        delta,
+        start=None,
+        end=None,
+        delay=0
+        ):
     """ Create date range based on samples and user-specified parameters
 
     Arguments:

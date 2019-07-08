@@ -14,7 +14,7 @@ from datetime import datetime, time, timedelta
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from carb_math import (map_, glucose_effects, carbs_on_board,
+from carb_math import (map_, carb_glucose_effects, carbs_on_board,
                        dynamic_carbs_on_board, dynamic_glucose_effects)
 
 
@@ -193,7 +193,7 @@ class TestCarbKitFunctions(unittest.TestCase):
         self.assertEqual(len(absorptions), 1)
         self.assertEqual(absorptions[0][6], 0)
 
-    """ Tests for glucose_effects (in carb_math) """
+    """ Tests for carb_glucose_effects """
     def test_carb_effect_from_history(self):
         input_ = self.load_history_fixture("carb_effect_from_history_input")
         (expected_dates,
@@ -204,7 +204,7 @@ class TestCarbKitFunctions(unittest.TestCase):
 
         (effect_starts,
          effect_values
-         ) = glucose_effects(
+         ) = carb_glucose_effects(
              *input_,
              *carb_ratio_tuple,
              self.INSULIN_SENSITIVITY_START_DATES,
@@ -536,6 +536,7 @@ class TestCarbKitFunctions(unittest.TestCase):
             )
 
     # not doing groupedByOverlappingAbsorptionTimes because it's never used
+
     """ Tests for dynamic_glucose_effects """
     def test_dynamic_glucose_effect_absorption_none_observed(self):
         input_ice = self.load_ice_input_fixture("ice_35_min_input")

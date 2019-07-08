@@ -709,7 +709,7 @@ def dynamic_carbs_on_board(
     return (cob_dates, cob_values)
 
 
-def glucose_effects(
+def carb_glucose_effects(
         carb_starts, carb_quantities, carb_absorptions,
         carb_ratio_starts, carb_ratios,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
@@ -789,7 +789,7 @@ def glucose_effects(
             carb_ratios,
             carb_starts[i]
             )
-        return glucose_effect(
+        return carb_glucose_effect(
             carb_starts[i],
             carb_quantities[i],
             date,
@@ -814,7 +814,7 @@ def glucose_effects(
     return (effect_start_dates, effect_values)
 
 
-def glucose_effect(
+def carb_glucose_effect(
         carb_start, carb_value,
         at_date,
         carb_ratio,

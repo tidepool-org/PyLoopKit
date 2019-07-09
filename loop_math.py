@@ -196,6 +196,8 @@ def predict_glucose(
                 + merged_values[i]
             )
 
+    assert len(predicted_dates) == len(predicted_values),\
+        "expected output shapes to match"
     return (predicted_dates, predicted_values)
 
 
@@ -254,6 +256,9 @@ def decay_effect(
         last_value = value
         date = date + timedelta(minutes=delta)
 
+    assert len(effect_dates) == len(effect_values),\
+        "expected output shapes to match"
+
     return (effect_dates, effect_values)
 
 
@@ -307,3 +312,155 @@ def simulation_date_range_for_samples(
                                          + timedelta(minutes=duration+delay),
                                          delta)
             )
+
+
+def subtracting(starts, ends, values,
+                other_starts, other_ends, other_values,
+                effect_interval
+                ):
+    """ Subtracts an array of glucose effects with uniform intervals and
+        no gaps from the collection of effect changes, which may not
+        have uniform intervals.
+
+    Parameters:
+    starts -- start times of effect that is subtracted-from (datetime)
+    ends -- end times of effect that is subtracted-from (datetime)
+    values -- values of effect that is subtracted-from (datetime)
+
+    other_starts -- start times of the effect to subtract (datetime)
+    other_ends -- end times of the effect to subtract (datetime)
+    other_values -- values of the effect to subtract
+
+    Output:
+    The resulting array of glucose effects in the form
+    (start_times, end_times, values)
+    """
+    assert len(starts) == len(ends) == len(values),\
+        "expected input shapes to match"
+    assert len(other_starts) == len(other_values),\
+        "expected input shapes to match"
+    # Trim both collections to match
+    (other_starts,
+     other_ends,
+     other_values
+     ) = filter_date_range(
+         other_starts, other_ends, other_values,
+         ends[0],
+         None
+         )
+    (starts,
+     ends,
+     values
+     ) = filter_date_range(
+         starts, ends, values,
+         other_starts[0],
+         None
+         )
+
+    (subtracted_starts,
+     subtracted_values
+     ) = ([], [])
+
+    previous_other_effect_value = other_values[0]
+    effect_index = 0
+
+    for i in range(1, len(other_starts)):
+        if effect_index >= len(starts):
+            break
+
+        other_effect_value = other_values[i]
+        other_effect_change = other_effect_value - previous_other_effect_value
+
+        previous_other_effect_value = other_effect_value
+
+        # Our effect array may have gaps, or have longer segments than 5 mins
+        if other_ends[i] and ends[effect_index] > other_ends[i]:
+            continue  # move on to next one
+
+        if other_starts[i] and ends[effect_index] > other_starts[i]:
+            continue  # move on to next one
+
+        effect_value = values[effect_index]
+        effect_value_matching_other_effect_interval = (
+            effect_value
+            * effect_interval
+        )
+
+        subtracted_starts.append(
+            ends[effect_index]
+        )
+        subtracted_values.append(
+            effect_value_matching_other_effect_interval
+            - other_effect_change
+        )
+
+        effect_index += 1
+
+    # if we have run out of other_effect items,
+    # we assume the other_effect_change remains zero
+    for i in range(effect_index, len(starts)):
+        effect_value = values[i]
+        effect_value_matching_other_effect_interval = (
+            effect_value
+            * effect_interval
+        )
+
+        subtracted_starts.append(
+            ends[i]
+        )
+        subtracted_values.append(
+            effect_value_matching_other_effect_interval
+        )
+
+    assert len(subtracted_starts) == len(subtracted_values),\
+        "expected output shapes to match"
+
+    return (subtracted_starts, subtracted_values)
+
+
+def filter_date_range(
+        starts, ends, values,
+        start_date,
+        end_date
+        ):
+    """ Returns an array of elements filtered by the specified date range.
+
+    Arguments:
+    starts -- start dates (datetime)
+    ends -- end dates (datetime)
+    values -- glucose values
+
+    start_date -- the earliest date of elements to return
+    end_date -- the last date of elements to return
+
+    Output:
+    Filtered dates in format (starts, ends, values)
+    """
+    # ends might not necesarily be the same length as starts/values
+    # because not all types have "end dates"
+    assert len(starts) == len(values),\
+        "expected input shapes to match"
+
+    (filtered_starts,
+     filtered_ends,
+     filtered_values
+     ) = ([], [], [])
+
+    for i in range(0, len(starts)):
+        if start_date and ends and ends[i] < start_date:
+            continue
+
+        if start_date and not ends and starts[i] < start_date:
+            continue
+
+        if end_date and starts[i] > end_date:
+            continue
+
+        filtered_starts.append(starts[i])
+        filtered_ends.append(ends[i] if ends else None)
+        filtered_values.append(values[i])
+
+    assert len(filtered_starts) == len(filtered_ends) == len(filtered_values),\
+        "expected output shapes to match"
+
+    return (filtered_starts, filtered_ends, filtered_values)

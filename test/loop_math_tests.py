@@ -8,12 +8,13 @@ Created on Fri Jul  5 19:26:16 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKitTests/LoopMathTests.swift
 """
+# pylint: disable=C0111, C0200, R0201, W0105
 import unittest
 from datetime import datetime
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from loop_math import predict_glucose, decay_effect
+from loop_math import predict_glucose, decay_effect, subtracting
 from date import time_interval_since
 
 
@@ -41,6 +42,42 @@ class TestCarbKitFunctions(unittest.TestCase):
             "expected output shape to match"
 
         return (dates, glucose_values)
+
+    def load_counteraction_input_fixture(self, name):
+        """ Load insulin counteraction effects from json file
+
+        Arguments:
+        name -- name of file without the extension
+
+        Output:
+        3 lists in (start_date, end_date, insulin_counteraction_value) format
+        """
+        fixture = load_fixture(name, ".json")
+
+        start_dates = [
+            datetime.fromisoformat(dict_.get("startDate"))
+            if "T" in dict_.get("startDate")
+            else datetime.strptime(
+                dict_.get("startDate"),
+                "%Y-%m-%d %H:%M:%S %z"
+            )
+            for dict_ in fixture
+        ]
+        end_dates = [
+            datetime.fromisoformat(dict_.get("endDate"))
+            if "T" in dict_.get("endDate")
+            else datetime.strptime(
+                dict_.get("endDate"),
+                "%Y-%m-%d %H:%M:%S %z"
+            )
+            for dict_ in fixture
+        ]
+        ice_values = [dict_.get("value") for dict_ in fixture]
+
+        assert len(start_dates) == len(end_dates) == len(ice_values),\
+            "expected output shape to match"
+
+        return (start_dates, end_dates, ice_values)
 
     def load_glucose_effect_fixture_normal_time(self, name):
         """ Load glucose effects from json file if dates are in format
@@ -147,6 +184,7 @@ class TestCarbKitFunctions(unittest.TestCase):
             "glucose_from_effects_insulin_effect_input"
         )
 
+    """ Predict_glucose tests """
     def test_predict_glucose_no_momentum(self):
         glucose = self.load_glucose_history_fixture(
             "glucose_from_effects_glucose_input"
@@ -154,17 +192,17 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_glucose_value_fixture(
-            "glucose_from_effects_no_momentum_output"
-            )
+             "glucose_from_effects_no_momentum_output"
+             )
 
         (predicted_dates,
          predicted_values
          ) = predict_glucose(
-            glucose[0][0], glucose[1][0],
-            [], [],
-            *self.carb_effect(),
-            *self.insulin_effect()
-        )
+             glucose[0][0], glucose[1][0],
+             [], [],
+             *self.carb_effect(),
+             *self.insulin_effect()
+             )
         self.assertEqual(
             len(expected_dates), len(predicted_dates)
         )
@@ -187,17 +225,17 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_glucose_value_fixture(
-            "glucose_from_effects_momentum_flat_output"
-            )
+             "glucose_from_effects_momentum_flat_output"
+             )
 
         (predicted_dates,
          predicted_values
          ) = predict_glucose(
-            glucose[0][0], glucose[1][0],
-            *momentum,
-            *self.carb_effect(),
-            *self.insulin_effect()
-        )
+             glucose[0][0], glucose[1][0],
+             *momentum,
+             *self.carb_effect(),
+             *self.insulin_effect()
+             )
         self.assertEqual(
             len(expected_dates), len(predicted_dates)
         )
@@ -220,17 +258,17 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_glucose_value_fixture(
-            "glucose_from_effects_momentum_up_output"
-            )
+             "glucose_from_effects_momentum_up_output"
+             )
 
         (predicted_dates,
          predicted_values
          ) = predict_glucose(
-            glucose[0][0], glucose[1][0],
-            *momentum,
-            *self.carb_effect(),
-            *self.insulin_effect()
-        )
+             glucose[0][0], glucose[1][0],
+             *momentum,
+             *self.carb_effect(),
+             *self.insulin_effect()
+             )
         self.assertEqual(
             len(expected_dates), len(predicted_dates)
         )
@@ -253,17 +291,17 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_glucose_value_fixture(
-            "glucose_from_effects_momentum_down_output"
-            )
+             "glucose_from_effects_momentum_down_output"
+             )
 
         (predicted_dates,
          predicted_values
          ) = predict_glucose(
-            glucose[0][0], glucose[1][0],
-            *momentum,
-            *self.carb_effect(),
-            *self.insulin_effect()
-        )
+             glucose[0][0], glucose[1][0],
+             *momentum,
+             *self.carb_effect(),
+             *self.insulin_effect()
+             )
         self.assertEqual(
             len(expected_dates), len(predicted_dates)
         )
@@ -289,17 +327,17 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_glucose_value_fixture(
-            "glucose_from_effects_momentum_blend_output"
-            )
+             "glucose_from_effects_momentum_blend_output"
+             )
 
         (predicted_dates,
          predicted_values
          ) = predict_glucose(
-            glucose[0][0], glucose[1][0],
-            *momentum,
-            *self.carb_effect(),
-            *insulin_effect
-        )
+             glucose[0][0], glucose[1][0],
+             *momentum,
+             *self.carb_effect(),
+             *insulin_effect
+             )
         self.assertEqual(
             len(expected_dates), len(predicted_dates)
         )
@@ -325,17 +363,17 @@ class TestCarbKitFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_sample_value_fixture(
-            "glucose_from_effects_non_zero_output"
-            )
+             "glucose_from_effects_non_zero_output"
+             )
 
         (predicted_dates,
          predicted_values
          ) = predict_glucose(
-            glucose[0][0], glucose[1][0],
-            [], [],
-            *carb_effect,
-            *insulin_effect
-        )
+             glucose[0][0], glucose[1][0],
+             [], [],
+             *carb_effect,
+             *insulin_effect
+             )
         self.assertEqual(
             len(expected_dates), len(predicted_dates)
         )
@@ -348,6 +386,7 @@ class TestCarbKitFunctions(unittest.TestCase):
                 expected_values[i], predicted_values[i], 3
             )
 
+    """ Decay_effects tests """
     def test_decay_effect(self):
         glucose_date = datetime(2016, 2, 1, 10, 13, 20)
         glucose_value = 100
@@ -433,6 +472,82 @@ class TestCarbKitFunctions(unittest.TestCase):
             [100, 97.5, 95.5, 94, 93, 92.5],
             values
         )
+
+    """ Subtracting effects tests """
+    def test_subtracting_carb_effect_from_ice_with_gaps(self):
+        insulin_counteraction_effects = self.load_counteraction_input_fixture(
+            "subtracting_carb_effect_counteration_input"
+        )
+
+        (carb_effect_starts,
+         carb_effect_values
+         ) = self.load_glucose_value_fixture(
+             "subtracting_carb_effect_carb_input"
+             )
+
+        (expected_starts,
+         expected_values
+         ) = self.load_glucose_effect_fixture_normal_time(
+             "ice_minus_carb_effect_with_gaps_output"
+             )
+
+        (starts,
+         values
+         ) = subtracting(
+             *insulin_counteraction_effects,
+             carb_effect_starts, [], carb_effect_values,
+             5
+             )
+
+        self.assertEqual(
+            len(expected_starts),
+            len(starts)
+        )
+
+        for i in range(0, len(expected_starts)):
+            self.assertAlmostEqual(
+                expected_values[i], values[i], 2
+            )
+
+    def test_subtracting_flat_carb_effect_from_ice(self):
+        insulin_counteraction_effects = self.load_counteraction_input_fixture(
+            "subtracting_flat_carb_from_ice_counteraction_input"
+        )
+
+        (carb_effect_starts,
+         carb_effect_values
+         ) = (
+             [datetime.strptime(
+                 "2018-08-26 00:45:00+0000",
+                 "%Y-%m-%d %H:%M:%S%z"
+                 )],
+             [385.8235294117647]
+             )
+
+        (expected_starts,
+         expected_values
+         ) = self.load_glucose_effect_fixture_normal_time(
+             "ice_minus_flat_carb_effect_output"
+             )
+
+        (starts,
+         values
+         ) = subtracting(
+             *insulin_counteraction_effects,
+             carb_effect_starts, [], carb_effect_values,
+             5
+             )
+
+        self.assertEqual(
+            len(expected_starts),
+            len(starts)
+        )
+
+        for i in range(0, len(expected_starts)):
+            self.assertAlmostEqual(
+                expected_values[i], values[i], 2
+            )
+
 
 if __name__ == '__main__':
     unittest.main()

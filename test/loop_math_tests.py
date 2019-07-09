@@ -18,7 +18,7 @@ from loop_math import predict_glucose, decay_effect, subtracting
 from date import time_interval_since
 
 
-class TestCarbKitFunctions(unittest.TestCase):
+class TestLoopMathFunctions(unittest.TestCase):
     """ unittest class to run LoopMath tests. """
 
     def load_glucose_effect_fixture_iso_time(self, name):

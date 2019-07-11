@@ -183,21 +183,13 @@ def reconciled(dose_types, start_dates, end_dates, values,
         to a timeline of doses that represents actual insulin delivery.
 
     Arguments:
-    basal_start_times -- list of times the basal rates start at
-    basal_rates -- list of basal rates(U/hr)
-    basal_minutes -- list of basal lengths (in mins)
-    dose_start_date -- start date of the range (datetime obj)
-    dose_end_date -- end date of the range (datetime obj)
-    basal_start_times -- list of times the basal rates start at
-    basal_rates -- list of basal rates(U/hr)
-    basal_minutes -- list of basal lengths (in mins)
-    convert_to_units_hr -- set to True if you want to convert the doses to U/hr
-        (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
-
-    Variables:
-    last_suspend_index -- index of the last suspend entry, relative to the
-                          current search index
-    last_basal -- list with [type, start_date, end_date, value] structure
+    dose_types -- list of types of doses (basal, bolus, etc)
+    start_dates -- list of datetime objects representing the dates
+                   the doses started at
+    end_dates -- list of datetime objects representing the dates
+                   the doses ended at
+    values -- list of insulin values for doses
+    scheduled_basal_rates -- basal rates scheduled during the times of doses
 
     Output:
     Tuple with *four* of the dose properties (does not include scheduled basal
@@ -300,9 +292,11 @@ def reconciled(dose_types, start_dates, end_dates, values,
             )
 
 
-def annotated(dose_types, start_dates, end_dates, values,
-              scheduled_basal_rates, basal_start_times, basal_rates,
-              basal_minutes, convert_to_units_hr=True):
+def annotated(
+    dose_types, start_dates, end_dates, values, scheduled_basal_rates,
+    basal_start_times, basal_rates, basal_minutes,
+    convert_to_units_hr=True
+    ):
     """ Annotates doses with the context of the scheduled basal rates
 
     Arguments:
@@ -311,9 +305,11 @@ def annotated(dose_types, start_dates, end_dates, values,
     dose_end_dates -- end dates of the doses (datetime obj)
     values -- actual basal rates of doses in U/hr (if a basal)
              or the value of the boluses in U
+
     basal_start_times -- list of times the basal rates start at
     basal_rates -- list of basal rates(U/hr)
     basal_minutes -- list of basal lengths (in mins)
+
     convert_to_units_hr -- set to True if you want to convert the doses to U/hr
         (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr);
         this will normally be reservoir values
@@ -807,10 +803,21 @@ def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
     return iob
 
 
-def glucose_effects(dose_types, dose_start_dates, dose_end_dates, dose_values,
-                    scheduled_basal_rates, model, sensitivity_start_times,
-                    sensitivity_end_times, sensitivity_values, delay=10,
-                    delta=5, start=None, end=None):
+def glucose_effects(
+        dose_types,
+        dose_start_dates,
+        dose_end_dates,
+        dose_values,
+        scheduled_basal_rates,
+        model,
+        sensitivity_start_times,
+        sensitivity_end_times,
+        sensitivity_values,
+        delay=10,
+        delta=5,
+        start=None,
+        end=None
+        ):
     """ Calculates the timeline of glucose effects for a collection of doses
 
     Arguments:

@@ -102,7 +102,8 @@ def load_insulin_value_fixture(resource_name):
     return (start_dates, insulin_values)
 
 
-def generate_glucose_effect_fixture(dose_fixture, previous_fixture=False):
+def generate_glucose_effect_fixture(dose_fixture, previous_fixture=False,
+                                    model_type="Exponential"):
     """ Generate a glucose effect fixture given a dose fixture and an
     optional fixture (for comparison purposes)
 
@@ -111,6 +112,10 @@ def generate_glucose_effect_fixture(dose_fixture, previous_fixture=False):
                     (without the ".json" ending)
     previous_fixture -- a glucose effect fixture to compare with the new
                         glucose effect (without the ".json" ending)
+    model -- the model to use to generate the effect (either Walsh or
+             Exponential); Walsh has a DIA of 4 hours (modify "WALSH_MODEL"
+             if you want to change that), Exponential has DIA of 360 mins and
+             peak at 75 mins (modify "MODEL" to change)
     """
     (i_types, i_start_dates, i_end_dates, i_values, i_scheduled_basal_rates
      ) = load_dose_fixture(dose_fixture)
@@ -118,7 +123,11 @@ def generate_glucose_effect_fixture(dose_fixture, previous_fixture=False):
     sensitivity_start_dates = INSULIN_SENSITIVITY_START_DATES
     sensitivity_end_dates = INSULIN_SENSITIVITY_END_DATES
     sensitivity_values = INSULIN_SENSITIVITY_VALUES
-    model = MODEL
+
+    if model_type.lower() in ["walsh", "w", "walsh model"]:
+        model = WALSH_MODEL
+    else:
+        model = MODEL
 
     effect_dates, effect_values = glucose_effects(
         i_types, i_start_dates, i_end_dates, i_values,
@@ -146,7 +155,10 @@ def generate_glucose_effect_fixture(dose_fixture, previous_fixture=False):
         effect_dict["amount"] = effect_values[i]
         output.append(effect_dict)
 
-    json.dump(output, open(previous_fixture + "_new.json", "w"))
+    if previous_fixture:
+        json.dump(output, open(previous_fixture + "_new.json", "w"))
+    else:
+        json.dump(output, open(dose_fixture + "_output.json", "w"))
 
 
 def generate_iob_fixture(dose_fixture, previous_iob_fixture=False,

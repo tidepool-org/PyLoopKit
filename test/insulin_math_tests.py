@@ -982,7 +982,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values, i_scheduled_basal_rates
+         i_values,
+         i_scheduled_basal_rates
          ) = self.load_dose_fixture("short_basal_dose")
 
         (expected_dates,

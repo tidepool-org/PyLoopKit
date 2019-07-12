@@ -37,7 +37,7 @@ class TestCarbKitFunctions(unittest.TestCase):
         2 lists in (schedule_offsets, carb_ratios) format
         """
         schedule = load_fixture("read_carb_ratios", ".json").get("schedule")
-        # offset is in mins
+
         carb_sched_starts = [
             time.fromisoformat(dict_.get("start"))
             for dict_ in schedule

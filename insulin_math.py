@@ -21,7 +21,15 @@ from walsh_insulin_model import walsh_percent_effect_remaining
 
 MAXIMUM_RESERVOIR_DROP_PER_MINUTE = 6.5
 DISTANT_PAST = datetime.fromisoformat("2001-01-01T00:00:00")
+TIMEZONE_DISTANT_PAST = datetime.strptime(
+    "2001-01-01 00:00:00 +0000",
+    "%Y-%m-%d %H:%M:%S %z"
+    )
 DISTANT_FUTURE = datetime.fromisoformat("2050-01-01T00:00:00")
+TIMEZONE_DISTANT_FUTURE = datetime.strptime(
+    "2050-01-01 00:00:00 +0000",
+    "%Y-%m-%d %H:%M:%S %z"
+    )
 
 
 def total_delivery(dose_types, starts, ends, values):
@@ -274,7 +282,7 @@ def reconciled(dose_types, start_dates, end_dates, values,
         output_ends.append(end_dates[last_suspend_index])
         output_values.append(values[last_suspend_index])
 
-    elif last_basal and last[2] > last[1]:
+    elif last_basal and last_basal[2] > last_basal[1]:
         # I slightly modified this because it wasn't dealing with the last
         # basal correctly
         output_types.append(dose_types[len(dose_types)-1])
@@ -293,9 +301,9 @@ def reconciled(dose_types, start_dates, end_dates, values,
 
 
 def annotated(
-    dose_types, start_dates, end_dates, values, scheduled_basal_rates,
-    basal_start_times, basal_rates, basal_minutes,
-    convert_to_units_hr=True
+        dose_types, start_dates, end_dates, values, scheduled_basal_rates,
+        basal_start_times, basal_rates, basal_minutes,
+        convert_to_units_hr=True
     ):
     """ Annotates doses with the context of the scheduled basal rates
 
@@ -429,7 +437,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
         if convert_to_units_hr:
             output_values.append(
-                0 if dose_type.lower() == "pumpsuspend" else value /
+                0 if dose_type.lower() in ["pumpsuspend"] else value /
                 (time_interval_since(dose_end_date, dose_start_date)/60/60))
         else:
             output_values.append(value)
@@ -829,7 +837,8 @@ def glucose_effects(
     dose_values -- list of insulin values for doses
     scheduled_basal_rates -- basal rates scheduled during the times of doses
 
-    model -- list of insulin model parameters in format [DIA, peak_time]
+    model -- list of insulin model parameters in format [DIA, peak_time] if
+             exponential model, or [DIA] if Walsh model
 
     sensitivity_start_times -- list of time objects of start times of
                                given insulin sensitivity values
@@ -1123,7 +1132,20 @@ def trim(dose_type, start, end, value, scheduled_basal_rate,
     end_interval). Format: [dose_type, dose_start_date, dose_end_date,
                             dose_value, dose_scheduled_rate]
     """
-    start_date = max(start_interval or DISTANT_PAST, start)
+    if start.tzinfo:
+        start_date = max(start_interval or DISTANT_PAST, start)
+    else:
+        start_date = max(start_interval or DISTANT_PAST, start)
+
+    if end.tzinfo:
+        return [dose_type,
+                start_date,
+                max(start_date,
+                    min(end_interval or TIMEZONE_DISTANT_FUTURE, end)
+                    ),
+                value,
+                scheduled_basal_rate
+                ]
 
     return [dose_type,
             start_date,
@@ -1178,7 +1200,7 @@ def overlay_basal_schedule(dose_types, starts, ends, values,
 
     for (i, type_) in enumerate(dose_types):
         if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart"]:
-            if ends[i] > ending_at:
+            if ending_at and ends[i] > ending_at:
                 continue
 
             if last_basal:

@@ -640,6 +640,76 @@ class TestDoseMathFunctions(unittest.TestCase):
 
         self.assertEqual(0, dose[0])
 
+    def test_start_low_and_end_just_above_range_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommended_temp_start_low_end_just_above_range"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0.275, dose[0])
+
+    def test_high_and_rising_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_high_and_rising"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(1.25, dose[0])
+
+    def test_rise_after_dia_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "far_future_high_bg_forecast"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
+
+    def test_no_input_glucose_bolus(self):
+        glucose = ([], [])
+
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            datetime.now(),
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+            )
+        self.assertEqual(0, dose[0])
+
 
 if __name__ == '__main__':
     unittest.main()

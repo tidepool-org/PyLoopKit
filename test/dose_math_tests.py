@@ -8,17 +8,19 @@ Created on Tue Jul  9 18:03:54 2019
 Github URL: https://github.com/tidepool-org/Loop/blob/
 8c1dfdba38fbf6588b07cee995a8b28fcf80ef69/DoseMathTests/DoseMathTests.swift
 """
+# pylint: disable=C0111, R0201, R0904, W0105
 import unittest
 from datetime import time, datetime, timedelta
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from dose_math import recommended_temp_basal
+from dose_math import recommended_temp_basal, recommended_bolus
 
 
 class TestDoseMathFunctions(unittest.TestCase):
     """ unittest class to run DoseMath tests. """
     MAX_BASAL_RATE = 3
+    MAX_BOLUS = 10
     SUSPEND_THRESHOLD = 55
 
     INSULIN_SENSITIVITY_STARTS = [time(0, 0)]
@@ -281,7 +283,7 @@ class TestDoseMathFunctions(unittest.TestCase):
         )
         self.assertEqual(0, dose[0])
         self.assertEqual(0, dose[1])
-    
+
     def test_flat_and_high(self):
         glucose = self.load_glucose_value_fixture(
             "recommend_temp_basal_flat_and_high"
@@ -384,7 +386,7 @@ class TestDoseMathFunctions(unittest.TestCase):
 
     def test_rise_after_dia(self):
         glucose = self.load_glucose_value_fixture(
-           "far_future_high_bg_forecast"
+            "far_future_high_bg_forecast"
         )
         dose = recommended_temp_basal(
             *glucose,
@@ -418,6 +420,225 @@ class TestDoseMathFunctions(unittest.TestCase):
         )
 
         self.assertIsNone(dose)
+
+    """ Tests for recommended_bolus """
+    def test_no_change_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_no_change_glucose"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
+
+    def test_start_low_end_in_range_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_low_end_in_range"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
+
+    def test_high_end_low_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_high_end_low"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
+
+    def test_start_low_end_high_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_low_end_high"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(1.575, dose[0])
+        self.assertEqual("predictedGlucoseBelowTarget", dose[2][0])
+        self.assertEqual(60, dose[2][1])
+
+    def test_start_below_suspend_threshold_end_high_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_low_end_high"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            70,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
+        self.assertEqual("glucoseBelowSuspendThreshold", dose[2][0])
+        self.assertEqual(60, dose[2][1])
+
+    def test_dropping_below_range_then_rising_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_dropping_then_rising"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(1.4, dose[0])
+        self.assertEqual("predictedGlucoseBelowTarget", dose[2][0])
+
+    def test_start_low_end_high_with_pending_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_low_end_high"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            1,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0.575, dose[0])
+
+    def test_start_low_end_very_high_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_very_low_end_high"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
+
+    def test_flat_and_high_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_flat_and_high"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(1.575, dose[0])
+
+    def test_high_and_falling_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_high_and_falling"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0.325, dose[0])
+
+    def test_in_range_and_rising_bolus(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_in_range_and_rising"
+        )
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0.325, dose[0])
+
+        # Less existing temp
+        dose = recommended_bolus(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            0.8,
+            self.MAX_BOLUS,
+            0.025
+        )
+
+        self.assertEqual(0, dose[0])
 
 
 if __name__ == '__main__':

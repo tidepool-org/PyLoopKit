@@ -226,7 +226,7 @@ def insulin_correction(
             Structure: [type, glucose value to be corrected, minimum target,
                         units of correction insulin]
         0 -- suspend
-            Structure: [type]
+            Structure: [type, min glucose value]
         1 -- in_range
             Structure: [type]
         2 -- above_range
@@ -269,7 +269,7 @@ def insulin_correction(
         # If any predicted value is below the suspend threshold,
         # return immediately
         if prediction_values[i] < suspend_threshold_value:
-            return [0, prediction_dates[i], prediction_values[i]]
+            return [0, prediction_values[i]]
 
         # Update range statistics
         if not min_glucose or prediction_values[i] < min_glucose[1]:
@@ -457,6 +457,57 @@ def as_temp_basal(
     return [rate, duration]
 
 
+def bolus_recommendation_notice(correction):
+    """ Make a bolus recommendation based on an insulin correction """
+    if correction[0] == 0:
+        return ["glucoseBelowSuspendThreshold", correction[1]]
+
+    if correction[0] in [-1, 1]:
+        return None
+
+    if correction[0] == 2:
+        # if we're recommending units but the minimum glucose is below target
+        if correction[4] > 0 and correction[1] < correction[3]:
+            return ["predictedGlucoseBelowTarget", correction[1]]
+
+    return None
+
+
+def as_bolus(
+        correction,
+        pending_insulin,
+        max_bolus,
+        volume_rounder
+        ):
+    """  Determine the bolus needed to perform the correction
+
+    Arguments:
+    correction -- list of information about the total amount of insulin
+                  needed to correct BGs
+    pending_insulin -- number of units expected to be delivered, but not yet
+                       reflected in the correction
+    max_bolus -- the maximum allowed bolus
+    volume_rounder -- the smallest fraction of a unit supported in
+                      insulin delivery
+
+    Output:
+    A bolus recommendation
+    """
+    correction_units = (
+        correction[len(correction) - 1]
+        if correction[0] in [-1, 2] else 0
+    )
+    units = correction_units - pending_insulin
+    units = min(max_bolus, max(0, units))
+    if volume_rounder:
+        volume_rounder = 1 / volume_rounder
+        units = round(units * volume_rounder) / volume_rounder
+
+    recommendation = bolus_recommendation_notice(correction)
+
+    return [units, pending_insulin, recommendation]
+
+
 def recommended_temp_basal(
         glucose_dates, glucose_values,
         target_starts, target_ends, target_mins, target_maxes,
@@ -514,7 +565,6 @@ def recommended_temp_basal(
     Output:
     The recommended temporary basal rate and duration
     """
-    # last temp basal: [type, start_date, end_date, value]
     assert len(glucose_dates) == len(glucose_values),\
         "expected input shapes to match"
 
@@ -577,3 +627,91 @@ def recommended_temp_basal(
         return [0, 0]
 
     return recommendation
+
+
+def recommended_bolus(
+        glucose_dates, glucose_values,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        pending_insulin,
+        max_bolus,
+        volume_rounder=None
+        ):
+    """ Recommends a temporary basal rate to conform a glucose prediction
+    timeline to a correction range
+
+    Returns None if normal scheduled basal or active temporary basal is
+    sufficient
+
+    Arguments:
+    glucose_dates -- dates of glucose values (datetime)
+    glucose_values -- glucose values (in mg/dL)
+
+    target_starts -- start times for given target ranges (datetime)
+    target_ends -- stop times for given target ranges (datetime)
+    target_mins -- the lower bounds of target ranges (mg/dL)
+    target_maxes -- the upper bounds of target ranges (mg/dL)
+
+    at_date -- date to calculate the temp basal at
+    suspend_threshold -- value to suspend all insulin delivery at (mg/dL)
+
+    sensitivity_starts -- list of time objects of start times of
+                          given insulin sensitivity values
+    sensitivity_ends -- list of time objects of start times of
+                        given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+
+    model -- list of insulin model parameters in format [DIA, peak_time] if
+             exponential model, or [DIA] if Walsh model
+
+    pending_insulin -- number of units expected to be delivered, but not yet
+                       reflected in the correction
+    max_bolus -- the maximum allowable bolus value in Units
+    volume_rounder -- the smallest fraction of a unit supported in insulin
+                      delivery; if None, no rounding is performed
+
+    Output:
+    A bolus recommendation
+    """
+    assert len(glucose_dates) == len(glucose_values),\
+        "expected input shapes to match"
+
+    assert len(target_starts) == len(target_ends) == len(target_mins)\
+        == len(target_maxes), "expected input shapes to match"
+
+    assert len(sensitivity_starts) == len(sensitivity_ends)\
+        == len(sensitivity_values), "expected input shapes to match"
+
+    if (not glucose_dates
+            or not target_starts
+            or not sensitivity_starts
+       ):
+        return None
+
+    sensitivity_value = find_ratio_at_time(
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        at_date
+        )
+
+    correction = insulin_correction(
+        glucose_dates, glucose_values,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_value,
+        model
+        )
+
+    bolus = as_bolus(
+        correction,
+        pending_insulin,
+        max_bolus,
+        volume_rounder
+        )
+
+    assert bolus[0] >= 0, "Expected bolus to be a positive value"
+
+    return bolus

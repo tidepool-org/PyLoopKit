@@ -9,7 +9,7 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 8c1dfdba38fbf6588b07cee995a8b28fcf80ef69/DoseMathTests/DoseMathTests.swift
 """
 import unittest
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
@@ -23,7 +23,7 @@ class TestDoseMathFunctions(unittest.TestCase):
 
     INSULIN_SENSITIVITY_STARTS = [time(0, 0)]
     INSULIN_SENSITIVITY_ENDS = [time(23, 59)]
-    INSULIN_SENSITIVITY_VALUES = [40]
+    INSULIN_SENSITIVITY_VALUES = [60]
     SENSITIVITY = (INSULIN_SENSITIVITY_STARTS,
                    INSULIN_SENSITIVITY_ENDS,
                    INSULIN_SENSITIVITY_VALUES
@@ -85,6 +85,7 @@ class TestDoseMathFunctions(unittest.TestCase):
 
         return (start_times, rates, minutes)
 
+    """ Tests for recommended_temp_basal """
     def test_no_change(self):
         glucose = self.load_glucose_value_fixture(
             "recommend_temp_basal_no_change_glucose"
@@ -99,6 +100,321 @@ class TestDoseMathFunctions(unittest.TestCase):
             *self.basal_rate_schedule(),
             self.MAX_BASAL_RATE,
             None
+        )
+
+        self.assertIsNone(dose)
+
+    def test_start_high_end_in_range(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_high_end_in_range"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None
+        )
+
+        self.assertIsNone(dose)
+
+        # "Cancel" basal
+        last_temp_basal = [
+            "TempBasal",
+            glucose[0][0] + timedelta(minutes=-11),
+            glucose[0][0] + timedelta(minutes=19),
+            0.125
+            ]
+
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            last_temp_basal
+        )
+        self.assertEqual(0, dose[0])
+        self.assertEqual(0, dose[1])
+
+    def test_start_low_end_in_range(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_low_end_in_range"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None
+        )
+
+        self.assertIsNone(dose)
+
+        last_temp_basal = [
+            "TempBasal",
+            glucose[0][0] + timedelta(minutes=-11),
+            glucose[0][0] + timedelta(minutes=19),
+            1.225
+            ]
+
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            last_temp_basal
+        )
+        self.assertEqual(0, dose[0])
+        self.assertEqual(0, dose[1])
+
+    def test_correct_low_at_min(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_correct_low_at_min"
+        )
+
+        last_temp_basal = [
+            "TempBasal",
+            glucose[0][0] + timedelta(minutes=-21),
+            glucose[0][0] + timedelta(minutes=9),
+            0.125
+            ]
+
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            last_temp_basal
+        )
+        self.assertEqual(0, dose[0])
+        self.assertEqual(0, dose[1])
+
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None
+        )
+
+        self.assertIsNone(dose)
+
+    def test_start_high_end_low(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_high_end_low"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None
+        )
+
+        self.assertEqual(0, dose[0])
+        self.assertEqual(30, dose[1])
+
+    def test_start_low_end_high(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_start_low_end_high"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None
+        )
+
+        self.assertIsNone(dose)
+
+        # "Cancel" basal
+        last_temp_basal = [
+            "TempBasal",
+            glucose[0][0] + timedelta(minutes=-11),
+            glucose[0][0] + timedelta(minutes=19),
+            1.225
+            ]
+
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            last_temp_basal
+        )
+        self.assertEqual(0, dose[0])
+        self.assertEqual(0, dose[1])
+    
+    def test_flat_and_high(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_flat_and_high"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
+        )
+
+        self.assertEqual(3, dose[0])
+        self.assertEqual(30, dose[1])
+
+    def test_high_and_falling(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_high_and_falling"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
+        )
+
+        self.assertEqual(1.425, dose[0])
+        self.assertEqual(30, dose[1])
+
+    def test_in_range_and_rising(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_in_range_and_rising"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
+        )
+
+        self.assertEqual(1.475, dose[0])
+        self.assertEqual(30, dose[1])
+
+    def test_high_and_rising(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_high_and_rising"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
+        )
+
+        self.assertEqual(3, dose[0])
+        self.assertEqual(30, dose[1])
+
+    def test_very_low_and_rising(self):
+        glucose = self.load_glucose_value_fixture(
+            "recommend_temp_basal_very_low_end_in_range"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
+        )
+
+        self.assertEqual(0, dose[0])
+        self.assertEqual(30, dose[1])
+
+    def test_rise_after_dia(self):
+        glucose = self.load_glucose_value_fixture(
+           "far_future_high_bg_forecast"
+        )
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            glucose[0][0],
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
+        )
+
+        self.assertIsNone(dose)
+
+    def test_no_input_glucose(self):
+        glucose = ([], [])
+
+        dose = recommended_temp_basal(
+            *glucose,
+            *self.TARGET_RANGE,
+            datetime.now(),
+            self.SUSPEND_THRESHOLD,
+            *self.SENSITIVITY,
+            self.WALSH_MODEL,
+            *self.basal_rate_schedule(),
+            self.MAX_BASAL_RATE,
+            None,
+            rate_rounder=0.025
         )
 
         self.assertIsNone(dose)

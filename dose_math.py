@@ -244,7 +244,7 @@ def insulin_correction(
      eventual_glucose,
      correcting_glucose,
      min_correction_units
-     ) = (None, None, None, None)
+     ) = ([], None, None, None)
 
     if len(model) == 1:  # if Walsh model
         date_range = [at_date,
@@ -296,7 +296,7 @@ def insulin_correction(
                 target_ends,
                 target_maxes,
                 at_date
-                ) -
+                ) +
              find_ratio_at_time(
                  target_starts,
                  target_ends,
@@ -319,7 +319,6 @@ def insulin_correction(
                 model[0],
                 model[1]
             )
-
         effected_sensitivity = percent_effected * sensitivity_value
 
         correction_units = insulin_correction_units(
@@ -383,14 +382,13 @@ def insulin_correction(
         if len(model) == 1:
             percent_effected = max(
                 sys.float_info.epsilon,
-                1 - walsh_percent_effect_remaining(at_date, model[0])
+                1 - walsh_percent_effect_remaining(time, model[0])
                 )
         else:
             percent_effected = max(
                 sys.float_info.epsilon,
-                1 - percent_effect_remaining(at_date, model[0], model[1])
+                1 - percent_effect_remaining(time, model[0], model[1])
                 )
-
         units = insulin_correction_units(
             min_glucose[1],
             sum(min_glucose_targets) / len(min_glucose_targets),
@@ -529,6 +527,13 @@ def recommended_temp_basal(
     assert len(basal_starts) == len(basal_rates) == len(basal_minutes),\
         "expected input shapes to match"
 
+    if (not glucose_dates
+            or not target_starts
+            or not sensitivity_starts
+            or not basal_starts
+       ):
+        return None
+
     sensitivity_value = find_ratio_at_time(
         sensitivity_starts, sensitivity_ends, sensitivity_values,
         at_date
@@ -559,10 +564,16 @@ def recommended_temp_basal(
         rate_rounder
         )
 
-    return if_necessary(
+    recommendation = if_necessary(
         temp_basal,
         at_date,
         scheduled_basal_rate,
         last_temp_basal,
         continuation_interval
         )
+
+    # convert a "cancel" into zero-temp, zero-duration basal
+    if recommendation == "cancel":
+        return [0, 0]
+
+    return recommendation

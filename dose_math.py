@@ -689,7 +689,7 @@ def recommended_bolus(
             or not target_starts
             or not sensitivity_starts
        ):
-        return None
+        return [0, 0, None]
 
     sensitivity_value = find_ratio_at_time(
         sensitivity_starts, sensitivity_ends, sensitivity_values,

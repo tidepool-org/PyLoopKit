@@ -173,13 +173,13 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
         in glucose readings that counteract the specified effects.
 
     Arguments:
-    dates -- list of datetime objects
+    dates -- list of datetime objects of dates of glucose values
     glucose_values -- list of glucose values (unit: mg/dL)
     displays -- list of display_only booleans
     provenances -- list of provenances (Strings)
+
     effect_dates -- list of datetime objects associated with a glucose effect
-    effect_values -- list of values (in mg/dL/min) associated with
-    a glucose effect
+    effect_values -- list of values associated with a glucose effect
 
     Output:
     An array of velocities describing the change in glucose samples

@@ -5,11 +5,13 @@ Created on Thu Jul 11 15:16:42 2019
 
 @author: annaquinlan
 """
+# pylint: disable=C0111, C0200, R0201, W0105
 from datetime import datetime, time, timedelta
 import unittest
 
 from dose_store import get_glucose_effects
-from glucose_store import get_recent_momentum_effects
+from glucose_store import (get_recent_momentum_effects,
+                           get_counteraction_effects)
 from loop_kit_tests import load_fixture
 
 
@@ -109,6 +111,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         return (start_dates, carb_values, absorption_times)
 
     def load_settings(self, resource_name):
+        """ Load settings from json file """
         settings_dict = load_fixture(resource_name, ".json")
 
         return settings_dict
@@ -205,6 +208,28 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             "expected output shape to match"
 
         return (dates, glucose_values)
+
+    def load_glucose_velocities(self, resource_name):
+        """ Load effect-velocity json file
+
+        Arguments:
+        resource_name -- name of file without the extension
+
+        Output:
+        3 lists in (start_date, end_date, glucose_effects) format
+        """
+        fixture = load_fixture(resource_name, ".json")
+
+        start_dates = [datetime.fromisoformat(dict_.get("startDate"))
+                       for dict_ in fixture]
+        end_dates = [datetime.fromisoformat(dict_.get("endDate"))
+                     for dict_ in fixture]
+        glucose_effects = [dict_.get("value") for dict_ in fixture]
+
+        assert len(start_dates) == len(end_dates) == len(glucose_effects),\
+            "expected output shape to match"
+
+        return (start_dates, end_dates, glucose_effects)
 
     """ Tests for get_glucose_effects """
     def test_glucose_effects_walsh_bolus(self):
@@ -377,8 +402,8 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
     """ Tests for get_momentum_effects """
     def test_momentum_bouncing_glucose(self):
         glucose_data = self.load_glucose_data(
-             "momentum_effect_bouncing_glucose_input"
-             )
+            "momentum_effect_bouncing_glucose_input"
+            )
         (expected_dates,
          expected_values
          ) = self.load_glucose_data(
@@ -411,12 +436,12 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
     def test_momentum_rising_glucose_doubles(self):
         glucose_data = self.load_glucose_data(
-             "momentum_effect_rising_glucose_double_entries_input"
-             )
+            "momentum_effect_rising_glucose_double_entries_input"
+            )
         (expected_dates,
          expected_values
          ) = self.load_glucose_data(
-            "momentum_effect_rising_glucose_output"
+             "momentum_effect_rising_glucose_output"
              )
 
         # slice the "expected" arrays to adjust for the shorter duration
@@ -445,14 +470,14 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
     def test_momentum_spaced_glucose(self):
         glucose_data = self.load_glucose_data(
-             "momentum_effect_incomplete_glucose_input"
-             )
+            "momentum_effect_incomplete_glucose_input"
+            )
 
         effect_dates = get_recent_momentum_effects(
-             *glucose_data,
-             datetime.fromisoformat("2015-10-25T19:14:37"),
-             self.MOMENTUM_DATE_INTERVAL
-             )[0]
+            *glucose_data,
+            datetime.fromisoformat("2015-10-25T19:14:37"),
+            self.MOMENTUM_DATE_INTERVAL
+            )[0]
 
         self.assertEqual(
             0, len(effect_dates)
@@ -462,13 +487,109 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         glucose_data = ([], [])
 
         effect_dates = get_recent_momentum_effects(
-             *glucose_data,
-             datetime.fromisoformat("2015-10-25T19:14:37"),
-             self.MOMENTUM_DATE_INTERVAL
-             )[0]
+            *glucose_data,
+            datetime.fromisoformat("2015-10-25T19:14:37"),
+            self.MOMENTUM_DATE_INTERVAL
+            )[0]
 
         self.assertEqual(
             0, len(effect_dates)
+        )
+
+    """ Tests for get_counteraction_effects """
+    def test_counteraction_effects_for_falling_glucose(self):
+        glucose_data = self.load_glucose_data(
+            "counteraction_effect_falling_glucose_input"
+            )
+
+        momentum_effect = self.load_glucose_data(
+             "momentum_effect_stable_glucose_output"
+             )
+
+        (expected_starts,
+         expected_ends,
+         expected_velocities
+         ) = self.load_glucose_velocities(
+             "counteraction_effect_falling_glucose_output"
+             )
+
+        (start_dates,
+         end_dates,
+         velocities
+         ) = get_counteraction_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:15:00"),
+             *momentum_effect
+             )
+
+        self.assertEqual(
+            len(expected_starts), len(start_dates)
+        )
+        for i in range(0, len(expected_starts)):
+            self.assertEqual(
+                expected_starts[i], start_dates[i]
+            )
+            self.assertEqual(
+                expected_ends[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_velocities[i], velocities[i], 2
+            )
+
+    def test_counteraction_effects_for_falling_glucose_almost_duplicates(self):
+        glucose_data = self.load_glucose_data(
+            "counteraction_effect_falling_glucose_almost_duplicates_input"
+            )
+
+        momentum_effect = self.load_glucose_data(
+             "counteraction_effect_falling_glucose_insulin"
+             )
+
+        (expected_starts,
+         expected_ends,
+         expected_velocities
+         ) = self.load_glucose_velocities(
+             "counteraction_effect_falling_glucose_almost_duplicates_output"
+             )
+
+        (start_dates,
+         end_dates,
+         velocities
+         ) = get_counteraction_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:15:00"),
+             *momentum_effect
+             )
+
+        self.assertEqual(
+            len(expected_starts), len(start_dates)
+        )
+        for i in range(0, len(expected_starts)):
+            self.assertEqual(
+                expected_starts[i], start_dates[i]
+            )
+            self.assertEqual(
+                expected_ends[i], end_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_velocities[i], velocities[i], 2
+            )
+
+    def test_counteraction_effects_no_glucose(self):
+        glucose_data = ([], [])
+
+        momentum_effect = self.load_glucose_data(
+             "counteraction_effect_falling_glucose_insulin"
+             )
+
+        start_dates = get_counteraction_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:15:00"),
+             *momentum_effect
+             )[0]
+
+        self.assertEqual(
+            0, len(start_dates)
         )
 
 

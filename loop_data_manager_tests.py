@@ -9,11 +9,14 @@ from datetime import datetime, time, timedelta
 import unittest
 
 from dose_store import get_glucose_effects
+from glucose_store import get_recent_momentum_effects
 from loop_kit_tests import load_fixture
 
 
 class TestLoopDataManagerFunctions(unittest.TestCase):
-    """ unittest class to run LoopDataManager tests."""
+    """ unittest class to run tests of functions that LoopDataManager uses."""
+    MOMENTUM_DATE_INTERVAL = 15
+
     def load_glucose_data(self, resource_name):
         """ Load glucose values from json file
 
@@ -370,6 +373,103 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             self.assertAlmostEqual(
                 expected_values[i], effect_values[i], delta=3
             )
+
+    """ Tests for get_momentum_effects """
+    def test_momentum_bouncing_glucose(self):
+        glucose_data = self.load_glucose_data(
+             "momentum_effect_bouncing_glucose_input"
+             )
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_data(
+             "momentum_effect_bouncing_glucose_output"
+             )
+
+        # slice the "expected" arrays to adjust for the shorter duration
+        # (15 mins vs 30 mins)
+        expected_dates = expected_dates[0:5]
+        expected_values = expected_values[0:5]
+
+        (effect_dates,
+         effect_values
+         ) = get_recent_momentum_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:25:00"),
+             self.MOMENTUM_DATE_INTERVAL
+             )
+
+        self.assertEqual(
+            len(expected_dates), len(effect_dates)
+        )
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 2
+            )
+
+    def test_momentum_rising_glucose_doubles(self):
+        glucose_data = self.load_glucose_data(
+             "momentum_effect_rising_glucose_double_entries_input"
+             )
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_data(
+            "momentum_effect_rising_glucose_output"
+             )
+
+        # slice the "expected" arrays to adjust for the shorter duration
+        # (15 mins vs 30 mins)
+        expected_dates = expected_dates[0:4]
+        expected_values = expected_values[0:4]
+
+        (effect_dates,
+         effect_values
+         ) = get_recent_momentum_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:15:00"),
+             self.MOMENTUM_DATE_INTERVAL
+             )
+
+        self.assertEqual(
+            len(expected_dates), len(effect_dates)
+        )
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 2
+            )
+
+    def test_momentum_spaced_glucose(self):
+        glucose_data = self.load_glucose_data(
+             "momentum_effect_incomplete_glucose_input"
+             )
+
+        effect_dates = get_recent_momentum_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:14:37"),
+             self.MOMENTUM_DATE_INTERVAL
+             )[0]
+
+        self.assertEqual(
+            0, len(effect_dates)
+        )
+
+    def test_momentum_no_glucose(self):
+        glucose_data = ([], [])
+
+        effect_dates = get_recent_momentum_effects(
+             *glucose_data,
+             datetime.fromisoformat("2015-10-25T19:14:37"),
+             self.MOMENTUM_DATE_INTERVAL
+             )[0]
+
+        self.assertEqual(
+            0, len(effect_dates)
+        )
 
 
 if __name__ == '__main__':

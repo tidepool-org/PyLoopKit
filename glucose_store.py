@@ -18,6 +18,7 @@ from glucose_math import linear_momentum_effect, counteraction_effects
 def get_recent_momentum_effects(
         glucose_starts, glucose_values,
         start_date,
+        now_date,
         momentum_data_interval=15,
         delta=5,
         display_list=None,
@@ -28,6 +29,9 @@ def get_recent_momentum_effects(
     Arguments:
     glucose_starts -- list of datetime objects of times of glucose values
     glucose_values -- list of glucose values (unit: mg/dL)
+
+    start_date -- date to start calculating momentum effects
+    now_date -- the date to assume as the "now" time (aka datetime.now())
 
     momentum_data_interval -- time to generate momentum effects out to (mins)
     delta -- time between blood glucose measurements
@@ -50,7 +54,7 @@ def get_recent_momentum_effects(
          glucose_starts,
          [],
          glucose_values,
-         start_date - timedelta(minutes=momentum_data_interval),
+         now_date - timedelta(minutes=momentum_data_interval),
          None
          )
 

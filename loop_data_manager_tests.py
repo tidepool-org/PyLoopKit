@@ -399,7 +399,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
                 expected_values[i], effect_values[i], delta=3
             )
 
-    """ Tests for get_momentum_effects """
+    """ Tests for get_recent_momentum_effects """
     def test_momentum_bouncing_glucose(self):
         glucose_data = self.load_glucose_data(
             "momentum_effect_bouncing_glucose_input"
@@ -419,6 +419,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
          effect_values
          ) = get_recent_momentum_effects(
              *glucose_data,
+             datetime.fromisoformat("2015-10-24T19:25:00"),
              datetime.fromisoformat("2015-10-25T19:25:00"),
              self.MOMENTUM_DATE_INTERVAL
              )
@@ -453,6 +454,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
          effect_values
          ) = get_recent_momentum_effects(
              *glucose_data,
+             datetime.fromisoformat("2015-10-24T19:15:00"),
              datetime.fromisoformat("2015-10-25T19:15:00"),
              self.MOMENTUM_DATE_INTERVAL
              )
@@ -475,6 +477,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
         effect_dates = get_recent_momentum_effects(
             *glucose_data,
+            datetime.fromisoformat("2015-10-24T19:14:37"),
             datetime.fromisoformat("2015-10-25T19:14:37"),
             self.MOMENTUM_DATE_INTERVAL
             )[0]
@@ -488,6 +491,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
         effect_dates = get_recent_momentum_effects(
             *glucose_data,
+            datetime.fromisoformat("2015-10-24T19:14:37"),
             datetime.fromisoformat("2015-10-25T19:14:37"),
             self.MOMENTUM_DATE_INTERVAL
             )[0]

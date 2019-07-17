@@ -701,7 +701,9 @@ class TestCarbKitFunctions(unittest.TestCase):
          carb_absorptions
          ) = self.load_carb_entry_fixture()
 
-        (expected_dates, expected_values) = self.load_effect_fixture(
+        (expected_dates,
+         expected_values
+         ) = self.load_effect_fixture(
             "dynamic_glucose_effect_fully_observed_output")
 
         carb_ratio_tuple = self.load_schedules()

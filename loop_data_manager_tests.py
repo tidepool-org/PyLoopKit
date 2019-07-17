@@ -12,12 +12,22 @@ import unittest
 from dose_store import get_glucose_effects
 from glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
+from carb_store import get_carb_glucose_effects
 from loop_kit_tests import load_fixture
 
 
 class TestLoopDataManagerFunctions(unittest.TestCase):
     """ unittest class to run tests of functions that LoopDataManager uses."""
     MOMENTUM_DATE_INTERVAL = 15
+
+    INSULIN_SENSITIVITY_START_DATES = [time(0, 0)]
+    INSULIN_SENSITIVITY_END_DATES = [time(23, 59)]
+    INSULIN_SENSITIVITY_VALUES = [40]
+
+    DEFAULT_ABSORPTION_TIMES = [60,
+                                120,
+                                240
+                                ]
 
     def load_glucose_data(self, resource_name):
         """ Load glucose values from json file
@@ -143,17 +153,14 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
         return (start_times, end_times, values)
 
-    def load_carb_ratios(self, resource_name):
+    def load_carb_ratios(self):
         """ Load carb ratios from json file
-
-        Arguments:
-        resource_name -- name of file without the extension
 
         Output:
         2 lists in (ratio_start_time, ratio (in units/insulin),
                     length_of_rate) format
         """
-        schedule = load_fixture(resource_name, ".json")
+        schedule = load_fixture("read_carb_ratios", ".json").get("schedule")
 
         carb_sched_starts = [
             time.fromisoformat(dict_.get("start"))
@@ -220,12 +227,20 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         """
         fixture = load_fixture(resource_name, ".json")
 
-        start_dates = [datetime.fromisoformat(dict_.get("startDate"))
-                       for dict_ in fixture]
-        end_dates = [datetime.fromisoformat(dict_.get("endDate"))
-                     for dict_ in fixture]
-        glucose_effects = [dict_.get("value") for dict_ in fixture]
-
+        start_dates = [
+            datetime.fromisoformat(dict_.get("startDate")
+            if dict_.get("startDate") else dict_.get("start_at"))
+            for dict_ in fixture
+        ]
+        end_dates = [
+            datetime.fromisoformat(dict_.get("endDate")
+            if dict_.get("endDate") else dict_.get("end_at"))
+            for dict_ in fixture
+        ]
+        glucose_effects = [
+            dict_.get("value") if dict_.get("value")
+            else dict_.get("velocity") for dict_ in fixture
+        ]
         assert len(start_dates) == len(end_dates) == len(glucose_effects),\
             "expected output shape to match"
 
@@ -595,6 +610,156 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         self.assertEqual(
             0, len(start_dates)
         )
+
+    """ Tests for get_carb_glucose_effects """
+    def test_dynamic_glucose_effect_absorption_none_observed(self):
+        input_ice = self.load_glucose_velocities("ice_35_min_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_data("carb_entry_input")
+
+        carb_ratio_tuple = self.load_carb_ratios()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[2]]
+        carb_entry_quantities = [carb_values[2]]
+        carb_entry_absorptions = [carb_absorptions[2]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_effect_output(
+             "dynamic_glucose_effect_none_observed_output"
+             )
+
+        (effect_dates,
+         effect_values
+         ) = get_carb_glucose_effects(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             input_ice[0][0],
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times,
+             delay=10,
+             absorption_time_overrun=2,
+             end_date=input_ice[0][0]+timedelta(hours=6)
+             )
+
+        assert len(expected_dates) == len(effect_dates)
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 2
+            )
+
+    def test_glucose_effect_absorption_partially_observed(self):
+        input_ice = self.load_glucose_velocities("ice_35_min_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_data("carb_entry_input")
+
+        carb_ratio_tuple = self.load_carb_ratios()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[0]]
+        carb_entry_quantities = [carb_values[0]]
+        carb_entry_absorptions = [carb_absorptions[0]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_effect_output(
+             "dynamic_glucose_effect_partially_observed_output"
+             )
+
+        (effect_dates,
+         effect_values
+         ) = get_carb_glucose_effects(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             input_ice[0][0],
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times,
+             delay=10,
+             absorption_time_overrun=2,
+             end_date=input_ice[0][0]+timedelta(hours=6)
+             )
+
+        assert len(expected_dates) == len(effect_dates)
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 2
+            )
+
+    def test_dynamic_glucose_effect_absorption_fully_observed(self):
+        input_ice = self.load_glucose_velocities("ice_1_hour_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_data("carb_entry_input")
+
+        carb_ratio_tuple = self.load_carb_ratios()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[0]]
+        carb_entry_quantities = [carb_values[0]]
+        carb_entry_absorptions = [carb_absorptions[0]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_effect_output(
+            "dynamic_glucose_effect_fully_observed_output")
+
+        (effect_dates,
+         effect_values
+         ) = get_carb_glucose_effects(
+             carb_entry_starts,
+             carb_entry_quantities,
+             carb_entry_absorptions,
+             input_ice[0][0],
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times,
+             delay=10,
+             absorption_time_overrun=2,
+             end_date=input_ice[0][0]+timedelta(hours=6)
+             )
+
+        self.assertEqual(len(effect_values), len(expected_values))
+
+        for i in range(0, len(effect_values)):
+            self.assertAlmostEqual(
+                expected_dates[i], effect_dates[i], 2
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 2
+            )
 
 
 if __name__ == '__main__':

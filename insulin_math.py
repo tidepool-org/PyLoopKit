@@ -282,7 +282,11 @@ def reconciled(dose_types, start_dates, end_dates, values,
         output_ends.append(end_dates[last_suspend_index])
         output_values.append(values[last_suspend_index])
 
-    elif last_basal and last_basal[2] > last_basal[1]:
+    elif (last_basal
+          and last_basal[2] > last_basal[1]
+          and dose_types[len(dose_types)-1].lower()
+          in ["tempbasal", "basalprofilestart"]
+          ):
         # I slightly modified this because it wasn't dealing with the last
         # basal correctly
         output_types.append(dose_types[len(dose_types)-1])

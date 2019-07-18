@@ -64,7 +64,9 @@ def filter_date_range_for_doses(
         filtered_starts.append(starts[i])
         filtered_ends.append(ends[i] if ends else None)
         filtered_values.append(values[i])
-        filtered_scheduled_basals.append(scheduled_basals[i])
+        filtered_scheduled_basals.append(
+            scheduled_basals[i] if scheduled_basals else None
+        )
 
     assert len(filtered_types) == len(filtered_starts) == len(filtered_ends)\
         == len(filtered_values) == len(filtered_scheduled_basals),\

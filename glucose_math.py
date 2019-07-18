@@ -242,6 +242,8 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
 
             effect_index += 1
 
+        if end_effect_value is None:
+            continue
         effect_change = end_effect_value - start_effect_value
         discrepancy = glucose_change - effect_change
 

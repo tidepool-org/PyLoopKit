@@ -224,7 +224,7 @@ def reconciled(dose_types, start_dates, end_dates, values,
             output_ends.append(end_dates[i])
             output_values.append(values[i])
 
-        elif type_.lower() in ["tempbasal", "basalprofilestart"]:
+        elif type_.lower() in ["tempbasal", "basalprofilestart", "basal"]:
             if last_basal and not last_suspend_index:
                 last = last_basal
                 end_date = min(last[2], start_dates[i])
@@ -285,7 +285,7 @@ def reconciled(dose_types, start_dates, end_dates, values,
     elif (last_basal
           and last_basal[2] > last_basal[1]
           and dose_types[len(dose_types)-1].lower()
-          in ["tempbasal", "basalprofilestart"]
+          in ["tempbasal", "basalprofilestart", "basal"]
           ):
         # I slightly modified this because it wasn't dealing with the last
         # basal correctly
@@ -400,7 +400,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     Output:
     Tuple with properties of doses, annotated with the current basal rates
     """
-    if dose_type.lower() not in ["basalprofilestart", "tempbasal",
+    if dose_type.lower() not in ["basalprofilestart", "tempbasal", "basal",
                                  "pumpsuspend"]:
         return ([dose_type], [dose_start_date], [dose_end_date], [value],
                 [0])
@@ -686,7 +686,7 @@ def insulin_on_board_calc(type_, start_date, end_date, value,
     """ Calculates the insulin on board for a specific dose at a specific time
 
     Arguments:
-    type_ -- String with type of dose ("Bolus" or "TempBasal")
+    type_ -- String with type of dose (bolus, basal, etc)
     start_date -- the date the dose started at (datetime object)
     end_date -- the date the dose ended at (datetime object)
     value -- insulin value for dose
@@ -1203,7 +1203,8 @@ def overlay_basal_schedule(dose_types, starts, ends, values,
                       ]
 
     for (i, type_) in enumerate(dose_types):
-        if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart"]:
+        if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart",
+                             "basal"]:
             if ending_at and ends[i] > ending_at:
                 continue
 

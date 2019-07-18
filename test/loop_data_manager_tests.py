@@ -5,7 +5,7 @@ Created on Thu Jul 11 15:16:42 2019
 
 @author: annaquinlan
 """
-# pylint: disable=C0111, C0200, R0201, W0105
+# pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
 from datetime import datetime, time, timedelta
 import unittest
 
@@ -228,13 +228,15 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         fixture = load_fixture(resource_name, ".json")
 
         start_dates = [
-            datetime.fromisoformat(dict_.get("startDate")
-            if dict_.get("startDate") else dict_.get("start_at"))
+            datetime.fromisoformat(
+                dict_.get("startDate")
+                if dict_.get("startDate") else dict_.get("start_at"))
             for dict_ in fixture
         ]
         end_dates = [
-            datetime.fromisoformat(dict_.get("endDate")
-            if dict_.get("endDate") else dict_.get("end_at"))
+            datetime.fromisoformat(
+                dict_.get("endDate")
+                if dict_.get("endDate") else dict_.get("end_at"))
             for dict_ in fixture
         ]
         glucose_effects = [
@@ -522,8 +524,8 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
 
         momentum_effect = self.load_glucose_data(
-             "momentum_effect_stable_glucose_output"
-             )
+            "momentum_effect_stable_glucose_output"
+            )
 
         (expected_starts,
          expected_ends,
@@ -561,8 +563,8 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
 
         momentum_effect = self.load_glucose_data(
-             "counteraction_effect_falling_glucose_insulin"
-             )
+            "counteraction_effect_falling_glucose_insulin"
+            )
 
         (expected_starts,
          expected_ends,
@@ -598,14 +600,14 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         glucose_data = ([], [])
 
         momentum_effect = self.load_glucose_data(
-             "counteraction_effect_falling_glucose_insulin"
-             )
+            "counteraction_effect_falling_glucose_insulin"
+            )
 
         start_dates = get_counteraction_effects(
-             *glucose_data,
-             datetime.fromisoformat("2015-10-25T19:15:00"),
-             *momentum_effect
-             )[0]
+            *glucose_data,
+            datetime.fromisoformat("2015-10-25T19:15:00"),
+            *momentum_effect
+            )[0]
 
         self.assertEqual(
             0, len(start_dates)
@@ -731,7 +733,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_glucose_effect_output(
-            "dynamic_glucose_effect_fully_observed_output")
+             "dynamic_glucose_effect_fully_observed_output")
 
         (effect_dates,
          effect_values

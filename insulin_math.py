@@ -276,23 +276,20 @@ def reconciled(dose_types, start_dates, end_dates, values,
             output_ends.append(end_dates[i])
             output_values.append(values[i])
 
-    if last_suspend_index or last_suspend_index == 0:
+    if last_suspend_index is not None:
         output_types.append(dose_types[last_suspend_index])
         output_starts.append(start_dates[last_suspend_index])
         output_ends.append(end_dates[last_suspend_index])
         output_values.append(values[last_suspend_index])
-
     elif (last_basal
           and last_basal[2] > last_basal[1]
-          and dose_types[len(dose_types)-1].lower()
-          in ["tempbasal", "basalprofilestart", "basal"]
           ):
         # I slightly modified this because it wasn't dealing with the last
         # basal correctly
-        output_types.append(dose_types[len(dose_types)-1])
-        output_starts.append(start_dates[len(start_dates)-1])
-        output_ends.append(end_dates[len(end_dates)-1])
-        output_values.append(values[len(values)-1])
+        output_types.append(last_basal[0])
+        output_starts.append(last_basal[1])
+        output_ends.append(last_basal[2])
+        output_values.append(last_basal[3])
 
     assert len(output_types) == len(output_starts) == len(output_ends) ==\
         len(output_values), "expected output shape to match"
@@ -307,7 +304,8 @@ def reconciled(dose_types, start_dates, end_dates, values,
 def annotated(
         dose_types, start_dates, end_dates, values, scheduled_basal_rates,
         basal_start_times, basal_rates, basal_minutes,
-        convert_to_units_hr=True
+        convert_to_units_hr=True,
+        offset=0
     ):
     """ Annotates doses with the context of the scheduled basal rates
 
@@ -325,6 +323,8 @@ def annotated(
     convert_to_units_hr -- set to True if you want to convert the doses to U/hr
         (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr);
         this will normally be reservoir values
+
+    offset -- the offset in hours from UTC time
 
     Output:
     5 lists of annotated dose properties
@@ -354,7 +354,8 @@ def annotated(
          ) = annotate_individual_dose(
              dose_types[i], start_dates[i], end_dates[i], values[i],
              basal_start_times, basal_rates, basal_minutes,
-             convert_to_units_hr
+             convert_to_units_hr,
+             offset=offset
              )
 
         output_types.extend(dose_type)
@@ -377,7 +378,7 @@ def annotated(
 
 def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
                              basal_start_times, basal_rates, basal_minutes,
-                             convert_to_units_hr=True):
+                             convert_to_units_hr=True, offset=0):
     """ Annotates a dose with the context of the scheduled basal rate
         If the dose crosses a schedule boundary, it will be split into
         multiple doses so each dose has a single scheduled basal rate.
@@ -395,6 +396,8 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     basal_minutes -- list of basal lengths (in mins)
     convert_to_units_hr -- set to True if you want to convert a dose to U/hr
         (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
+
+    offset -- the offset in hours from UTC time
 
 
     Output:
@@ -421,7 +424,8 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
          basal_rates,
          basal_minutes,
          dose_start_date,
-         dose_end_date
+         dose_end_date,
+         offset=offset
          )
 
     for i in range(0, len(sched_basal_starts)):
@@ -461,7 +465,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
 
 def between(basal_start_times, basal_rates, basal_minutes, start_date,
-            end_date, repeat_interval=24):
+            end_date, repeat_interval=24, offset=0):
     """ Returns a slice of scheduled basal rates that occur between two dates
 
     Arguments:
@@ -470,11 +474,14 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     basal_minutes -- list of basal lengths (in mins)
     start_date -- start date of the range (datetime obj)
     end_date -- end date of the range (datetime obj)
+    offset -- the offset in hours from UTC time
 
     Output:
     Tuple in format (basal_start_times, basal_rates, basal_minutes) within
     the range of dose_start_date and dose_end_date
     """
+    if not start_date.tzinfo:
+        offset = 0
 
     if start_date > end_date:
         return ([], [], [])
@@ -490,6 +497,7 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     )
 
     start_offset = schedule_offset(start_date, basal_start_times[0])
+
     end_offset = (
         start_offset
         + timedelta(seconds=time_interval_since(end_date, start_date))
@@ -505,7 +513,9 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
              basal_rates,
              basal_minutes,
              start_date,
-             boundary_date
+             boundary_date,
+             repeat_interval=repeat_interval,
+             offset=offset
              )
         (start_times_2,
          end_times_2,
@@ -515,7 +525,9 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
              basal_rates,
              basal_minutes,
              boundary_date,
-             end_date
+             end_date,
+             repeat_interval=repeat_interval,
+             offset=offset
              )
 
         return (start_times_1 + start_times_2,
@@ -532,9 +544,9 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
             minutes=start_time.minute,
             seconds=start_time.second
         )
-        if start_offset >= start_time:
+        if start_offset + timedelta(hours=offset) >= start_time:
             start_index = i
-        if end_offset < start_time:
+        if end_offset + timedelta(hours=offset) < start_time:
             end_index = i
             break
 
@@ -547,19 +559,18 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
 
     for i in range(start_index, end_index):
         end_time = (timedelta(
-            hours=basal_start_times[i+1].hour,
+            hours=basal_start_times[i+1].hour - offset,
             minutes=basal_start_times[i+1].minute,
             seconds=basal_start_times[i+1].second) if i+1 <
                     len(basal_start_times) else max_time_interval)
 
         output_start_times.append(
             reference_date + timedelta(
-                hours=basal_start_times[i].hour,
+                hours=basal_start_times[i].hour - offset,
                 minutes=basal_start_times[i].minute,
                 seconds=basal_start_times[i].second
             )
         )
-
         output_end_times.append(reference_date + end_time)
         output_basal_rates.append(basal_rates[i])
 
@@ -576,8 +587,8 @@ def schedule_offset(date_to_offset, reference_time,
 
     Arguments:
     date_to_offset -- datetime object of the date to convert
-    reference_time -- time object that's normally the first basal dose time in
-                      a basal schedule
+    reference_time -- time object that's the first basal dose time in
+                      a basal schedule (typically midnight)
     repeat_interval -- the interval with which the basal schedule repeats
 
     Output:
@@ -589,7 +600,7 @@ def schedule_offset(date_to_offset, reference_time,
                              )
     interval = time_interval_since_reference_date(date_to_offset)
 
-    return timedelta(seconds=(interval-reference_time_seconds)
+    return timedelta(seconds=(interval - reference_time_seconds)
                      % (repeat_interval * 60 * 60)
                      + reference_time_seconds)
 

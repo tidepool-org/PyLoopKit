@@ -9,7 +9,6 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/Extensions/Date.swift
 """
 import datetime
-import dateutil.tz
 import math
 
 REF_TIME = datetime.datetime.fromisoformat("2001-01-01T00:00:00")
@@ -17,15 +16,6 @@ TIMEZONE_REF_TIME = datetime.datetime.strptime(
     "2001-01-01 00:00:00 +0000",
     "%Y-%m-%d %H:%M:%S %z"
     )
-
-
-def get_timezone_offset():
-    """ Returns the timezone offset from UTC in hours """
-    local_tz = dateutil.tz.tzlocal()
-    local_offset = local_tz.utcoffset(datetime.datetime.now(local_tz))
-    hours_offset = local_offset.total_seconds() / 3600
-
-    return hours_offset
 
 
 def time_interval_since_reference_date(actual_time):

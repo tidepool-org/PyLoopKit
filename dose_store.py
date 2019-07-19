@@ -22,7 +22,8 @@ def get_glucose_effects(
         basal_starts, basal_rates, basal_minutes,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
         insulin_model,
-        end_date=None
+        end_date=None,
+        timezone_offset=0
         ):
     """ Get the glucose effects at a particular time, given a list of
     doses and a time interval
@@ -80,7 +81,7 @@ def get_glucose_effects(
         *filtered_doses
         )
 
-    # sort the lists because they're slightly out of order due to
+    # sort the lists because they could be slightly out of order due to
     # basals and suspends
     unsort_types = numpy.array(reconciled_doses[0])
     start_dates = numpy.array(reconciled_doses[1])

@@ -464,3 +464,96 @@ def filter_date_range(
         "expected output shapes to match"
 
     return (filtered_starts, filtered_ends, filtered_values)
+
+
+def combined_sums(
+        starts, ends, values,
+        duration,
+        delta=5
+        ):
+    """
+    Sums adjacent glucose effects into buckets of the specified duration.
+
+    Requires the receiver to be sorted chronologically by endDate
+
+    Arguments:
+    starts -- start dates (datetime)
+    ends -- end dates (datetime)
+    values -- glucose values
+
+    duration -- duration of each resulting summed element (minutes)
+    delta -- delta between glucose effects (minutes)
+
+    Output:
+    Summed effects in format (start_dates, end_dates, values)
+    """
+    assert len(starts) == len(values),\
+        "expected input shapes to match"
+    
+    sum_starts = []
+    sum_ends = []
+    sum_values = []
+
+    starts.reverse()
+    ends.reverse()
+    values.reverse()
+    last_valid_index = 0
+
+    for i in range(0, len(starts)):
+        sum_starts.append(starts[i])
+        sum_ends.append(ends[i] if ends else starts[i])
+        sum_values.append(values[i])
+
+        for sums_index in range(last_valid_index, len(sum_starts)-1):
+            if (ends
+                    and sum_ends[sums_index]
+                    and (sum_ends[sums_index]
+                         > ends[i] + timedelta(minutes=duration)
+                         )
+               ):
+                last_valid_index += 1
+                continue
+
+            elif (sum_ends[sums_index]
+                  and sum_ends[sums_index]
+                    > starts[i] + timedelta(minutes=duration)
+               ):
+                last_valid_index += 1
+                continue
+
+            sum_starts[sums_index] = starts[i]
+            if not sum_ends[sums_index]:
+                sum_ends[sums_index] = ends[i] if ends else starts[i]
+            sum_values[sums_index] += values[i]
+
+    assert len(sum_starts) == len(sum_ends) == len(sum_values),\
+        "expected output shapes to match"
+
+    sum_starts.reverse()
+    sum_ends.reverse()
+    sum_values.reverse()
+
+    return (sum_starts,
+            sum_ends,
+            sum_values
+            )
+    """
+    if (ends
+                    and sum_ends[sum_index]
+                    and sum_ends[sum_index]
+                    > ends[i] + timedelta(minutes=duration)
+               ):
+                last_valid_index += 1
+                continue
+
+            sum_starts.insert(sum_index + 1, starts[i])
+            if ends:
+                sum_ends.insert(sum_index + 1, ends[i] if ends else None)
+            else:
+                sum_ends.insert(
+                    sum_index + 1,
+                    starts[i+1] if i < len(starts) - 1
+                    else starts[i] + timedelta(minutes=delta)
+                )
+            sum_values.insert(sum_index + 1, values[i])
+    """

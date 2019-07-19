@@ -14,7 +14,7 @@ from datetime import datetime
 
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from loop_math import predict_glucose, decay_effect, subtracting
+from loop_math import predict_glucose, decay_effect, subtracting, combined_sums
 from date import time_interval_since
 
 
@@ -544,6 +544,45 @@ class TestLoopMathFunctions(unittest.TestCase):
         )
 
         for i in range(0, len(expected_starts)):
+            self.assertAlmostEqual(
+                expected_values[i], values[i], 2
+            )
+
+    """ Tests for combined_sums """
+    def test_combined_sums_with_gaps(self):
+        (input_starts,
+         input_values
+         ) = self.load_glucose_effect_fixture_normal_time(
+            "ice_minus_carb_effect_with_gaps_output"
+        )
+
+        (expected_starts,
+         expected_ends,
+         expected_values
+         ) = self.load_counteraction_input_fixture(
+             "combined_sums_with_gaps_output"
+             )
+
+        (starts,
+         ends,
+         values
+         ) = combined_sums(
+             input_starts, [], input_values,
+             30
+             )
+
+        self.assertEqual(
+            len(expected_starts),
+            len(starts)
+        )
+
+        for i in range(0, len(expected_starts)):
+            self.assertEqual(
+                expected_starts[i], starts[i]
+            )
+            self.assertEqual(
+                expected_ends[i], ends[i]
+            )
             self.assertAlmostEqual(
                 expected_values[i], values[i], 2
             )

@@ -14,6 +14,7 @@ from glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
 from carb_store import get_carb_glucose_effects
 from loop_kit_tests import load_fixture
+from pyloop_parser import load_momentum_effects, get_glucose_data
 
 
 class TestLoopDataManagerFunctions(unittest.TestCase):
@@ -247,6 +248,28 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             "expected output shape to match"
 
         return (start_dates, end_dates, glucose_effects)
+
+    def load_report_momentum_effects(self, report_name):
+        """ Load the expected momentum effects from an issue report """
+        report = load_fixture(report_name, ".json")
+
+        assert report.get("glucose_momentum_effect"),\
+            "expected issue report to contain momentum information"
+
+        return load_momentum_effects(
+            report.get("glucose_momentum_effect")
+        )
+
+    def load_report_glucose_values(self, report_name):
+        """ Load the cached glucose values from an issue report """
+        report = load_fixture(report_name, ".json")
+
+        assert report.get("cached_glucose_samples"),\
+            "expected issue report to contain momentum information"
+
+        return get_glucose_data(
+            report.get("cached_glucose_samples")
+        )
 
     """ Tests for get_glucose_effects """
     def test_glucose_effects_walsh_bolus(self):
@@ -516,6 +539,36 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         self.assertEqual(
             0, len(effect_dates)
         )
+
+    def test_momentum_issue_report(self):
+        glucose_data = self.load_report_glucose_values("loop_issue_report")
+
+        (expected_starts,
+         expected_values
+         ) = self.load_report_momentum_effects("loop_issue_report")
+
+        (starts, values) = get_recent_momentum_effects(
+            *glucose_data,
+            datetime.strptime(
+                "2019-07-17 12:50:58 +0000",
+                "%Y-%m-%d %H:%M:%S %z"
+                ),
+            datetime.strptime(
+                "2019-07-18 12:50:58 +0000",
+                "%Y-%m-%d %H:%M:%S %z"
+                )
+            )
+
+        self.assertEqual(
+            len(expected_starts), len(starts)
+        )
+        for i in range(0, len(expected_starts)):
+            self.assertEqual(
+                expected_starts[i], starts[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], values[i], 2
+            )
 
     """ Tests for get_counteraction_effects """
     def test_counteraction_effects_for_falling_glucose(self):

@@ -480,11 +480,27 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     Tuple in format (basal_start_times, basal_rates, basal_minutes) within
     the range of dose_start_date and dose_end_date
     """
-    if not start_date.tzinfo:
-        offset = 0
-
+    timezone_info = start_date.tzinfo
     if start_date > end_date:
         return ([], [], [])
+
+    if offset != 0:
+        start_date = datetime(
+            year=start_date.year,
+            month=start_date.month,
+            day=start_date.day,
+            hour=start_date.hour,
+            minute=start_date.minute,
+            second=start_date.second
+            ) + timedelta(hours=offset)
+        end_date = datetime(
+            year=end_date.year,
+            month=end_date.month,
+            day=end_date.day,
+            hour=end_date.hour,
+            minute=end_date.minute,
+            second=end_date.second
+            ) + timedelta(hours=offset)
 
     reference_time_interval = timedelta(
         hours=basal_start_times[0].hour,
@@ -512,8 +528,8 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
              basal_start_times,
              basal_rates,
              basal_minutes,
-             start_date,
-             boundary_date,
+             start_date - timedelta(hours=offset),
+             boundary_date - timedelta(hours=offset),
              repeat_interval=repeat_interval,
              offset=offset
              )
@@ -524,8 +540,8 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
              basal_start_times,
              basal_rates,
              basal_minutes,
-             boundary_date,
-             end_date,
+             boundary_date - timedelta(hours=offset),
+             end_date - timedelta(hours=offset),
              repeat_interval=repeat_interval,
              offset=offset
              )
@@ -544,13 +560,22 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
             minutes=start_time.minute,
             seconds=start_time.second
         )
-        if start_offset + timedelta(hours=offset) >= start_time:
+        if start_offset >= start_time:
             start_index = i
-        if end_offset + timedelta(hours=offset) < start_time:
+        if end_offset < start_time:
             end_index = i
             break
 
-    reference_date = start_date - start_offset
+    reference_date = start_date - start_offset - timedelta(hours=offset)
+    reference_date = datetime(
+            year=reference_date.year,
+            month=reference_date.month,
+            day=reference_date.day,
+            hour=reference_date.hour,
+            minute=reference_date.minute,
+            second=reference_date.second,
+            tzinfo=timezone_info
+            )
 
     if start_index > end_index:
         return ([], [], [])
@@ -559,14 +584,14 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
 
     for i in range(start_index, end_index):
         end_time = (timedelta(
-            hours=basal_start_times[i+1].hour - offset,
+            hours=basal_start_times[i+1].hour,
             minutes=basal_start_times[i+1].minute,
             seconds=basal_start_times[i+1].second) if i+1 <
                     len(basal_start_times) else max_time_interval)
 
         output_start_times.append(
             reference_date + timedelta(
-                hours=basal_start_times[i].hour - offset,
+                hours=basal_start_times[i].hour,
                 minutes=basal_start_times[i].minute,
                 seconds=basal_start_times[i].second
             )

@@ -256,7 +256,59 @@ def get_basal_schedule(data):
     assert len(start_times) == len(rate_minutes) == len(values),\
         "expected output shapes to match"
 
-    return (start_times, rate_minutes, values)
+    return (start_times, values, rate_minutes)
+
+
+def load_momentum_effects(data):
+    """ Load glucose momentum effects from a list """
+    start_times = [
+        datetime.strptime(
+            dict_.get("startDate"),
+            "%Y-%m-%d %H:%M:%S %z"
+        )
+        for dict_ in data
+    ]
+    values = [
+        float(dict_.get("quantity")) for dict_ in data
+    ]
+    return (start_times, values)
+
+
+def get_counteractions(data):
+    """ Load counteraction effect data from a list """
+    start_times = [
+        datetime.strptime(
+            dict_.get("start_time"),
+            "%Y-%m-%d %H:%M:%S %z"
+        )
+        for dict_ in data
+    ]
+    end_times = [
+        datetime.strptime(
+            dict_.get("end_time"),
+            " %Y-%m-%d %H:%M:%S %z"
+        )
+        for dict_ in data
+    ]
+    values = [
+        float(dict_.get("value")) for dict_ in data
+    ]
+    return (start_times, end_times, values)
+
+
+def get_insulin_effects(data):
+    """ Load insulin effect data from a list """
+    start_times = [
+        datetime.strptime(
+            dict_.get("start_time"),
+            "%Y-%m-%d %H:%M:%S %z"
+        )
+        for dict_ in data
+    ]
+    values = [
+        float(dict_.get("value")) for dict_ in data
+    ]
+    return (start_times, values)
 
 
 def get_settings(data):
@@ -302,11 +354,20 @@ def get_settings(data):
 
     settings["dynamic_carb_absorption_enabled"] = True
     settings["retrospective_correction_integration_interval"] = 30
+    settings["recency_interval"] = 15
+    settings["retrospective_correction_grouping_interval"] = 30
+
     settings["default_absorption_times"] = [
          float(data.get("carb_default_absorption_times_fast")) / 60,
          float(data.get("carb_default_absorption_times_medium")) / 60,
          float(data.get("carb_default_absorption_times_slow")) / 60
          ]
+
+    if data.get("basal_rate_timeZone"):
+        settings["tz_offset"] = float(data.get("basal_rate_timeZone")) / 3600
+    else:
+        settings["tz_offset"] = 0
+
     return settings
 
 

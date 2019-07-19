@@ -468,8 +468,7 @@ def filter_date_range(
 
 def combined_sums(
         starts, ends, values,
-        duration,
-        delta=5
+        duration
         ):
     """
     Sums adjacent glucose effects into buckets of the specified duration.
@@ -489,7 +488,7 @@ def combined_sums(
     """
     assert len(starts) == len(values),\
         "expected input shapes to match"
-    
+
     sum_starts = []
     sum_ends = []
     sum_values = []
@@ -516,8 +515,8 @@ def combined_sums(
 
             elif (sum_ends[sums_index]
                   and sum_ends[sums_index]
-                    > starts[i] + timedelta(minutes=duration)
-               ):
+                  > starts[i] + timedelta(minutes=duration)
+                  ):
                 last_valid_index += 1
                 continue
 
@@ -537,23 +536,3 @@ def combined_sums(
             sum_ends,
             sum_values
             )
-    """
-    if (ends
-                    and sum_ends[sum_index]
-                    and sum_ends[sum_index]
-                    > ends[i] + timedelta(minutes=duration)
-               ):
-                last_valid_index += 1
-                continue
-
-            sum_starts.insert(sum_index + 1, starts[i])
-            if ends:
-                sum_ends.insert(sum_index + 1, ends[i] if ends else None)
-            else:
-                sum_ends.insert(
-                    sum_index + 1,
-                    starts[i+1] if i < len(starts) - 1
-                    else starts[i] + timedelta(minutes=delta)
-                )
-            sum_values.insert(sum_index + 1, values[i])
-    """

@@ -17,11 +17,11 @@ from datetime import datetime, time
 import numpy
 
 import path_grabber  # pylint: disable=unused-import
-from loop_kit_tests import load_fixture
+from exponential_insulin_model import percent_effect_remaining
 from insulin_math import (dose_entries, is_continuous, insulin_on_board,
                           glucose_effects, annotated, reconciled,
                           total_delivery, trim, overlay_basal_schedule)
-from exponential_insulin_model import percent_effect_remaining
+from loop_kit_tests import load_fixture
 
 
 class TestInsulinKitFunctions(unittest.TestCase):

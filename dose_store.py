@@ -105,7 +105,8 @@ def get_glucose_effects(
      ) = annotated(
          types, start_dates, end_dates, values, [0 for i in types],
          basal_starts, basal_rates, basal_minutes,
-         convert_to_units_hr=False
+         convert_to_units_hr=False,
+         offset=timezone_offset
          )
 
     # trim the doses to start of interval

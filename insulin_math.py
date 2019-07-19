@@ -961,7 +961,8 @@ def glucose_effects(
 
 
 def find_ratio_at_time(sensitivity_start_times, sensitivity_end_times,
-                       sensitivity_values, time_to_check, type_="isf"):
+                       sensitivity_values, time_to_check, type_="isf"
+                       ):
     """ Finds sensitivity setting value at a given time
 
     Arguments:

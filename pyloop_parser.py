@@ -427,13 +427,13 @@ def parse_json(path, name):
     else:
         raise RuntimeError("No glucose information found")
 
-    if issue_dict.get("cached_dose_entries"):
-        dose_data = get_cached_insulin_data(
-            issue_dict.get("cached_dose_entries")
-        )
-    elif issue_dict.get("get_normalized_dose_entries"):
+    if issue_dict.get("get_normalized_dose_entries"):
         dose_data = get_normalized_insulin_data(
             issue_dict.get("get_normalized_dose_entries")
+        )
+    elif issue_dict.get("cached_dose_entries"):
+        dose_data = get_cached_insulin_data(
+            issue_dict.get("cached_dose_entries")
         )
     else:
         raise RuntimeError("No insulin dose information found")

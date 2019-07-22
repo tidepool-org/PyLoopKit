@@ -22,8 +22,7 @@ def get_glucose_effects(
         basal_starts, basal_rates, basal_minutes,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
         insulin_model,
-        end_date=None,
-        timezone_offset=0
+        end_date=None
         ):
     """ Get the glucose effects at a particular time, given a list of
     doses and a time interval
@@ -105,8 +104,7 @@ def get_glucose_effects(
      ) = annotated(
          types, start_dates, end_dates, values, [0 for i in types],
          basal_starts, basal_rates, basal_minutes,
-         convert_to_units_hr=False,
-         offset=timezone_offset
+         convert_to_units_hr=False
          )
 
     # trim the doses to start of interval

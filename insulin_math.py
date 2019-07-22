@@ -354,8 +354,7 @@ def annotated(
          ) = annotate_individual_dose(
              dose_types[i], start_dates[i], end_dates[i], values[i],
              basal_start_times, basal_rates, basal_minutes,
-             convert_to_units_hr,
-             offset=offset
+             convert_to_units_hr
              )
 
         output_types.extend(dose_type)
@@ -378,7 +377,7 @@ def annotated(
 
 def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
                              basal_start_times, basal_rates, basal_minutes,
-                             convert_to_units_hr=True, offset=0):
+                             convert_to_units_hr=True):
     """ Annotates a dose with the context of the scheduled basal rate
         If the dose crosses a schedule boundary, it will be split into
         multiple doses so each dose has a single scheduled basal rate.
@@ -396,8 +395,6 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     basal_minutes -- list of basal lengths (in mins)
     convert_to_units_hr -- set to True if you want to convert a dose to U/hr
         (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
-
-    offset -- the offset in hours from UTC time
 
 
     Output:
@@ -425,7 +422,6 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
          basal_minutes,
          dose_start_date,
          dose_end_date,
-         offset=offset
          )
 
     for i in range(0, len(sched_basal_starts)):
@@ -465,7 +461,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
 
 def between(basal_start_times, basal_rates, basal_minutes, start_date,
-            end_date, repeat_interval=24, offset=0):
+            end_date, repeat_interval=24):
     """ Returns a slice of scheduled basal rates that occur between two dates
 
     Arguments:
@@ -474,7 +470,6 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     basal_minutes -- list of basal lengths (in mins)
     start_date -- start date of the range (datetime obj)
     end_date -- end date of the range (datetime obj)
-    offset -- the offset in hours from UTC time
 
     Output:
     Tuple in format (basal_start_times, basal_rates, basal_minutes) within
@@ -483,24 +478,6 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     timezone_info = start_date.tzinfo
     if start_date > end_date:
         return ([], [], [])
-
-    if offset != 0:
-        start_date = datetime(
-            year=start_date.year,
-            month=start_date.month,
-            day=start_date.day,
-            hour=start_date.hour,
-            minute=start_date.minute,
-            second=start_date.second
-            ) + timedelta(hours=offset)
-        end_date = datetime(
-            year=end_date.year,
-            month=end_date.month,
-            day=end_date.day,
-            hour=end_date.hour,
-            minute=end_date.minute,
-            second=end_date.second
-            ) + timedelta(hours=offset)
 
     reference_time_interval = timedelta(
         hours=basal_start_times[0].hour,
@@ -528,10 +505,9 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
              basal_start_times,
              basal_rates,
              basal_minutes,
-             start_date - timedelta(hours=offset),
-             boundary_date - timedelta(hours=offset),
-             repeat_interval=repeat_interval,
-             offset=offset
+             start_date,
+             boundary_date,
+             repeat_interval=repeat_interval
              )
         (start_times_2,
          end_times_2,
@@ -540,10 +516,9 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
              basal_start_times,
              basal_rates,
              basal_minutes,
-             boundary_date - timedelta(hours=offset),
-             end_date - timedelta(hours=offset),
-             repeat_interval=repeat_interval,
-             offset=offset
+             boundary_date,
+             end_date,
+             repeat_interval=repeat_interval
              )
 
         return (start_times_1 + start_times_2,
@@ -566,7 +541,7 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
             end_index = i
             break
 
-    reference_date = start_date - start_offset - timedelta(hours=offset)
+    reference_date = start_date - start_offset
     reference_date = datetime(
             year=reference_date.year,
             month=reference_date.month,

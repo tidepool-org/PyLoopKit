@@ -493,7 +493,8 @@ def as_bolus(
                       insulin delivery
 
     Output:
-    A bolus recommendation
+    A bolus recommendation in form [units of bolus, pending insulin,
+                                    recommendation]
     """
     correction_units = (
         correction[len(correction) - 1]
@@ -565,7 +566,7 @@ def recommended_temp_basal(
                     delivery; if None, no rounding is performed
 
     Output:
-    The recommended temporary basal rate and duration
+    The recommended temporary basal in the format [rate, duration]
     """
     assert len(glucose_dates) == len(glucose_values),\
         "expected input shapes to match"

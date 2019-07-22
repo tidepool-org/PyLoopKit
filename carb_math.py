@@ -947,6 +947,7 @@ def dynamic_glucose_effects(
             carb_starts[i]
             )
         csf = insulin_sensitivity / carb_ratio
+
         return csf * carb_status.dynamic_absorbed_carbs(
             carb_starts[i],
             carb_quantities[i],
@@ -997,4 +998,53 @@ def absorbed_carbs(
         carb_value,
         time - delay,
         absorption_time
+        )
+
+
+def filter_date_range_for_carbs(
+        starts, values, absorptions,
+        start_date,
+        end_date
+        ):
+    """ Returns an array of elements filtered by the specified date range.
+
+    Arguments:
+    starts -- start dates (datetime)
+    values -- carb values (g)
+    absorptions -- absorption times for entries
+
+    start_date -- the earliest date of elements to return
+    end_date -- the last date of elements to return
+
+    Output:
+    Filtered carb entries in format (starts, values, absorptions)
+    """
+    # ends might not necesarily be the same length as starts/values
+    # because not all types have "end dates"
+    assert len(starts) == len(values) == len(absorptions),\
+        "expected input shapes to match"
+
+    (filtered_starts,
+     filtered_values,
+     filtered_absorptions
+     ) = ([], [], [])
+
+    for i in range(0, len(starts)):
+        if start_date and starts[i] < start_date:
+            continue
+
+        if end_date and starts[i] > end_date:
+            continue
+
+        filtered_starts.append(starts[i])
+        filtered_values.append(values[i])
+        filtered_absorptions.append(absorptions[i])
+
+    assert len(filtered_starts) == len(filtered_values)\
+        == len(filtered_absorptions), "expected output shapes to match"
+
+    return (
+        filtered_starts,
+        filtered_values,
+        filtered_absorptions
         )

@@ -366,6 +366,12 @@ def get_settings(data):
     else:
         settings["momentum_time_interval"] = 15
 
+    suspend_threshold = data.get("suspend_threshold")
+    if suspend_threshold:
+        settings["suspend_threshold"] = float(suspend_threshold)
+    else:
+        settings["suspend_threshold"] = 70
+
     settings["dynamic_carb_absorption_enabled"] = True
     settings["retrospective_correction_integration_interval"] = 30
     settings["recency_interval"] = 15
@@ -377,12 +383,42 @@ def get_settings(data):
          float(data.get("carb_default_absorption_times_slow")) / 60
          ]
 
-    if data.get("basal_rate_timeZone"):
-        settings["tz_offset"] = float(data.get("basal_rate_timeZone")) / 3600
-    else:
-        settings["tz_offset"] = 0
+    settings["max_basal_rate"] = data.get("maximum_basal_rate")
+    settings["max_bolus"] = data.get("maximum_bolus")
 
     return settings
+
+
+def get_last_temp_basal(data, offset):
+    """ Load the last temporary basal from an issue report
+        "last_temp_basal" dictionary
+    """
+    if (data.get(" type") == "LoopKit.DoseType.tempBasal"
+        or data.get("type") == "LoopKit.DoseType.tempBasal"
+       ):
+        type_ = "tempBasal"
+    elif (data.get(" type") == "LoopKit.DoseType.basal"
+          or data.get("type") == "LoopKit.DoseType.basal"
+        ):
+        type_ = "basal"
+    else:
+        raise RuntimeError("The last temporary basal is not a basal")
+
+    return [
+        type_,
+        datetime.strptime(
+            data.get(" startDate") if data.get(" startDate")
+            else data.get("startDate"),
+            "%Y-%m-%d %H:%M:%S %z"
+        ) + timedelta(seconds=offset),
+        datetime.strptime(
+            data.get(" endDate") if data.get(" endDate")
+            else data.get("endDate"),
+            "%Y-%m-%d %H:%M:%S %z"
+        ) + timedelta(seconds=offset),
+        float(data.get(" value")) if data.get(" value")
+        else float(data.get("value"))
+    ]
 
 
 def sort_by_first_list(list_1, list_2, list_3=None, list_4=None, list_5=None):

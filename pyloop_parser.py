@@ -10,12 +10,14 @@ import json
 import numpy
 import os
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from loop_data_manager import runner
+from glucose_math import counteraction_effects
+from insulin_math import glucose_effects
 
 
-def get_glucose_data(glucose_dict):
+def get_glucose_data(glucose_dict, offset):
     """ Load glucose values from an issue report cached_glucose dictionary
 
     Arguments:
@@ -28,7 +30,7 @@ def get_glucose_data(glucose_dict):
         datetime.strptime(
             dict_.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in glucose_dict
     ]
 
@@ -40,7 +42,7 @@ def get_glucose_data(glucose_dict):
     return (dates, glucose_values)
 
 
-def get_cached_insulin_data(data):
+def get_cached_insulin_data(data, offset):
     """ Load doses from an issue report cached_doses dictionary
 
     Arguments:
@@ -59,14 +61,14 @@ def get_cached_insulin_data(data):
         datetime.strptime(
             dict_.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     end_dates = [
         datetime.strptime(
             dict_.get("endDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     values = [float(dict_.get("value")) for dict_ in data]
@@ -86,7 +88,7 @@ def get_cached_insulin_data(data):
             scheduled_basal_rates)
 
 
-def get_normalized_insulin_data(data):
+def get_normalized_insulin_data(data, offset):
     """ Load doses from an issue report get_normalized_doses dictionary
 
     Arguments:
@@ -105,14 +107,14 @@ def get_normalized_insulin_data(data):
         datetime.strptime(
             dict_.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     end_dates = [
         datetime.strptime(
             dict_.get("endDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     values = [float(dict_.get("value")) for dict_ in data]
@@ -132,7 +134,7 @@ def get_normalized_insulin_data(data):
             scheduled_basal_rates)
 
 
-def get_carb_data(data):
+def get_carb_data(data, offset):
     """ Load carb information from an issue report cached_carbs dictionary
 
     Arguments:
@@ -147,7 +149,7 @@ def get_carb_data(data):
         datetime.strptime(
             dict_.get("startDate"),
             " %Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     absorption_times = [
@@ -259,7 +261,19 @@ def get_basal_schedule(data):
     return (start_times, values, rate_minutes)
 
 
-def load_momentum_effects(data):
+def get_target_range_schedule(data):
+    """ Load target range schedule
+        from an issue report "correction_range_schedule" dictionary
+    """
+    seconds = [float(dict_.get("startTime")) for dict_ in data]
+    (start_times, end_times) = get_starts_and_ends_from_seconds(seconds)
+    min_values = [float(dict_.get("value")[0]) for dict_ in data]
+    max_values = [float(dict_.get("value")[1]) for dict_ in data]
+
+    return (start_times, end_times, min_values, max_values)
+
+
+def load_momentum_effects(data, offset):
     """ Load glucose momentum effects from a list """
     start_times = [
         datetime.strptime(
@@ -274,7 +288,7 @@ def load_momentum_effects(data):
     return (start_times, values)
 
 
-def get_counteractions(data):
+def get_counteractions(data, offset):
     """ Load counteraction effect data from a list """
     start_times = [
         datetime.strptime(
@@ -296,7 +310,7 @@ def get_counteractions(data):
     return (start_times, end_times, values)
 
 
-def get_insulin_effects(data):
+def get_insulin_effects(data, offset):
     """ Load insulin effect data from a list """
     start_times = [
         datetime.strptime(
@@ -415,10 +429,19 @@ def parse_json(path, name):
     issue_dict = json.load(
         open(data_path_and_name, "r")
     )
+    if issue_dict.get("basal_rate_timeZone"):
+        offset = issue_dict.get("basal_rate_timeZone")
+    elif issue_dict.get("carb_ratio_timeZone"):
+        offset = issue_dict.get("carb_ratio_timeZone")
+    elif issue_dict.get("insulin_sensitivity_factor_timeZone"):
+        offset = issue_dict.get("insulin_sensitivity_factor_timeZone")
+    else:
+        offset = 0
 
     if issue_dict.get("cached_glucose_samples"):
         glucose_data = get_glucose_data(
-            issue_dict.get("cached_glucose_samples")
+            issue_dict.get("cached_glucose_samples"),
+            offset
         )
         glucose_data = sort_by_first_list(
             *glucose_data
@@ -429,18 +452,21 @@ def parse_json(path, name):
 
     if issue_dict.get("get_normalized_dose_entries"):
         dose_data = get_normalized_insulin_data(
-            issue_dict.get("get_normalized_dose_entries")
+            issue_dict.get("get_normalized_dose_entries"),
+            offset
         )
     elif issue_dict.get("cached_dose_entries"):
         dose_data = get_cached_insulin_data(
-            issue_dict.get("cached_dose_entries")
+            issue_dict.get("cached_dose_entries"),
+            offset
         )
     else:
         raise RuntimeError("No insulin dose information found")
 
     if issue_dict.get("cached_carb_entries"):
         carb_data = get_carb_data(
-            issue_dict.get("cached_carb_entries")
+            issue_dict.get("cached_carb_entries"),
+            offset
         )
     else:
         carb_data = ([], [], [])
@@ -468,30 +494,67 @@ def parse_json(path, name):
     else:
         raise RuntimeError("No basal rate information found")
 
+    if issue_dict.get("correction_range_schedule"):
+        target_range_schedule = get_target_range_schedule(
+            issue_dict.get("correction_range_schedule")
+        )
+    else:
+        raise RuntimeError("No target range rate information found")
+
+    if issue_dict.get("last_temp_basal"):
+        last_temp_basal = get_last_temp_basal(
+            issue_dict.get("last_temp_basal"), offset
+        )
+    else:
+        raise RuntimeError(
+            "No information found about the last temporary basal rate"
+        )
+
     if issue_dict.get("recommended_temp_basal"):
         time_to_run = datetime.strptime(
             issue_dict.get("recommended_temp_basal").get("date") or
             issue_dict.get("recommended_temp_basal").get(" date"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
     elif issue_dict.get("recommended_bolus"):
         time_to_run = datetime.strptime(
             issue_dict.get("recommended_bolus").get("date") or
             issue_dict.get("recommended_bolus").get(" date"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
     else:
         raise RuntimeError("No information found about report time")
 
-    runner(glucose_data,
-           dose_data,
-           carb_data,
-           settings,
-           sensitivity_schedule,
-           carb_ratio_schedule,
+    test_counteraction = get_counteractions(
+        issue_dict.get("insulin_counteraction_effects"), offset
+    )
+    test_effects = get_insulin_effects(
+        issue_dict.get("insulin_effect"), offset
+    )
            basal_schedule,
-           time_to_run
-           )
+        *glucose_data,
+        [False for i in glucose_data[0]],
+        ["PyLoop" for i in glucose_data[0]],
+        *test_effects
+        )
+
+    recommendations = runner(
+        glucose_data,
+        dose_data,
+        carb_data,
+        settings,
+        sensitivity_schedule,
+        carb_ratio_schedule,
+        basal_schedule,
+        target_range_schedule,
+        last_temp_basal,
+        time_to_run,
+        counteraction_starts=test_counteraction[0],
+        counteraction_ends=test_counteraction[1],
+        counteraction_values=test_counteraction[2],
+        actual_effect_starts=test_effects[0],
+        actual_effect_ends=test_effects[1]
+        )
 
 
 file_path = str(input("Path: "))

@@ -328,3 +328,193 @@ def update_retrospective_glucose_effect(
         velocity,
         effect_duration
         )
+
+
+def get_pending_insulin(
+        at_date,
+        basal_starts, basal_rates, basal_minutes,
+        last_temp_basal,
+        pending_bolus_amount=None
+    ):
+    """ Get the pending insulin for the purposes of calculating a recommended
+        bolus
+
+    Arguments:
+    at_date -- the "now" time (roughly equivalent to datetime.now)
+
+    basal_starts -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+
+    last_temp_basal -- information about the last temporary basal in the form
+                       [type, start time, end time, basal rate]
+    pending_bolus_amount -- amount of unconfirmed bolus insulin in U
+
+    Output:
+    Amount of insulin that is "pending"
+    """
+    assert len(basal_starts) == len(basal_rates) == len(basal_minutes),\
+        "expected input shapes to match"
+
+    if not basal_starts:
+        return 0
+
+    # if the end date for the temp basal is greater than current date,
+    # find the pending insulin
+    if last_temp_basal[2] > at_date:
+        normal_basal_rate = find_ratio_at_time(
+            basal_starts, [], basal_rates, at_date
+        )
+        remaining_time = time_interval_since(
+            last_temp_basal[2],
+            at_date
+        ) / 60 / 60
+
+        remaining_units = (
+            last_temp_basal[3] - normal_basal_rate
+        ) * remaining_time
+        pending_basal_insulin = max(0, remaining_units)
+
+    else:
+        pending_basal_insulin = 0
+
+    if pending_bolus_amount:
+        pending_bolus = pending_bolus_amount
+    else:
+        pending_bolus = 0
+
+    return pending_basal_insulin + pending_bolus
+
+
+def update_predicted_glucose_and_recommended_basal_and_bolus(
+        at_date,
+        glucose_dates, glucose_values,
+        momentum_dates, momentum_values,
+        carb_effect_dates, carb_effect_values,
+        insulin_effect_dates, insulin_effect_values,
+        retrospective_effect_dates, retrospective_effect_values,
+        target_starts, target_ends, target_mins, target_maxes,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        basal_starts, basal_rates, basal_minutes,
+        max_basal_rate, max_bolus,
+        last_temp_basal,
+        duration=30,
+        continuation_interval=11,
+        rate_rounder=None
+        ):
+    """ Generate glucose predictions, then use the predicted glucose along
+        with settings and dose data to recommend a temporary basal rate and
+        a bolus
+
+    Arguments:
+    at_date -- date to calculate the temp basal and bolus recommendations
+
+    glucose_dates -- dates of glucose values (datetime)
+    glucose_values -- glucose values (in mg/dL)
+
+    momentum_dates -- times of calculated momentums (datetime)
+    momentum_values -- values (mg/dL) of momentums
+
+    carb_effect_dates -- times of carb effects (datetime)
+    carb_effect -- values (mg/dL) of effects from carbs
+
+    insulin_effect_dates -- times of insulin effects (datetime)
+    insulin_effect -- values (mg/dL) of effects from insulin
+
+    correction_effect_dates -- times of retrospective effects (datetime)
+    correction_effect -- values (mg/dL) retrospective glucose effects
+
+    target_starts -- start times for given target ranges (datetime)
+    target_ends -- stop times for given target ranges (datetime)
+    target_mins -- the lower bounds of target ranges (mg/dL)
+    target_maxes -- the upper bounds of target ranges (mg/dL)
+
+    suspend_threshold -- value at which to suspend all insulin delivery (mg/dL)
+
+    sensitivity_starts -- list of time objects of start times of
+                          given insulin sensitivity values
+    sensitivity_ends -- list of time objects of start times of
+                        given insulin sensitivity values
+    sensitivity_values -- list of sensitivities (mg/dL/U)
+
+    model -- list of insulin model parameters in format [DIA, peak_time] if
+             exponential model, or [DIA] if Walsh model
+
+    basal_starts -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+
+    max_basal_rate -- max basal rate that Loop can give (U/hr)
+    max_bolus -- max bolus that Loop can give (U)
+
+    last_temp_basal -- list of last temporary basal information in format
+                       [type, start time, end time, basal rate]
+    duration -- length of the temp basal (mins)
+    continuation_interval -- length of time before an ongoing temp basal
+                             should be continued with a new command (mins)
+    rate_rounder -- the smallest fraction of a unit supported in basal
+                    delivery; if None, no rounding is performed
+
+    Output:
+    The predicted glucose values, recommended temporary basal, and
+    recommended bolus in the format [
+        (predicted glucose times, predicted glucose values),
+        temporary basal recommendation,
+        bolus recommendation
+    ]
+    """
+    assert glucose_dates, "expected to receive glucose data"
+
+    assert target_starts and sensitivity_starts and basal_starts and model,\
+        "expected to receive complete settings data"
+
+    if (not momentum_dates
+            and carb_effect_dates
+            and insulin_effect_dates
+       ):
+        print("Expected to receive effect data")
+        return (None, None, None)
+
+    predicted_glucoses = predict_glucose(
+        glucose_dates[-1], glucose_values[-1],
+        momentum_dates, momentum_values,
+        carb_effect_dates, carb_effect_values,
+        insulin_effect_dates, insulin_effect_values,
+        retrospective_effect_dates, retrospective_effect_values
+        )
+
+    pending_insulin = get_pending_insulin(
+        at_date,
+        basal_starts, basal_rates, basal_minutes,
+        last_temp_basal
+    )
+    temp_basal = recommended_temp_basal(
+        *predicted_glucoses,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        basal_starts, basal_rates, basal_minutes,
+        max_basal_rate,
+        last_temp_basal,
+        duration,
+        continuation_interval,
+        rate_rounder
+        )
+
+    bolus = recommended_bolus(
+        *predicted_glucoses,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        pending_insulin,
+        max_bolus,
+        rate_rounder
+        )
+
+    return [predicted_glucoses, temp_basal, bolus]

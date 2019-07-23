@@ -440,6 +440,41 @@ def sort_by_first_list(list_1, list_2, list_3=None, list_4=None, list_5=None):
     return (list_1, l2, l3, l4, l5)
 
 
+def sort_dose_lists(list_1, list_2, list_3=None, list_4=None, list_5=None):
+    """ Sort dose lists that are matched index-wise, using the *second* list as
+         the property to sort by
+
+    Example:
+        l1: [50, 2, 3]               ->     [2, 3, 50]
+        l2: [dog, cat, parrot]       ->     [cat, parrot, dog]
+    """
+    unsort_1 = numpy.array(list_1)
+    unsort_2 = numpy.array(list_2)
+    unsort_3 = numpy.array(list_3)
+    unsort_4 = numpy.array(list_4)
+    unsort_5 = numpy.array(list_5)
+
+    sort_indexes = unsort_2.argsort()
+
+    l1 = list(unsort_1[sort_indexes])
+    unsort_2.sort()
+    list_2 = list(unsort_2)
+    if list_3:
+        l3 = list(unsort_3[sort_indexes])
+    else:
+        l3 = []
+    if list_4:
+        l4 = list(unsort_4[sort_indexes])
+    else:
+        l4 = []
+    if list_5:
+        l5 = list(unsort_5[sort_indexes])
+    else:
+        l5 = []
+
+    return (l1, list_2, l3, l4, l5)
+
+
 def parse_json(path, name):
     """ Get relevent information from a Loop issue report and use it to
         run PyLoopKit
@@ -482,12 +517,14 @@ def parse_json(path, name):
         )
     else:
         raise RuntimeError("No insulin dose information found")
+    dose_data = sort_dose_lists(*dose_data)[0:4]
 
     if issue_dict.get("cached_carb_entries"):
         carb_data = get_carb_data(
             issue_dict.get("cached_carb_entries"),
             offset
         )
+        carb_data = sort_by_first_list(*carb_data)[0:3]
     else:
         carb_data = ([], [], [])
 
@@ -497,6 +534,7 @@ def parse_json(path, name):
         sensitivity_schedule = get_sensitivities(
             issue_dict.get("insulin_sensitivity_factor_schedule")
         )
+        sensitivity_schedule = sort_by_first_list(*sensitivity_schedule)[0:3]
     else:
         raise RuntimeError("No insulin sensitivity information found")
 
@@ -504,6 +542,7 @@ def parse_json(path, name):
         carb_ratio_schedule = get_carb_ratios(
             issue_dict.get("carb_ratio_schedule")
         )
+        carb_ratio_schedule = sort_by_first_list(*carb_ratio_schedule)[0:2]
     else:
         raise RuntimeError("No carb ratio information found")
 
@@ -511,6 +550,7 @@ def parse_json(path, name):
         basal_schedule = get_basal_schedule(
             issue_dict.get("basal_rate_schedule")
         )
+        basal_schedule = sort_by_first_list(*basal_schedule)[0:3]
     else:
         raise RuntimeError("No basal rate information found")
 
@@ -518,6 +558,7 @@ def parse_json(path, name):
         target_range_schedule = get_target_range_schedule(
             issue_dict.get("correction_range_schedule")
         )
+        target_range_schedule = sort_by_first_list(*target_range_schedule)[0:4]
     else:
         raise RuntimeError("No target range rate information found")
 

@@ -17,7 +17,7 @@ from insulin_math import (annotated, trim, glucose_effects, reconciled)
 
 
 def get_glucose_effects(
-        types, starts, ends, values, scheduled_basal_rates,
+        types, starts, ends, values,
         start_date,
         basal_starts, basal_rates, basal_minutes,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
@@ -54,8 +54,8 @@ def get_glucose_effects(
     Output:
     Glucose effects in the format (effect_date, effect_value)
     """
-    assert len(types) == len(starts) == len(ends) == len(values)\
-        == len(scheduled_basal_rates), "expected input shapes to match"
+    assert len(types) == len(starts) == len(ends) == len(values),\
+        "expected input shapes to match"
 
     # to properly know glucose effects at start_date,
     # we need to go back another DIA hours
@@ -69,7 +69,7 @@ def get_glucose_effects(
                       )
 
     filtered_doses = filter_date_range_for_doses(
-        types, starts, ends, values, scheduled_basal_rates,
+        types, starts, ends, values,
         dose_start,
         end_date
         )
@@ -102,10 +102,12 @@ def get_glucose_effects(
      a_values,
      a_scheduled_rates
      ) = annotated(
-         types, start_dates, end_dates, values, [0 for i in types],
+         types, start_dates, end_dates, values,
          basal_starts, basal_rates, basal_minutes,
          convert_to_units_hr=False
          )
+    '''for i in range(0, len(a_types)):
+        print(a_types[i], a_starts[i], a_ends[i], a_values[i], a_scheduled_rates[i])'''
 
     # trim the doses to start of interval
     for i in range(0, len(a_types)):
@@ -117,6 +119,7 @@ def get_glucose_effects(
 
         a_starts[i] = result[1]
         a_ends[i] = result[2]
+        #print(a_types[i], a_starts[i], a_ends[i], a_values[i], a_scheduled_rates[i])
 
     # get the glucose effects using the prepared dose data
     glucose_effect = glucose_effects(

@@ -340,9 +340,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
-         ) = self.load_dose_fixture("suspend_dose")
+         i_values
+         ) = self.load_dose_fixture("suspend_dose")[0:4]
 
         (r_types,
          r_start_dates,
@@ -379,8 +378,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
              i_types,
              i_start_dates,
              i_end_dates,
-             i_values,
-             i_scheduled_basal_rates
+             i_values
              )
 
         self.assertEqual(
@@ -406,7 +404,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
              r_out_start_dates,
              r_out_end_dates,
              r_out_values,
-             i_scheduled_basal_rates,
              start_times,
              rates,
              minutes
@@ -430,11 +427,11 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (dates,
          insulin_values
          ) = insulin_on_board(
-             i_types,
-             i_start_dates,
-             i_end_dates,
-             i_values,
-             i_scheduled_basal_rates,
+             n_out_types,
+             n_out_start_dates,
+             n_out_end_dates,
+             n_out_values,
+             n_out_scheduled_rates,
              model
              )
 
@@ -682,11 +679,10 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
+         i_values
          ) = self.load_dose_fixture(
              "reservoir_history_with_rewind_and_prime_output"
-             )
+             )[0:4]
 
         (expected_types,
          expected_start_dates,
@@ -712,7 +708,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
              i_start_dates,
              i_end_dates,
              i_values,
-             i_scheduled_basal_rates,
              start_times,
              rates,
              minutes
@@ -740,9 +735,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
-         ) = self.load_dose_fixture("normalize_edge_case_doses_input")
+         i_values
+         ) = self.load_dose_fixture("normalize_edge_case_doses_input")[0:4]
 
         (expected_types,
          expected_start_dates,
@@ -766,7 +760,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
              i_start_dates,
              i_end_dates,
              i_values,
-             i_scheduled_basal_rates,
              start_times,
              rates,
              minutes,
@@ -794,9 +787,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
-         ) = self.load_dose_fixture("reconcile_history_input")
+         i_values
+         ) = self.load_dose_fixture("reconcile_history_input")[0:4]
 
         (expected_types,
          expected_start_dates,
@@ -813,8 +805,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
              i_types,
              i_start_dates,
              i_end_dates,
-             i_values,
-             i_scheduled_basal_rates
+             i_values
              )
 
         # sort the lists because they're out of order due to all the
@@ -851,9 +842,10 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
-         ) = self.load_dose_fixture("reconcile_resume_before_rewind_input")
+         i_values
+         ) = self.load_dose_fixture(
+             "reconcile_resume_before_rewind_input"
+             )[0:4]
 
         (expected_types,
          expected_start_dates,
@@ -870,8 +862,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
              i_types,
              i_start_dates,
              i_end_dates,
-             i_values,
-             i_scheduled_basal_rates
+             i_values
              )
 
         self.assertEqual(
@@ -1275,9 +1266,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
         (i_types,
          i_start_dates,
          i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
-         ) = self.load_dose_fixture("reconcile_history_output")
+         i_values
+         ) = self.load_dose_fixture("reconcile_history_output")[0:4]
 
         # put the dose lists in order of start time
         unsort_types = numpy.array(i_types)
@@ -1313,7 +1303,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
              list(i_start_dates),
              i_end_dates,
              i_values,
-             i_scheduled_basal_rates,
              start_times,
              rates,
              minutes,
@@ -1362,7 +1351,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
              list(i_start_dates)[0:len(i_types) - 11],
              i_end_dates[0:len(i_types) - 11],
              i_values[0:len(i_types) - 11],
-             i_scheduled_basal_rates[0:len(i_types) - 11],
              start_times,
              rates,
              minutes,

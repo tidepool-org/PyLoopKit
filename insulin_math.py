@@ -185,8 +185,7 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     return True
 
 
-def reconciled(dose_types, start_dates, end_dates, values,
-               scheduled_basal_rates):
+def reconciled(dose_types, start_dates, end_dates, values):
     """ Maps a timeline of dose entries with overlapping start and end dates
         to a timeline of doses that represents actual insulin delivery.
 
@@ -214,7 +213,7 @@ def reconciled(dose_types, start_dates, end_dates, values,
     last_basal = []
 
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values) == len(scheduled_basal_rates),\
+        len(values),\
         "expected input shapes to match"
 
     for (i, type_) in enumerate(dose_types):
@@ -302,10 +301,9 @@ def reconciled(dose_types, start_dates, end_dates, values,
 
 
 def annotated(
-        dose_types, start_dates, end_dates, values, scheduled_basal_rates,
+        dose_types, start_dates, end_dates, values,
         basal_start_times, basal_rates, basal_minutes,
-        convert_to_units_hr=True,
-        offset=0
+        convert_to_units_hr=True
     ):
     """ Annotates doses with the context of the scheduled basal rates
 
@@ -330,7 +328,7 @@ def annotated(
     5 lists of annotated dose properties
     """
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values) == len(scheduled_basal_rates),\
+        len(values),\
         "expected input shapes to match"
 
     assert len(basal_start_times) == len(basal_rates) == len(basal_minutes),\
@@ -543,14 +541,14 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
 
     reference_date = start_date - start_offset
     reference_date = datetime(
-            year=reference_date.year,
-            month=reference_date.month,
-            day=reference_date.day,
-            hour=reference_date.hour,
-            minute=reference_date.minute,
-            second=reference_date.second,
-            tzinfo=timezone_info
-            )
+        year=reference_date.year,
+        month=reference_date.month,
+        day=reference_date.day,
+        hour=reference_date.hour,
+        minute=reference_date.minute,
+        second=reference_date.second,
+        tzinfo=timezone_info
+        )
 
     if start_index > end_index:
         return ([], [], [])

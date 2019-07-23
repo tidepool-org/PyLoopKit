@@ -19,7 +19,7 @@ from exponential_insulin_model import percent_effect_remaining
 
 
 def filter_date_range_for_doses(
-        types, starts, ends, values, scheduled_basals,
+        types, starts, ends, values,
         start_date,
         end_date
         ):
@@ -30,25 +30,23 @@ def filter_date_range_for_doses(
     starts -- start dates (datetime)
     ends -- end dates (datetime)
     values -- glucose values
-    scheduled_basals -- scheduled basal rate during dose
 
     start_date -- the earliest date of elements to return
     end_date -- the last date of elements to return
 
     Output:
-    Filtered dates in format (starts, ends, values)
+    Filtered dates in format (types, starts, ends, values)
     """
     # ends might not necesarily be the same length as starts/values
     # because not all types have "end dates"
-    assert len(types) == len(starts) == len(values) == len(scheduled_basals),\
+    assert len(types) == len(starts) == len(values),\
         "expected input shapes to match"
 
     (filtered_types,
      filtered_starts,
      filtered_ends,
-     filtered_values,
-     filtered_scheduled_basals
-     ) = ([], [], [], [], [])
+     filtered_values
+     ) = ([], [], [], [])
 
     for i in range(0, len(starts)):
         if start_date and ends and ends[i] < start_date:
@@ -64,20 +62,16 @@ def filter_date_range_for_doses(
         filtered_starts.append(starts[i])
         filtered_ends.append(ends[i] if ends else None)
         filtered_values.append(values[i])
-        filtered_scheduled_basals.append(
-            scheduled_basals[i] if scheduled_basals else None
-        )
 
     assert len(filtered_types) == len(filtered_starts) == len(filtered_ends)\
-        == len(filtered_values) == len(filtered_scheduled_basals),\
+        == len(filtered_values),\
         "expected output shapes to match"
 
     return (
         filtered_types,
         filtered_starts,
         filtered_ends,
-        filtered_values,
-        filtered_scheduled_basals
+        filtered_values
         )
 
 

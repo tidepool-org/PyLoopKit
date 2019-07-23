@@ -73,19 +73,11 @@ def get_cached_insulin_data(data, offset):
     ]
     values = [float(dict_.get("value")) for dict_ in data]
 
-    scheduled_basal_rates = [
-        float(dict_.get("scheduledBasalRate"))
-        if dict_.get("scheduledBasalRate") != "nil"
-        else 0
-        for dict_ in data
-    ]
-
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values) == len(scheduled_basal_rates),\
+        len(values),\
         "expected output shape to match"
 
-    return (dose_types, start_dates, end_dates, values,
-            scheduled_basal_rates)
+    return (dose_types, start_dates, end_dates, values)
 
 
 def get_normalized_insulin_data(data, offset):
@@ -119,19 +111,11 @@ def get_normalized_insulin_data(data, offset):
     ]
     values = [float(dict_.get("value")) for dict_ in data]
 
-    scheduled_basal_rates = [
-        float(dict_.get("scheduledBasalRate")[:-5])
-        if dict_.get("scheduledBasalRate") != "nil"
-        else 0
-        for dict_ in data
-    ]
-
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values) == len(scheduled_basal_rates),\
+        len(values),\
         "expected output shape to match"
 
-    return (dose_types, start_dates, end_dates, values,
-            scheduled_basal_rates)
+    return (dose_types, start_dates, end_dates, values)
 
 
 def get_carb_data(data, offset):
@@ -154,7 +138,7 @@ def get_carb_data(data, offset):
     ]
     absorption_times = [
         float(dict_.get("absorptionTime")) / 60
-        if dict_.get("absorptionTime")
+        if dict_.get("absorptionTime") is not None
         else None for dict_ in data
     ]
 
@@ -361,13 +345,13 @@ def get_settings(data):
         ]
 
     momentum_interval = data.get("glucose_store").get("momentumDataInterval")
-    if momentum_interval:
+    if momentum_interval is not None:
         settings["momentum_time_interval"] = float(momentum_interval) / 60
     else:
         settings["momentum_time_interval"] = 15
 
     suspend_threshold = data.get("suspend_threshold")
-    if suspend_threshold:
+    if suspend_threshold is not None:
         settings["suspend_threshold"] = float(suspend_threshold)
     else:
         settings["suspend_threshold"] = 70
@@ -465,11 +449,11 @@ def parse_json(path, name):
     issue_dict = json.load(
         open(data_path_and_name, "r")
     )
-    if issue_dict.get("basal_rate_timeZone"):
+    if issue_dict.get("basal_rate_timeZone") is not None:
         offset = issue_dict.get("basal_rate_timeZone")
-    elif issue_dict.get("carb_ratio_timeZone"):
+    elif issue_dict.get("carb_ratio_timeZone") is not None:
         offset = issue_dict.get("carb_ratio_timeZone")
-    elif issue_dict.get("insulin_sensitivity_factor_timeZone"):
+    elif issue_dict.get("insulin_sensitivity_factor_timeZone") is not None:
         offset = issue_dict.get("insulin_sensitivity_factor_timeZone")
     else:
         offset = 0

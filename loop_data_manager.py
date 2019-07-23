@@ -44,9 +44,7 @@ def runner(
         (types of dose (tempBasal, bolus, etc),
          start times of insulin delivery,
          end times of insulin delivery,
-         amounts of insulin (in U/hr if a basal or U if a bolus),
-         scheduled basal rates during the doses (this is *not* mandatory and
-            will be added by the runner if it's not present and/or correct)
+         amounts of insulin (in U/hr if a basal or U if a bolus)
          )
     carb_data -- tuple in form
         (times of carbohydrate entries,

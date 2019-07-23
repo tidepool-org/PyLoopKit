@@ -407,16 +407,16 @@ def get_last_temp_basal(data, offset):
     return [
         type_,
         datetime.strptime(
-            data.get(" startDate") if data.get(" startDate")
+            data.get(" startDate") if data.get(" startDate") is not None
             else data.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
         ) + timedelta(seconds=offset),
         datetime.strptime(
-            data.get(" endDate") if data.get(" endDate")
+            data.get(" endDate") if data.get(" endDate") is not None
             else data.get("endDate"),
             "%Y-%m-%d %H:%M:%S %z"
         ) + timedelta(seconds=offset),
-        float(data.get(" value")) if data.get(" value")
+        float(data.get(" value")) if data.get(" value") is not None
         else float(data.get("value"))
     ]
 

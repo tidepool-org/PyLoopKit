@@ -469,8 +469,8 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         "expected to receive complete settings data"
 
     if (not momentum_dates
-            and carb_effect_dates
-            and insulin_effect_dates
+            and not carb_effect_dates
+            and not insulin_effect_dates
        ):
         print("Expected to receive effect data")
         return (None, None, None)

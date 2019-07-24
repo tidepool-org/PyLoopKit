@@ -17,7 +17,7 @@ from glucose_math import counteraction_effects
 from insulin_math import glucose_effects
 
 
-def get_glucose_data(glucose_dict, offset):
+def get_glucose_data(glucose_dict, offset=0):
     """ Load glucose values from an issue report cached_glucose dictionary
 
     Arguments:
@@ -42,7 +42,7 @@ def get_glucose_data(glucose_dict, offset):
     return (dates, glucose_values)
 
 
-def get_cached_insulin_data(data, offset):
+def get_cached_insulin_data(data, offset=0):
     """ Load doses from an issue report cached_doses dictionary
 
     Arguments:
@@ -80,7 +80,7 @@ def get_cached_insulin_data(data, offset):
     return (dose_types, start_dates, end_dates, values)
 
 
-def get_normalized_insulin_data(data, offset):
+def get_normalized_insulin_data(data, offset=0):
     """ Load doses from an issue report get_normalized_doses dictionary
 
     Arguments:
@@ -118,7 +118,7 @@ def get_normalized_insulin_data(data, offset):
     return (dose_types, start_dates, end_dates, values)
 
 
-def get_carb_data(data, offset):
+def get_carb_data(data, offset=0):
     """ Load carb information from an issue report cached_carbs dictionary
 
     Arguments:
@@ -257,7 +257,7 @@ def get_target_range_schedule(data):
     return (start_times, end_times, min_values, max_values)
 
 
-def load_momentum_effects(data, offset):
+def load_momentum_effects(data, offset=0):
     """ Load glucose momentum effects from a list """
     start_times = [
         datetime.strptime(
@@ -272,7 +272,7 @@ def load_momentum_effects(data, offset):
     return (start_times, values)
 
 
-def get_counteractions(data, offset):
+def get_counteractions(data, offset=0):
     """ Load counteraction effect data from a list """
     start_times = [
         datetime.strptime(
@@ -294,7 +294,7 @@ def get_counteractions(data, offset):
     return (start_times, end_times, values)
 
 
-def get_insulin_effects(data, offset):
+def get_insulin_effects(data, offset=0):
     """ Load insulin effect data from a list """
     start_times = [
         datetime.strptime(
@@ -305,6 +305,21 @@ def get_insulin_effects(data, offset):
     ]
     values = [
         float(dict_.get("value")) for dict_ in data
+    ]
+    return (start_times, values)
+
+
+def get_retrospective_effects(data, offset=0):
+    """ Load retrospective effect data from a list """
+    start_times = [
+        datetime.strptime(
+            dict_.get("startDate"),
+            "%Y-%m-%d %H:%M:%S %z"
+        )
+        for dict_ in data
+    ]
+    values = [
+        float(dict_.get("quantity")) for dict_ in data
     ]
     return (start_times, values)
 
@@ -373,7 +388,7 @@ def get_settings(data):
     return settings
 
 
-def get_last_temp_basal(data, offset):
+def get_last_temp_basal(data, offset=0):
     """ Load the last temporary basal from an issue report
         "last_temp_basal" dictionary
     """

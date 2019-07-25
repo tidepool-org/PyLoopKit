@@ -483,6 +483,17 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         retrospective_effect_dates, retrospective_effect_values
         )
 
+    # Dosing requires prediction entries at least as long as the insulin
+    # model duration. If our prediction is shorter than that, extend it here.
+    if len(model) == 1:  # Walsh model
+        final_date = glucose_dates[-1] + timedelta(hours=model[0])
+    else:
+        final_date = glucose_dates[-1] + timedelta(minutes=model[0])
+
+    if predicted_glucoses[0][-1] < final_date:
+        predicted_glucoses[0].append(final_date)
+        predicted_glucoses[1].append(predicted_glucoses[1][-1])
+
     pending_insulin = get_pending_insulin(
         at_date,
         basal_starts, basal_rates, basal_minutes,

@@ -75,12 +75,14 @@ def predict_glucose(
        ):
         return ([], [])
 
-    merged_dates = list(
-        dict.fromkeys(
-            momentum_dates
-            + carb_effect_dates
-            + insulin_effect_dates
-            + correction_effect_dates
+    merged_dates = sorted(
+        list(
+            dict.fromkeys(
+                momentum_dates
+                + carb_effect_dates
+                + insulin_effect_dates
+                + correction_effect_dates
+            )
         )
     )
     merged_values = [0 for i in merged_dates]
@@ -536,3 +538,38 @@ def combined_sums(
             sum_ends,
             sum_values
             )
+
+
+def lists_sorter(list_1, list_2, list_3=None, list_4=None, list_5=None):
+    """ Sort lists that are matched index-wise, using the first list as the
+        property to sort by
+
+    Example:
+        l1: [50, 2, 3]               ->     [2, 3, 50]
+        l2: [dog, cat, parrot]       ->     [cat, parrot, dog]
+    """
+    unsort_1 = numpy.array(list_1)
+    unsort_2 = numpy.array(list_2)
+    unsort_3 = numpy.array(list_3)
+    unsort_4 = numpy.array(list_4)
+    unsort_5 = numpy.array(list_5)
+
+    sort_indexes = unsort_1.argsort()
+
+    unsort_1.sort()
+    list_1 = list(unsort_1)
+    l2 = list(unsort_2[sort_indexes])
+    if list_3:
+        l3 = list(unsort_3[sort_indexes])
+    else:
+        l3 = []
+    if list_4:
+        l4 = list(unsort_4[sort_indexes])
+    else:
+        l4 = []
+    if list_5:
+        l5 = list(unsort_5[sort_indexes])
+    else:
+        l5 = []
+
+    return (list_1, l2, l3, l4, l5)

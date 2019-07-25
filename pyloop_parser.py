@@ -384,6 +384,9 @@ def get_settings(data):
 
     settings["max_basal_rate"] = data.get("maximum_basal_rate")
     settings["max_bolus"] = data.get("maximum_bolus")
+    settings["retrospective_correction_enabled"] = True if data.get(
+        "retrospective_correction_enabled"
+    ).lower() == "true" else False
 
     return settings
 

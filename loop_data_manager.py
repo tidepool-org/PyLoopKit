@@ -200,14 +200,19 @@ def runner(
             )
         ]
 
-    retrospective_glucose_effects = update_retrospective_glucose_effect(
-        *glucose_data,
-        carb_effect_dates, carb_effect_values,
-        *counteraction_effects,
-        settings_dictionary.get("recency_interval"),
-        settings_dictionary.get("retrospective_correction_grouping_interval"),
-        time_to_calculate_at
-        )
+    if settings_dictionary.get("retrospective_correction_enabled"):
+        retrospective_glucose_effects = update_retrospective_glucose_effect(
+            *glucose_data,
+            carb_effect_dates, carb_effect_values,
+            *counteraction_effects,
+            settings_dictionary.get("recency_interval"),
+            settings_dictionary.get(
+                "retrospective_correction_grouping_interval"
+            ),
+            time_to_calculate_at
+            )
+    else:
+        retrospective_glucose_effects = ([], [])
 
     recommendations = update_predicted_glucose_and_recommended_basal_and_bolus(
         time_to_calculate_at,

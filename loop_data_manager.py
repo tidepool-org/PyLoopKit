@@ -360,7 +360,7 @@ def get_pending_insulin(
     assert len(basal_starts) == len(basal_rates) == len(basal_minutes),\
         "expected input shapes to match"
 
-    if not basal_starts:
+    if not basal_starts or not last_temp_basal:
         return 0
 
     # if the end date for the temp basal is greater than current date,
@@ -505,6 +505,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         basal_starts, basal_rates, basal_minutes,
         last_temp_basal
     )
+
     temp_basal = recommended_temp_basal(
         *predicted_glucoses,
         target_starts, target_ends, target_mins, target_maxes,

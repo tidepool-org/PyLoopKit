@@ -586,9 +586,8 @@ def parse_json(path, name):
             issue_dict.get("last_temp_basal"), offset
         )
     else:
-        raise RuntimeError(
-            "No information found about the last temporary basal rate"
-        )
+        last_temp_basal = []
+        print("No information found about the last temporary basal rate")
 
     if issue_dict.get("recommended_temp_basal"):
         time_to_run = datetime.strptime(

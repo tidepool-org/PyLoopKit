@@ -463,7 +463,8 @@ def simulation_date_range(
         delay,
         delta,
         start=None,
-        end=None
+        end=None,
+        scaler=1
         ):
     """ Create date range based on carb data and user-specified parameters
 
@@ -476,6 +477,7 @@ def simulation_date_range(
     delta -- what to round to
     start -- specified start date
     end -- specified end date
+    scaler -- the factor to extend the absorption time by
 
     Output:
     tuple with (start_time, end_time) structure
@@ -497,21 +499,25 @@ def simulation_date_range(
 
         try:
             end_date = end_times[i] + timedelta(
-                absorption_times or default_absorption_time
+                (absorption_times or default_absorption_time) * scaler
                 + delay
             )
         except IndexError:
             end_date = start_times[i] + timedelta(
                 minutes=(
-                    (absorption_times[i] or default_absorption_time)
+                    (absorption_times[i] or default_absorption_time) * scaler
                     + delay)
             )
         if end_date > max_date:
             max_date = end_date
 
-    return (date_floored_to_time_interval(start or min_date, delta),
-            date_ceiled_to_time_interval(end or max_date, delta)
-            )
+    start_date = date_floored_to_time_interval(start or min_date, delta)
+    end_date = date_ceiled_to_time_interval(end or max_date, delta)
+
+    assert start_date <= end_date,\
+        "expected start to be less than or equal to end"
+
+    return (start_date, end_date)
 
 
 def carbs_on_board(
@@ -717,7 +723,8 @@ def carb_glucose_effects(
         delay=10,
         delta=5,
         start=None,
-        end=None
+        end=None,
+        scaler=1
         ):
     """
     Find the expected effects of carbohydate consumption on blood glucose
@@ -769,7 +776,8 @@ def carb_glucose_effects(
         delay=delay,
         delta=delta,
         start=start,
-        end=end
+        end=end,
+        scaler=scaler
         )
 
     date = start
@@ -863,7 +871,8 @@ def dynamic_glucose_effects(
         delay=10,
         delta=5,
         start=None,
-        end=None
+        end=None,
+        scaler=1
         ):
     """
     Find the expected effects of carbohydate consumption on blood glucose
@@ -895,6 +904,7 @@ def dynamic_glucose_effects(
     delta -- the differential between timeline entries
     start -- datetime to start calculation of glucose effects
     end -- datetime to stop calculation of glucose effects
+    scaler -- the factor of the absorption time to have the effects go out to
 
     Output:
     Two lists in format (effect_start_dates, effect_values)
@@ -926,7 +936,8 @@ def dynamic_glucose_effects(
         delay=delay,
         delta=delta,
         start=start,
-        end=end
+        end=end,
+        scaler=1.5
         )
 
     date = start

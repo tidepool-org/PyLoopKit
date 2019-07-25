@@ -228,7 +228,8 @@ def runner(
         *scheduled_basals_data,
         settings_dictionary.get("max_basal_rate"),
         settings_dictionary.get("max_bolus"),
-        last_temp_basal
+        last_temp_basal,
+        rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
     return recommendations

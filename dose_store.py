@@ -14,6 +14,7 @@ import numpy
 
 from dose_math import filter_date_range_for_doses
 from insulin_math import (annotated, trim, glucose_effects, reconciled)
+from loop_math import filter_date_range
 
 
 def get_glucose_effects(
@@ -61,11 +62,15 @@ def get_glucose_effects(
     # we need to go back another DIA hours
     if len(insulin_model) == 1:  # if using Walsh model
         dose_start = (start_date
-                      - timedelta(hours=insulin_model[0])
+                      - timedelta(
+                              hours=insulin_model[0]
+                              )
                       )
     else:
         dose_start = (start_date
-                      - timedelta(minutes=insulin_model[0])
+                      - timedelta(
+                              minutes=insulin_model[0]
+                              )
                       )
 
     filtered_doses = filter_date_range_for_doses(

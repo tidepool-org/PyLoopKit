@@ -13,8 +13,6 @@ import os
 from datetime import datetime, time, timedelta
 
 from loop_data_manager import runner
-from glucose_math import counteraction_effects
-from insulin_math import glucose_effects
 
 
 def get_glucose_data(glucose_dict, offset=0):
@@ -386,6 +384,8 @@ def get_settings(data):
     settings["max_basal_rate"] = data.get("maximum_basal_rate")
     settings["max_bolus"] = data.get("maximum_bolus")
     settings["retrospective_correction_enabled"] = True if data.get(
+        "retrospective_correction_enabled"
+    ) and data.get(
         "retrospective_correction_enabled"
     ).lower() == "true" else False
 

@@ -157,7 +157,7 @@ def runner(
          next_effect_date,
          *scheduled_basals_data,
          *sensitivity_data,
-         settings_dictionary.get("model"),
+         settings_dictionary.get("model")
          )
 
     if next_effect_date < last_glucose_date and insulin_effect_dates:

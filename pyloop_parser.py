@@ -598,8 +598,8 @@ def parse_report_and_run(path, name):
             offset
         )
     else:
-        raise RuntimeError("No insulin dose information found")
-    dose_data = sort_dose_lists(*dose_data)[0:4]
+        print("No insulin dose information found")
+        dose_data = ([], [], [], [])
     dose_data = remove_too_new_values(
         time_to_run,
         *sort_dose_lists(*dose_data)[0:4],

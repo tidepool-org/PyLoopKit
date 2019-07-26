@@ -287,13 +287,13 @@ def simulation_date_range_for_samples(
     Output:
     tuple with (start_time, end_time) structure
     """
-    if not start_times:
-        raise ValueError
-
     if start is not None and end is not None:
         return(date_floored_to_time_interval(start, delta),
                date_ceiled_to_time_interval(end, delta)
                )
+
+    if not start_times:
+        raise ValueError
 
     min_date = start_times[0]
     max_date = min_date

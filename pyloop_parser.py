@@ -494,7 +494,52 @@ def sort_dose_lists(list_1, list_2, list_3=None, list_4=None, list_5=None):
     return (l1, list_2, l3, l4, l5)
 
 
-def parse_json(path, name):
+def remove_too_new_values(
+        sort_time,
+        list_1, list_2, list_3=None, list_4=None, list_5=None,
+        is_dose_data=False
+        ):
+    """ Remove values that occur after a certain date. This function makes the
+        assumption that the date list is sorted in ascending order, and
+        that all lists (if they are not None) are the same length. The first
+        list must be the list with the times, unless is_dose_data is True,
+        in which case the second list must contain the times.
+
+    Arguments:
+    sort_time -- the datetime after which to remove values
+    """
+    l1 = []
+    l2 = []
+    l3 = []
+    l4 = []
+    l5 = []
+
+    for i in range(0, len(list_1)):
+        # if this isn't dose data, use the first list to sort
+        if not is_dose_data and list_1[i] <= sort_time:
+            l1.append(list_1[i])
+            l2.append(list_2[i])
+            if list_3:
+                l3.append(list_3[i])
+            if list_4:
+                l4.append(list_4[i])
+            if list_5:
+                l5.append(list_5[i])
+        # otherwise, use the second list to sort
+        elif is_dose_data and list_2[i] <= sort_time:
+            l1.append(list_1[i])
+            l2.append(list_2[i])
+            if list_3:
+                l3.append(list_3[i])
+            if list_4:
+                l4.append(list_4[i])
+            if list_5:
+                l5.append(list_5[i])
+
+    return (l1, l2, l3, l4, l5)
+
+
+def parse_report_and_run(path, name):
     """ Get relevent information from a Loop issue report and use it to
         run PyLoopKit
     """
@@ -512,13 +557,31 @@ def parse_json(path, name):
     else:
         offset = 0
 
+    if issue_dict.get("recommended_temp_basal"):
+        time_to_run = datetime.strptime(
+            issue_dict.get("recommended_temp_basal").get("date") or
+            issue_dict.get("recommended_temp_basal").get(" date"),
+            "%Y-%m-%d %H:%M:%S %z"
+        ) + timedelta(seconds=offset)
+    elif issue_dict.get("recommended_bolus"):
+        time_to_run = datetime.strptime(
+            issue_dict.get("recommended_bolus").get("date") or
+            issue_dict.get("recommended_bolus").get(" date"),
+            "%Y-%m-%d %H:%M:%S %z"
+        ) + timedelta(seconds=offset)
+    else:
+        raise RuntimeError("No information found about report time")
+
     if issue_dict.get("cached_glucose_samples"):
         glucose_data = get_glucose_data(
             issue_dict.get("cached_glucose_samples"),
             offset
         )
-        glucose_data = sort_by_first_list(
-            *glucose_data
+        glucose_data = remove_too_new_values(
+            time_to_run,
+            *sort_by_first_list(
+                *glucose_data
+            )[0:2]
         )[0:2]
 
     else:
@@ -537,11 +600,16 @@ def parse_json(path, name):
     else:
         raise RuntimeError("No insulin dose information found")
     dose_data = sort_dose_lists(*dose_data)[0:4]
+    dose_data = remove_too_new_values(
+        time_to_run,
+        *sort_dose_lists(*dose_data)[0:4],
+        is_dose_data=True
+    )[0:4]
 
     if issue_dict.get("cached_carb_entries"):
         carb_data = get_carb_data(
             issue_dict.get("cached_carb_entries"),
-            offset
+            offset,
         )
         carb_data = sort_by_first_list(*carb_data)[0:3]
     else:
@@ -589,28 +657,10 @@ def parse_json(path, name):
         last_temp_basal = []
         print("No information found about the last temporary basal rate")
 
-    if issue_dict.get("recommended_temp_basal"):
-        time_to_run = datetime.strptime(
-            issue_dict.get("recommended_temp_basal").get("date") or
-            issue_dict.get("recommended_temp_basal").get(" date"),
-            "%Y-%m-%d %H:%M:%S %z"
-        ) + timedelta(seconds=offset)
-    elif issue_dict.get("recommended_bolus"):
-        time_to_run = datetime.strptime(
-            issue_dict.get("recommended_bolus").get("date") or
-            issue_dict.get("recommended_bolus").get(" date"),
-            "%Y-%m-%d %H:%M:%S %z"
-        ) + timedelta(seconds=offset)
-    else:
-        raise RuntimeError("No information found about report time")
-
     test_counteraction = get_counteractions(
         issue_dict.get("insulin_counteraction_effects"), offset
     )
-    test_effects = get_insulin_effects(
-        issue_dict.get("insulin_effect"), offset
-    )
-           basal_schedule,
+    '''counteraction_effect = counteraction_effects(
         *glucose_data,
         [False for i in glucose_data[0]],
         ["PyLoop" for i in glucose_data[0]],

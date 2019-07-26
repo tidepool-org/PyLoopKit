@@ -29,6 +29,7 @@ def load_fixture(resource_name, extension):
 # this will return the FIRST instance of the file
 def find_full_path(resource_name, extension):
     """ Find file path, given name and extension
+        example: "/home/pi/Media/tidepool_demo.json")
 
     Arguments:
     resource_name -- name of file without the extension
@@ -43,6 +44,29 @@ def find_full_path(resource_name, extension):
             (base, ext) = os.path.splitext(name)
             if base == resource_name and extension == ext:
                 return os.path.join(root, name)
+
+    print("No file found for that key")
+    return ""
+
+
+# this will return the FIRST instance of the file
+def find_root_path(resource_name, extension):
+    """ Find root path, given name and extension
+        (example: "/home/pi/Media")
+
+    Arguments:
+    resource_name -- name of file without the extension
+    extension -- ending of file (ex: ".json")
+
+    Output:
+    root path to file
+    """
+    search_dir = os.path.dirname(__file__)
+    for root, dirs, files in os.walk(search_dir):  # pylint: disable=W0612
+        for name in files:
+            (base, ext) = os.path.splitext(name)
+            if base == resource_name and extension == ext:
+                return root
 
     print("No file found for that key")
     return ""

@@ -10,6 +10,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 """
 # pylint: disable=R0913, R0914, C0200, R0912, R0915, W0102
 # disable pylint errors for too many arguments/variables
+import numpy
 from datetime import timedelta
 
 from date import (date_floored_to_time_interval,
@@ -309,10 +310,17 @@ def simulation_date_range_for_samples(
         except IndexError:
             continue
 
-    return (date_floored_to_time_interval(start or min_date, delta),
-            date_ceiled_to_time_interval(end or max_date
-                                         + timedelta(minutes=duration+delay),
-                                         delta)
+    start_date = date_floored_to_time_interval(start or min_date, delta)
+    end_date = date_ceiled_to_time_interval(
+        end or max_date
+        + timedelta(minutes=duration+delay),
+        delta
+    )
+
+    assert start_date <= end_date, "expected start to be less than end"
+
+    return (start_date,
+            end_date
             )
 
 

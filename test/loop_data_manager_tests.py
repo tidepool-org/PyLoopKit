@@ -6,248 +6,101 @@ Created on Thu Jul 11 15:16:42 2019
 @author: annaquinlan
 """
 # pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 import unittest
 
-from dose_store import get_glucose_effects
-from glucose_store import (get_recent_momentum_effects,
-                           get_counteraction_effects)
+import path_grabber  # pylint: disable=unused-import
 from carb_store import get_carb_glucose_effects
+from dose_store import get_glucose_effects
+from glucose_store import (
+    get_recent_momentum_effects, get_counteraction_effects
+)
+from loop_data_manager import update_retrospective_glucose_effect
 from loop_kit_tests import load_fixture
-from pyloop_parser import load_momentum_effects, get_glucose_data
+from loop_math import predict_glucose
+from pyloop_parser import (
+    load_momentum_effects, get_glucose_data, get_insulin_effects,
+    get_normalized_insulin_data, get_basal_schedule, get_carb_ratios,
+    get_sensitivities, get_settings, get_counteractions, get_carb_data,
+    get_retrospective_effects
+)
 
 
 class TestLoopDataManagerFunctions(unittest.TestCase):
-    """ unittest class to run tests of functions that LoopDataManager uses."""
-    MOMENTUM_DATE_INTERVAL = 15
+    """ unittest class to run integrated tests of LoopDataManager uses."""
 
-    INSULIN_SENSITIVITY_START_DATES = [time(0, 0)]
-    INSULIN_SENSITIVITY_END_DATES = [time(23, 59)]
-    INSULIN_SENSITIVITY_VALUES = [40]
+    def load_report_glucose_values(self, report_name):
+        """ Load the cached glucose values from an issue report """
+        report = load_fixture(report_name, ".json")
 
-    DEFAULT_ABSORPTION_TIMES = [60,
-                                120,
-                                240
-                                ]
+        assert report.get("cached_glucose_samples"),\
+            "expected issue report to contain glucose information"
 
-    def load_glucose_data(self, resource_name):
-        """ Load glucose values from json file
+        return get_glucose_data(
+            report.get("cached_glucose_samples")
+        )
 
-        Arguments:
-        resource_name -- file name without the extension
-        Output:
-        2 lists in (date, glucose_value) format
-        """
-        data = load_fixture(resource_name, ".json")
+    def load_report_insulin_doses(self, report_name):
+        """ Load the normalized dose entries from an issue report """
+        report = load_fixture(report_name, ".json")
 
-        dates = [
-            datetime.fromisoformat(dict_.get("date"))
-            for dict_ in data
-        ]
+        assert report.get("get_normalized_dose_entries"),\
+            "expected issue report to contain dose information"
 
-        glucose_values = [dict_.get("amount") for dict_ in data]
+        return get_normalized_insulin_data(
+            report.get("get_normalized_dose_entries")
+        )
 
-        assert len(dates) == len(glucose_values),\
-            "expected output shape to match"
+    def load_report_carb_values(self, report_name):
+        """ Load the carb entries from an issue report """
+        report = load_fixture(report_name, ".json")
 
-        return (dates, glucose_values)
+        if not report.get("cached_carb_entries"):
+            print("Issue report contains no carb information")
+            return ([], [])
 
-    def load_insulin_data(self, resource_name):
-        """ Load insulin dose data from json file
+        return get_carb_data(
+            report.get("cached_carb_entries")
+        )
 
-        Arguments:
-        resource_name -- name of file without the extension
+    def load_report_basal_schedule(self, report_name):
+        """ Load the basal schedule from an issue report """
+        report = load_fixture(report_name, ".json")
 
-        Output:
-        5 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
-                    values (in units/insulin), scheduled_basal_rates) format
-        """
-        data = load_fixture(resource_name, ".json")
+        assert report.get("basal_rate_schedule"),\
+            "expected issue report to contain basal rate information"
 
-        dose_types = [
-            dict_.get("type") or "!" for dict_ in data
-        ]
-        start_dates = [
-            datetime.fromisoformat(dict_.get("start_at"))
-            for dict_ in data
-        ]
-        end_dates = [
-            datetime.fromisoformat(dict_.get("end_at"))
-            for dict_ in data
-        ]
-        values = [dict_.get("amount") for dict_ in data]
+        return get_basal_schedule(
+            report.get("basal_rate_schedule")
+        )
 
-        scheduled_basal_rates = [
-            dict_.get("scheduled") or 0 for dict_ in data
-        ]
+    def load_report_cr_schedule(self, report_name):
+        """ Load the carb ratio schedule from an issue report """
+        report = load_fixture(report_name, ".json")
 
-        assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-            len(values) == len(scheduled_basal_rates),\
-            "expected output shape to match"
-        # if dose_type doesn't exist (meaning there's an "!"), remove entry
-        if "!" in dose_types:
-            for i in range(0, len(dose_types)):
-                if dose_types[i] == "!":
-                    del dose_types[i]
-                    del start_dates[i]
-                    del end_dates[i]
-                    del values[i]
-                    del scheduled_basal_rates[i]
+        assert report.get("carb_ratio_schedule"),\
+            "expected issue report to contain carb ratio information"
 
-        return (dose_types, start_dates, end_dates, values,
-                scheduled_basal_rates)
+        return get_carb_ratios(
+            report.get("carb_ratio_schedule")
+        )
 
-    def load_carb_data(self, resource_name):
-        """ Load carb entries data from json file
+    def load_report_sensitivity_schedule(self, report_name):
+        """ Load the insulin sensitivity schedule from an issue report """
+        report = load_fixture(report_name, ".json")
 
-        Arguments:
-        resource_name -- name of file without the extension
+        assert report.get("insulin_sensitivity_factor_schedule"),\
+            "expected issue report to contain insulin sensitivity information"
 
-        Output:
-        3 lists in (carb_values, carb_start_dates, carb_absorption_times)
-        format
-        """
-        data = load_fixture(resource_name, ".json")
+        return get_sensitivities(
+            report.get("insulin_sensitivity_factor_schedule")
+        )
 
-        carb_values = [dict_.get("amount") for dict_ in data]
-        start_dates = [
-            datetime.fromisoformat(dict_.get("start_at"))
-            for dict_ in data
-        ]
-        absorption_times = [
-            dict_.get("absorption_time") if dict_.get("absorption_time")
-            else None for dict_ in data
-        ]
+    def load_report_settings(self, report_name):
+        """ Load the relevent settings from an issue report """
+        report = load_fixture(report_name, ".json")
 
-        return (start_dates, carb_values, absorption_times)
-
-    def load_settings(self, resource_name):
-        """ Load settings from json file """
-        settings_dict = load_fixture(resource_name, ".json")
-
-        return settings_dict
-
-    def load_sensitivities(self, resource_name):
-        """ Load insulin sensitivity schedule from json file
-
-        Arguments:
-        resource_name -- name of file without the extension
-
-        Output:
-        3 lists in (sensitivity_start_time, sensitivity_end_time,
-                    sensitivity_value (mg/dL/U)) format
-        """
-        data = load_fixture(resource_name, ".json")
-
-        start_times = [
-            datetime.strptime(dict_.get("start"), "%H:%M:%S").time()
-            for dict_ in data
-        ]
-        end_times = [
-            datetime.strptime(dict_.get("end"), "%H:%M:%S").time()
-            for dict_ in data
-        ]
-        values = [dict_.get("value") for dict_ in data]
-
-        assert len(start_times) == len(end_times) == len(values),\
-            "expected output shape to match"
-
-        return (start_times, end_times, values)
-
-    def load_carb_ratios(self):
-        """ Load carb ratios from json file
-
-        Output:
-        2 lists in (ratio_start_time, ratio (in units/insulin),
-                    length_of_rate) format
-        """
-        schedule = load_fixture("read_carb_ratios", ".json").get("schedule")
-
-        carb_sched_starts = [
-            time.fromisoformat(dict_.get("start"))
-            for dict_ in schedule
-        ]
-        carb_sched_ratios = [dict_.get("ratio") for dict_ in schedule]
-
-        return (carb_sched_starts, carb_sched_ratios)
-
-    def load_scheduled_basals(self, resource_name):
-        """ Load basal schedule from json file
-
-        Arguments:
-        resource_name -- name of file without the extension
-
-        Output:
-        3 lists in (rate_start_time, rate (in units/hr),
-                    length_of_rate) format
-        """
-        data = load_fixture(resource_name, ".json")
-
-        start_times = [
-            datetime.strptime(dict_.get("start"), "%H:%M:%S").time()
-            for dict_ in data
-        ]
-        rates = [dict_.get("rate") for dict_ in data]
-        minutes = [dict_.get("minutes") for dict_ in data]
-
-        assert len(start_times) == len(rates) == len(minutes),\
-            "expected output shape to match"
-
-        return (start_times, rates, minutes)
-
-    def load_glucose_effect_output(self, resource_name):
-        """ Load glucose effects from json file
-
-        Arguments:
-        resource_name -- name of file without the extension
-
-        Output:
-        2 lists in (date, glucose_value) format
-        """
-        fixture = load_fixture(resource_name, ".json")
-
-        dates = [
-            datetime.fromisoformat(dict_.get("date"))
-            for dict_ in fixture
-        ]
-        glucose_values = [dict_.get("amount") for dict_ in fixture]
-
-        assert len(dates) == len(glucose_values),\
-            "expected output shape to match"
-
-        return (dates, glucose_values)
-
-    def load_glucose_velocities(self, resource_name):
-        """ Load effect-velocity json file
-
-        Arguments:
-        resource_name -- name of file without the extension
-
-        Output:
-        3 lists in (start_date, end_date, glucose_effects) format
-        """
-        fixture = load_fixture(resource_name, ".json")
-
-        start_dates = [
-            datetime.fromisoformat(
-                dict_.get("startDate")
-                if dict_.get("startDate") else dict_.get("start_at"))
-            for dict_ in fixture
-        ]
-        end_dates = [
-            datetime.fromisoformat(
-                dict_.get("endDate")
-                if dict_.get("endDate") else dict_.get("end_at"))
-            for dict_ in fixture
-        ]
-        glucose_effects = [
-            dict_.get("value") if dict_.get("value")
-            else dict_.get("velocity") for dict_ in fixture
-        ]
-        assert len(start_dates) == len(end_dates) == len(glucose_effects),\
-            "expected output shape to match"
-
-        return (start_dates, end_dates, glucose_effects)
+        return get_settings(report)
 
     def load_report_momentum_effects(self, report_name):
         """ Load the expected momentum effects from an issue report """

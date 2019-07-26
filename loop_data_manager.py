@@ -40,12 +40,14 @@ def runner(
     glucose_data -- tuple in form
         (times of glucose measurements,
          glucose measurements in mg/dL)
+
     insulin_data -- tuple in form
         (types of dose (tempBasal, bolus, etc),
          start times of insulin delivery,
          end times of insulin delivery,
          amounts of insulin (in U/hr if a basal or U if a bolus)
          )
+
     carb_data -- tuple in form
         (times of carbohydrate entries,
         amount of carbohydrates eaten,
@@ -175,8 +177,7 @@ def runner(
          else ([], [], []),
          *carb_ratio_data,
          *sensitivity_data,
-         settings_dictionary.get("default_absorption_times"),
-         end_date=None
+         settings_dictionary.get("default_absorption_times")
          )
 
     (cob_dates,
@@ -189,8 +190,7 @@ def runner(
          else ([], [], []),
          *carb_ratio_data,
          *sensitivity_data,
-         settings_dictionary.get("default_absorption_times"),
-         end_date=None
+         settings_dictionary.get("default_absorption_times")
          )
 
     current_cob = cob_values[

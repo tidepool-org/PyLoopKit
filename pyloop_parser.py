@@ -292,7 +292,7 @@ def get_counteractions(data, offset=0):
     return (start_times, end_times, values)
 
 
-def get_insulin_effects(data, offset=0):
+def load_insulin_effects(data, offset=0):
     """ Load insulin effect data from a list """
     start_times = [
         datetime.strptime(

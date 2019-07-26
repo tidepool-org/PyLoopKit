@@ -19,7 +19,7 @@ from loop_data_manager import update_retrospective_glucose_effect
 from loop_kit_tests import load_fixture, find_root_path
 from loop_math import predict_glucose
 from pyloop_parser import (
-    load_momentum_effects, get_glucose_data, get_insulin_effects,
+    load_momentum_effects, get_glucose_data, load_insulin_effects,
     get_normalized_insulin_data, get_basal_schedule, get_carb_ratios,
     get_sensitivities, get_settings, get_counteractions, get_carb_data,
     get_retrospective_effects, parse_report_and_run
@@ -120,7 +120,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         assert report.get("insulin_effect"),\
             "expected issue report to contain insulin effect information"
 
-        return get_insulin_effects(
+        return load_insulin_effects(
             report.get("insulin_effect")
         )
 
@@ -142,7 +142,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         assert report.get("carb_effect"),\
             "expected issue report to contain carb effect information"
 
-        return get_insulin_effects(
+        return load_insulin_effects(
             report.get("carb_effect")
         )
 
@@ -164,7 +164,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         assert report.get("predicted_glucose"),\
             "expected issue report to contain glucose prediction information"
 
-        return get_insulin_effects(
+        return load_insulin_effects(
             report.get("predicted_glucose")
         )
 
@@ -177,7 +177,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         )[0]
 
     """ Integrated tests for all the effects """
-    def test_effects_with_utc_issue_report(self):
+    def test_loop_with_utc_issue_report(self):
         pyloop_predicted_glucoses = self.run_report_through_runner(
             "utc_issue_report"
         )
@@ -196,7 +196,43 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
             self.assertAlmostEqual(
                 pyloop_predicted_glucoses[1][i],
-                expected_predicted_glucoses[1][i], 2
+                expected_predicted_glucoses[1][i], 1
+            )
+
+    def test_loop_with_timezoned_issue_report(self):
+        pyloop_predicted_glucoses = self.run_report_through_runner(
+            "timezoned_issue_report"
+        )
+        expected_predicted_glucoses = self.load_report_predicted_glucoses(
+            "timezoned_issue_report"
+        )
+
+        self.assertEqual(
+            len(pyloop_predicted_glucoses[0]),
+            len(expected_predicted_glucoses[0])
+        )
+        for i in range(0, len(pyloop_predicted_glucoses[0])):
+            self.assertAlmostEqual(
+                pyloop_predicted_glucoses[1][i],
+                expected_predicted_glucoses[1][i], 1
+            )
+
+    def test_loop_with_high_glucose_issue_report(self):
+        pyloop_predicted_glucoses = self.run_report_through_runner(
+            "high_bg_recommended_basal_and_bolus_report"
+        )
+        expected_predicted_glucoses = self.load_report_predicted_glucoses(
+            "high_bg_recommended_basal_and_bolus_report"
+        )
+
+        self.assertEqual(
+            len(pyloop_predicted_glucoses[0]),
+            len(expected_predicted_glucoses[0])
+        )
+        for i in range(0, len(pyloop_predicted_glucoses[0])):
+            self.assertAlmostEqual(
+                pyloop_predicted_glucoses[1][i],
+                expected_predicted_glucoses[1][i], 1
             )
 
 

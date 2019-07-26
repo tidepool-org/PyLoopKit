@@ -125,7 +125,20 @@ def get_glucose_effects(
     glucose_effect = glucose_effects(
         a_types, a_starts, a_ends, a_values, a_scheduled_rates,
         insulin_model,
-        sensitivity_starts, sensitivity_ends, sensitivity_values
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        start=start_date,
+        end=end_date
         )
 
-    return glucose_effect
+    (filtered_starts,
+     ends,
+     filtered_effect_values) = filter_date_range(
+         glucose_effect[0],
+         [],
+         glucose_effect[1],
+         start_date,
+         end_date
+         )
+    
+
+    return (filtered_starts, filtered_effect_values)

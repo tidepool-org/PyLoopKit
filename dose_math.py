@@ -250,6 +250,13 @@ def insulin_correction(
         date_range = [at_date,
                       at_date + timedelta(minutes=model[0])
                       ]
+    if not suspend_threshold_value:
+        suspend_threshold_value = find_ratio_at_time(
+            target_starts,
+            target_ends,
+            target_mins,
+            at_date
+            )
 
     # For each prediction above target, determine the amount of insulin
     # necessary to correct glucose based on the modeled effectiveness of

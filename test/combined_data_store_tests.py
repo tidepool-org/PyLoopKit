@@ -5,6 +5,7 @@ Created on Wed Jul 24 09:48:51 2019
 
 @author: annaquinlan
 """
+# pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
 from datetime import datetime, time, timedelta
 import unittest
 

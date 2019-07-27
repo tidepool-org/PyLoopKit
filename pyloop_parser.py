@@ -367,13 +367,15 @@ def get_settings(data):
     if suspend_threshold is not None:
         settings["suspend_threshold"] = float(suspend_threshold)
     else:
-        settings["suspend_threshold"] = 70
+        print("No suspend threshold set")
+        settings["suspend_threshold"] = None
 
     settings["dynamic_carb_absorption_enabled"] = True
     settings["retrospective_correction_integration_interval"] = 30
     settings["recency_interval"] = 15
     settings["retrospective_correction_grouping_interval"] = 30
     settings["rate_rounder"] = 0.05
+    settings["delay"] = 10
 
     settings["default_absorption_times"] = [
          float(data.get("carb_default_absorption_times_fast")) / 60,
@@ -548,6 +550,7 @@ def parse_report_and_run(path, name):
     issue_dict = json.load(
         open(data_path_and_name, "r")
     )
+
     if issue_dict.get("basal_rate_timeZone") is not None:
         offset = issue_dict.get("basal_rate_timeZone")
     elif issue_dict.get("carb_ratio_timeZone") is not None:
@@ -689,4 +692,4 @@ def parse_report_and_run(path, name):
 file_path = str(input("Path: "))
 file_name = str(input("File name: ")) + ".json"
 
-parse_json(file_path, file_name)
+parse_report_and_run(file_path, file_name)

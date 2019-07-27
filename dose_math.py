@@ -298,13 +298,13 @@ def insulin_correction(
                 target_starts,
                 target_ends,
                 target_maxes,
-                at_date
+                prediction_dates[i]
                 ) +
              find_ratio_at_time(
                  target_starts,
                  target_ends,
                  target_mins,
-                 at_date
+                 prediction_dates[i]
                  )
              ) / 2
         )

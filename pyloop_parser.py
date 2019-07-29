@@ -40,15 +40,26 @@ def get_glucose_data(glucose_dict, offset=0):
     return (dates, glucose_values)
 
 
-def get_cached_insulin_data(data, offset=0):
-    """ Load doses from an issue report cached_doses dictionary
+def convert_to_correct_units(type_, start, end, value):
+    """ Take a dose and convert it into the appropriate unit
+        (either U or U/hr)
+    """
+    if type_.lower() == "bolus":
+        return value
+    else:
+        return value / ((end - start).total_seconds()/60/60)
+
+
+def get_insulin_data(data, offset=0, convert_to_units=False):
+    """ Load doses from an issue report cached_doses
+        or normalized_insulin_doses dictionary
 
     Arguments:
     data -- dictionary containing cached dose information
 
     Output:
-    5 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
-                values (in units/insulin), scheduled_basal_rates) format
+    4 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
+                values (in units/insulin)) format
     """
     dose_types = [
         dict_.get("type")[17:]
@@ -69,45 +80,16 @@ def get_cached_insulin_data(data, offset=0):
         ) + timedelta(seconds=offset)
         for dict_ in data
     ]
-    values = [float(dict_.get("value")) for dict_ in data]
-
-    assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values),\
-        "expected output shape to match"
-
-    return (dose_types, start_dates, end_dates, values)
-
-
-def get_normalized_insulin_data(data, offset=0):
-    """ Load doses from an issue report get_normalized_doses dictionary
-
-    Arguments:
-    data -- dictionary containing cached dose information
-
-    Output:
-    5 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
-                values (in units/insulin), scheduled_basal_rates) format
-    """
-    dose_types = [
-        dict_.get("type")[17:]
-        if dict_.get("type").startswith("LoopKit.DoseType.")
-        else dict_.get("type") for dict_ in data
-    ]
-    start_dates = [
-        datetime.strptime(
-            dict_.get("startDate"),
-            "%Y-%m-%d %H:%M:%S %z"
-        ) + timedelta(seconds=offset)
-        for dict_ in data
-    ]
-    end_dates = [
-        datetime.strptime(
-            dict_.get("endDate"),
-            "%Y-%m-%d %H:%M:%S %z"
-        ) + timedelta(seconds=offset)
-        for dict_ in data
-    ]
-    values = [float(dict_.get("value")) for dict_ in data]
+    values = []
+    for i in range(0, len(data)):
+        values.append(
+            convert_to_correct_units(
+                dose_types[i],
+                start_dates[i],
+                end_dates[i],
+                float(data[i].get("value"))
+            ) if convert_to_units else float(data[i].get("value"))
+        )
 
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values),\
@@ -590,15 +572,22 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No glucose information found")
 
-    if issue_dict.get("get_normalized_dose_entries"):
-        dose_data = get_normalized_insulin_data(
-            issue_dict.get("get_normalized_dose_entries"),
+    if issue_dict.get("get_normalized_pump_event_dose"):
+        dose_data = get_insulin_data(
+            issue_dict.get("get_normalized_pump_event_dose"),
             offset
         )
+    elif issue_dict.get("get_normalized_dose_entries"):
+        dose_data = get_insulin_data(
+            issue_dict.get("get_normalized_dose_entries"),
+            offset,
+            convert_to_units=True
+        )
     elif issue_dict.get("cached_dose_entries"):
-        dose_data = get_cached_insulin_data(
+        dose_data = get_insulin_data(
             issue_dict.get("cached_dose_entries"),
-            offset
+            offset,
+            convert_to_units=True
         )
     else:
         print("No insulin dose information found")

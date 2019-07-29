@@ -121,12 +121,7 @@ def get_insulin_data(
             start_dates.append(start)
             end_dates.append(end)
             values.append(
-                convert_to_correct_units(
-                    dose_types[-1],
-                    start,
-                    end,
-                    float(entry_to_add.get("value"))
-                )
+                float(entry_to_add.get("value"))
             )
 
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\

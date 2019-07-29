@@ -2017,7 +2017,7 @@
         " scheduledBasalRate": "nil",
         " startDate": "2019-07-18 12:51:07 +0000",
         " syncIdentifier": "Optional(\"44313230463642302d373541452d343933432d393637342d434634384243324630304645\"",
-        " type": "LoopKit.DoseType.basal",
+        " type": "LoopKit.DoseType.tempBasal",
         " unit": "LoopKit.DoseUnit.unitsPerHour",
         " value": 0.9
     },

@@ -2574,6 +2574,16 @@
             "type": "LoopKit.DoseType.basal",
             "unit": "LoopKit.DoseUnit.unitsPerHour",
             "value": "0.95"
+        },
+        {
+            "description": "nil",
+            "endDate": "2019-07-20 02:29:23 +0000",
+            "scheduledBasalRate": "nil",
+            "startDate": "2019-07-20 02:27:49 +0000",
+            "syncIdentifier": "\"\"",
+            "type": "LoopKit.DoseType.bolus",
+            "unit": "LoopKit.DoseUnit.units",
+            "value": "2.35"
         }
     ],
     "get_pump_event_values": [
@@ -4094,7 +4104,7 @@
         " scheduledBasalRate": "nil",
         " startDate": "2019-07-20 02:27:19 +0000",
         " syncIdentifier": "Optional(\"30453746434631312d363932412d343239412d383646462d393445413832374643464437\"",
-        " type": "LoopKit.DoseType.basal",
+        " type": "LoopKit.DoseType.tempBasal",
         " unit": "LoopKit.DoseUnit.unitsPerHour",
         " value": 1.25
     },

@@ -3037,6 +3037,16 @@
             "type": "LoopKit.DoseType.bolus",
             "unit": "LoopKit.DoseUnit.units",
             "value": "3.75"
+        },
+        {
+            "description": "nil",
+            "endDate": "2019-07-26 21:55:28 +0000",
+            "scheduledBasalRate": "nil",
+            "startDate": "2019-07-26 21:52:58 +0000",
+            "syncIdentifier": "\"\"",
+            "type": "LoopKit.DoseType.bolus",
+            "unit": "LoopKit.DoseUnit.units",
+            "value": "3.75"
         }
     ],
     "get_pump_event_values": [
@@ -5135,7 +5145,7 @@
         " scheduledBasalRate": "nil",
         " startDate": "2019-07-26 21:55:11 +0000",
         " syncIdentifier": "Optional(\"35444332463339392d434633372d344631452d423345302d433346324334353038463845\"",
-        " type": "LoopKit.DoseType.basal",
+        " type": "LoopKit.DoseType.tempBasal",
         " unit": "LoopKit.DoseUnit.unitsPerHour",
         " value": 0.0
     },
@@ -5690,5 +5700,6 @@
             "startDate": "2019-07-26 22:50:00 +0000"
         }
     ],
-    "suspend_threshold_unit": "mg/dL"
+    "suspend_threshold_unit": "mg/dL",
+    "suspend_threshold": "70"
 }

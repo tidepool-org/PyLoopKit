@@ -6,21 +6,13 @@ Created on Thu Jul 11 15:16:42 2019
 @author: annaquinlan
 """
 # pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
-from datetime import datetime, timedelta
 import unittest
 
 import path_grabber  # pylint: disable=unused-import
-from carb_store import get_carb_glucose_effects
-from dose_store import get_glucose_effects
-from glucose_store import (
-    get_recent_momentum_effects, get_counteraction_effects
-)
-from loop_data_manager import update_retrospective_glucose_effect
 from loop_kit_tests import load_fixture, find_root_path
-from loop_math import predict_glucose
 from pyloop_parser import (
     load_momentum_effects, get_glucose_data, load_insulin_effects,
-    get_normalized_insulin_data, get_basal_schedule, get_carb_ratios,
+    get_insulin_data, get_basal_schedule, get_carb_ratios,
     get_sensitivities, get_settings, get_counteractions, get_carb_data,
     get_retrospective_effects, parse_report_and_run
 )
@@ -47,7 +39,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         assert report.get("get_normalized_dose_entries"),\
             "expected issue report to contain dose information"
 
-        return get_normalized_insulin_data(
+        return get_insulin_data(
             report.get("get_normalized_dose_entries")
         )
 
@@ -253,6 +245,25 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         self.assertEqual(recommendation[1][1], 30)
         self.assertEqual(recommendation[2][0], 0.15)
 
+    def test_loop_with_one_basal_issue_report(self):
+        recommendation = self.run_report_through_runner(
+            "one_basal_issue_report"
+        )
+        pyloop_predicted_glucoses = recommendation[0]
+        expected_predicted_glucoses = self.load_report_predicted_glucoses(
+            "one_basal_issue_report"
+        )
+
+        self.assertEqual(
+            len(pyloop_predicted_glucoses[0]),
+            len(expected_predicted_glucoses[0])
+        )
+        for i in range(0, len(pyloop_predicted_glucoses[0])):
+            self.assertAlmostEqual(
+                pyloop_predicted_glucoses[1][i],
+                expected_predicted_glucoses[1][i], 1
+            )
+        self.assertIsNone(recommendation[1])
 
 if __name__ == '__main__':
     unittest.main()

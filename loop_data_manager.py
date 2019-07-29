@@ -198,7 +198,7 @@ def runner(
             time_to_calculate_at,
             cob_dates
             )
-        ]
+        ] if cob_dates else 0
 
     if settings_dictionary.get("retrospective_correction_enabled"):
         retrospective_glucose_effects = update_retrospective_glucose_effect(

@@ -20,6 +20,7 @@ def get_glucose_data(glucose_dict, offset=0):
 
     Arguments:
     glucose_dict -- dictionary containing cached glucose sample information
+    offset -- the offset from UTC in seconds
 
     Output:
     2 lists in (date, glucose_value) format
@@ -50,12 +51,21 @@ def convert_to_correct_units(type_, start, end, value):
         return value / ((end - start).total_seconds()/60/60)
 
 
-def get_insulin_data(data, offset=0, convert_to_units=False):
+def get_insulin_data(
+        data, offset=0, convert_to_units=False, entry_to_add=None):
     """ Load doses from an issue report cached_doses
         or normalized_insulin_doses dictionary
 
     Arguments:
     data -- dictionary containing cached dose information
+    offset -- the offset from UTC in seconds
+    convert_to_units -- convert from dose amounts to doses with the correct
+                        units (so U for boluses and U/hr for basals)
+    entry_to_add -- the last entry to add; this is normally used when getting
+                    data from the "get_normalized_pump_event_dose" dictionary,
+                    as it sometimes lacks the last insulin dose. This function
+                    assumes that if it is a basal, it will need to be converted
+                    to U/hr.
 
     Output:
     4 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
@@ -90,6 +100,34 @@ def get_insulin_data(data, offset=0, convert_to_units=False):
                 float(data[i].get("value"))
             ) if convert_to_units else float(data[i].get("value"))
         )
+    if entry_to_add:
+        start = datetime.strptime(
+            entry_to_add.get("startDate"),
+            "%Y-%m-%d %H:%M:%S %z"
+        ) + timedelta(seconds=offset)
+        end = datetime.strptime(
+            entry_to_add.get("endDate"),
+            "%Y-%m-%d %H:%M:%S %z"
+        ) + timedelta(seconds=offset)
+
+        # if this entry is truly a new entry, convert to the appropriate units
+        # and add to the output
+        if not start == start_dates[-1] and not end == end_dates[-1]:
+            dose_types.append(
+                entry_to_add.get("type")[17:]
+                if entry_to_add.get("type").startswith("LoopKit.DoseType.")
+                else entry_to_add.get("type")
+            )
+            start_dates.append(start)
+            end_dates.append(end)
+            values.append(
+                convert_to_correct_units(
+                    dose_types[-1],
+                    start,
+                    end,
+                    float(entry_to_add.get("value"))
+                )
+            )
 
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values),\
@@ -572,10 +610,12 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No glucose information found")
 
-    if issue_dict.get("get_normalized_pump_event_dose"):
+    if (issue_dict.get("get_normalized_pump_event_dose")
+            and issue_dict.get("get_normalized_dose_entries")):
         dose_data = get_insulin_data(
             issue_dict.get("get_normalized_pump_event_dose"),
-            offset
+            offset,
+            entry_to_add=issue_dict.get("get_normalized_dose_entries")[-1]
         )
     elif issue_dict.get("get_normalized_dose_entries"):
         dose_data = get_insulin_data(

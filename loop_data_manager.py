@@ -17,6 +17,7 @@ from dose_math import recommended_temp_basal, recommended_bolus
 from dose_store import get_glucose_effects
 from glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
+from input_validation_tools import are_settings_valid
 from insulin_math import find_ratio_at_time
 from loop_math import combined_sums, decay_effect, subtracting, predict_glucose
 
@@ -129,6 +130,9 @@ def runner(
           recommended basal rate,
           recommended bolus)
     """
+    if not are_settings_valid(settings_dictionary):
+        return []
+
     last_glucose_date = glucose_data[0][len(glucose_data[0]) - 1]
 
     retrospective_start = (

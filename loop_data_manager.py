@@ -17,7 +17,10 @@ from dose_math import recommended_temp_basal, recommended_bolus
 from dose_store import get_glucose_effects
 from glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
-from input_validation_tools import are_settings_valid
+from input_validation_tools import (
+    are_settings_valid, are_glucose_readings_valid, are_carb_readings_valid,
+    is_insulin_sensitivity_schedule_valid, are_carb_ratios_valid,
+    are_basal_rates_valid, are_correction_ranges_valid)
 from insulin_math import find_ratio_at_time
 from loop_math import combined_sums, decay_effect, subtracting, predict_glucose
 
@@ -130,7 +133,15 @@ def runner(
           recommended basal rate,
           recommended bolus)
     """
-    if not are_settings_valid(settings_dictionary):
+    if (
+            not are_settings_valid(settings_dictionary)
+            or not are_glucose_readings_valid(*glucose_data)
+            or not are_carb_readings_valid(*carb_data)
+            or not is_insulin_sensitivity_schedule_valid(*sensitivity_data)
+            or not are_carb_ratios_valid(*carb_ratio_data)
+            or not are_basal_rates_valid(*scheduled_basals_data)
+            or not are_correction_ranges_valid(*target_range_data)
+       ):
         return []
 
     last_glucose_date = glucose_data[0][len(glucose_data[0]) - 1]

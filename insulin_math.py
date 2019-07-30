@@ -267,7 +267,8 @@ def reconciled(dose_types, start_dates, end_dates, values):
 
                 if last[2] <= start_dates[i]:
                     last_basal = []
-            last_suspend_index = i
+            if start_dates[i] == end_dates[i]:
+                last_suspend_index = i
 
         elif type_.lower() == "meal":
             output_types.append(type_)

@@ -408,7 +408,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     Tuple with properties of doses, annotated with the current basal rates
     """
     if dose_type.lower() not in ["basalprofilestart", "tempbasal", "basal",
-                                 "pumpsuspend"]:
+                                 "pumpsuspend", "suspend"]:
         return ([dose_type], [dose_start_date], [dose_end_date], [value],
                 [0])
 
@@ -448,8 +448,8 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
         if convert_to_units_hr:
             output_values.append(
-                0 if dose_type.lower() in ["pumpsuspend"] else value /
-                (time_interval_since(dose_end_date, dose_start_date)/60/60))
+                0 if dose_type.lower() in ["pumpsuspend", "suspend"] else value
+                / (time_interval_since(dose_end_date, dose_start_date)/60/60))
         else:
             output_values.append(value)
 
@@ -1223,7 +1223,7 @@ def overlay_basal_schedule(dose_types, starts, ends, values,
 
     for (i, type_) in enumerate(dose_types):
         if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart",
-                             "basal"]:
+                             "basal", "suspend"]:
             if ending_at and ends[i] > ending_at:
                 continue
 

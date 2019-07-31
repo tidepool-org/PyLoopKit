@@ -133,6 +133,7 @@ def runner(
           recommended basal rate,
           recommended bolus)
     """
+    # check that the inputs make sense before doing math with them
     if (
             not are_settings_valid(settings_dictionary)
             or not are_glucose_readings_valid(*glucose_data)

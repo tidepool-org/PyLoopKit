@@ -30,14 +30,14 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
 
     hours_ = hours(end, start)
     # don't divide by zero if it's a suspend
-    if type_.lower() == "pumpsuspend":
+    if type_.lower() in ["pumpsuspend", "suspend"]:
         return -scheduled_basal_rate * hours_
     return (value - scheduled_basal_rate) * hours_
 
 
 def total_units_given(type_, value, start, end):
     """ Find total units given """
-    if type_.lower() in ["bolus", "pumpsuspend"]:
+    if type_.lower() in ["bolus", "pumpsuspend", "suspend"]:
         return value
 
     return value * hours(end, start)

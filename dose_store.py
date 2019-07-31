@@ -14,7 +14,7 @@ import numpy
 
 from dose_math import filter_date_range_for_doses
 from insulin_math import (annotated, trim, glucose_effects, reconciled)
-from loop_math import filter_date_range
+from loop_math import filter_date_range, sort_dose_lists
 
 
 def get_glucose_effects(
@@ -84,21 +84,9 @@ def get_glucose_effects(
     reconciled_doses = reconciled(
         *filtered_doses
         )
-
     # sort the lists because they could be slightly out of order due to
     # basals and suspends
-    unsort_types = numpy.array(reconciled_doses[0])
-    start_dates = numpy.array(reconciled_doses[1])
-    unsort_end_dates = numpy.array(reconciled_doses[2])
-    unsort_values = numpy.array(reconciled_doses[3])
-
-    sort_ind = start_dates.argsort()
-
-    types = list(unsort_types[sort_ind])
-    start_dates.sort()
-    start_dates = list(start_dates)
-    end_dates = list(unsort_end_dates[sort_ind])
-    values = list(unsort_values[sort_ind])
+    sorted_reconciled_doses = sort_dose_lists(*reconciled_doses)[0:4]
 
     # annotate the doses with scheduled basal rate
     (a_types,
@@ -107,10 +95,10 @@ def get_glucose_effects(
      a_values,
      a_scheduled_rates
      ) = annotated(
-         types, start_dates, end_dates, values,
-         basal_starts, basal_rates, basal_minutes,
-         convert_to_units_hr=False
-         )
+             *sorted_reconciled_doses,
+             basal_starts, basal_rates, basal_minutes,
+             convert_to_units_hr=False
+             )
     '''for i in range(0, len(a_types)):
         print(a_types[i], a_starts[i], a_ends[i], a_values[i], a_scheduled_rates[i])'''
 

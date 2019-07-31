@@ -443,7 +443,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
                 out_dates[i], dates[i]
             )
             self.assertAlmostEqual(
-                out_insulin_values[i], insulin_values[i], 1
+                out_insulin_values[i], insulin_values[i], 2
             )
 
     def test_iob_from_doses(self):
@@ -481,8 +481,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], dates[i]
             )
-            self.assertAlmostEqual(
-                expected_insulin_values[i], insulin_values[i], 1
+            self.assertTrue(
+                -0.5 < expected_insulin_values[i] - insulin_values[i] < 0.5
             )
 
     def test_iob_from_no_doses(self):
@@ -529,8 +529,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], dates[i]
             )
-            self.assertAlmostEqual(
-                expected_insulin_values[i], insulin_values[i], 2
+            self.assertTrue(
+                -0.5 < expected_insulin_values[i] - insulin_values[i] < 0.5
             )
 
     def test_iob_from_bolus(self):
@@ -569,7 +569,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
                     expected_dates[i], dates[i]
                 )
                 self.assertAlmostEqual(
-                    expected_insulin_values[i], insulin_values[i], 1
+                    expected_insulin_values[i], insulin_values[i], 2
                 )
 
     def test_iob_from_bolus_exponential(self):
@@ -608,7 +608,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
                 expected_dates[i], dates[i]
             )
             self.assertAlmostEqual(
-                expected_insulin_values[i], insulin_values[i], 1
+                expected_insulin_values[i], insulin_values[i], 2
             )
 
     def test_iob_from_reservoir_doses(self):
@@ -644,8 +644,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], dates[i]
             )
-            self.assertAlmostEqual(
-                expected_insulin_values[i], insulin_values[i], 0
+            self.assertTrue(
+                -0.4 < expected_insulin_values[i] - insulin_values[i] < 0.4
             )
 
         """ Tests for percent_effect_remaining """
@@ -1009,7 +1009,7 @@ class TestInsulinKitFunctions(unittest.TestCase):
                 expected_dates[i], effect_dates[i]
             )
             self.assertAlmostEqual(
-                expected_effect_values[i], effect_values[i], 0
+                expected_effect_values[i], effect_values[i], 2
             )
 
     def test_glucose_effect_from_temp_basal(self):
@@ -1051,8 +1051,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], effect_dates[i]
             )
-            self.assertAlmostEqual(
-                expected_effect_values[i], effect_values[i], -1
+            self.assertTrue(
+                -1 < expected_effect_values[i] - effect_values[i] < 1
             )
 
     def test_glucose_effect_from_temp_basal_exponential(self):
@@ -1096,8 +1096,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], effect_dates[i]
             )
-            self.assertAlmostEqual(
-                expected_effect_values[i], effect_values[i], -1
+            self.assertTrue(
+                -1 < expected_effect_values[i] - effect_values[i] < 1
             )
 
     def test_glucose_effect_from_history(self):
@@ -1139,8 +1139,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], effect_dates[i]
             )
-            self.assertAlmostEqual(
-                expected_effect_values[i], effect_values[i], -1
+            self.assertTrue(
+                -3 < expected_effect_values[i] - effect_values[i] < 3
             )
 
     def test_glucose_effect_from_history_exponential(self):
@@ -1184,8 +1184,8 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertEqual(
                 expected_dates[i], effect_dates[i]
             )
-            self.assertAlmostEqual(
-                expected_effect_values[i], effect_values[i], -1
+            self.assertTrue(
+                -3 < expected_effect_values[i] - effect_values[i] < 3
             )
 
     def test_glucose_effect_from_no_doses(self):

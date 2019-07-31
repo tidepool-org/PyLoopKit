@@ -660,6 +660,7 @@ def parse_report_and_run(path, name):
         time_to_run
         )
 
+    return recommendations
 
 file_path = str(input("Path: "))
 file_name = str(input("File name: ")) + ".json"

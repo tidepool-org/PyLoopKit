@@ -5,14 +5,14 @@ Created on Fri Jul 12 13:35:43 2019
 
 @author: annaquinlan
 """
-# pylint: disable=C0200, C0103, R0912
+# pylint: disable=C0200, C0103, R0912, R0913, R0914, R0915
 import json
-import numpy
 import os
-
 from datetime import datetime, time, timedelta
+import numpy
 
 from loop_data_manager import runner
+from loop_math import sort_dose_lists
 
 
 def get_glucose_data(glucose_dict, offset=0):
@@ -136,6 +136,7 @@ def get_carb_data(data, offset=0):
 
     Arguments:
     data -- dictionary containing cached carb information
+    offset -- the offset from UTC in seconds
 
     Output:
     3 lists in (carb_values, carb_start_dates, carb_absorption_times)
@@ -276,7 +277,7 @@ def load_momentum_effects(data, offset=0):
         datetime.strptime(
             dict_.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     values = [
@@ -291,7 +292,7 @@ def get_counteractions(data, offset=0):
         datetime.strptime(
             dict_.get("start_time"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     end_times = [
@@ -313,7 +314,7 @@ def load_insulin_effects(data, offset=0):
         datetime.strptime(
             dict_.get("start_time"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     values = [
@@ -328,7 +329,7 @@ def get_retrospective_effects(data, offset=0):
         datetime.strptime(
             dict_.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     values = [
@@ -382,7 +383,6 @@ def get_settings(data):
     if suspend_threshold is not None:
         settings["suspend_threshold"] = float(suspend_threshold)
     else:
-        print("No suspend threshold set")
         settings["suspend_threshold"] = None
 
     settings["dynamic_carb_absorption_enabled"] = True
@@ -393,18 +393,18 @@ def get_settings(data):
     settings["delay"] = 10
 
     settings["default_absorption_times"] = [
-         float(data.get("carb_default_absorption_times_fast")) / 60,
-         float(data.get("carb_default_absorption_times_medium")) / 60,
-         float(data.get("carb_default_absorption_times_slow")) / 60
-         ]
+        float(data.get("carb_default_absorption_times_fast")) / 60,
+        float(data.get("carb_default_absorption_times_medium")) / 60,
+        float(data.get("carb_default_absorption_times_slow")) / 60
+        ]
 
     settings["max_basal_rate"] = data.get("maximum_basal_rate")
     settings["max_bolus"] = data.get("maximum_bolus")
-    settings["retrospective_correction_enabled"] = True if data.get(
+    settings["retrospective_correction_enabled"] = data.get(
         "retrospective_correction_enabled"
     ) and data.get(
         "retrospective_correction_enabled"
-    ).lower() == "true" else False
+    ).lower() == "true"
 
     return settings
 
@@ -414,12 +414,10 @@ def get_last_temp_basal(data, offset=0):
         "last_temp_basal" dictionary
     """
     if (data.get(" type") == "LoopKit.DoseType.tempBasal"
-        or data.get("type") == "LoopKit.DoseType.tempBasal"
-       ):
+            or data.get("type") == "LoopKit.DoseType.tempBasal"):
         type_ = "tempBasal"
     elif (data.get(" type") == "LoopKit.DoseType.basal"
-          or data.get("type") == "LoopKit.DoseType.basal"
-        ):
+          or data.get("type") == "LoopKit.DoseType.basal"):
         type_ = "basal"
     else:
         raise RuntimeError("The last temporary basal is not a basal")
@@ -649,16 +647,6 @@ def parse_report_and_run(path, name):
         last_temp_basal = []
         print("No information found about the last temporary basal rate")
 
-    test_counteraction = get_counteractions(
-        issue_dict.get("insulin_counteraction_effects"), offset
-    )
-    '''counteraction_effect = counteraction_effects(
-        *glucose_data,
-        [False for i in glucose_data[0]],
-        ["PyLoop" for i in glucose_data[0]],
-        *test_effects
-        )
-
     recommendations = runner(
         glucose_data,
         dose_data,
@@ -669,12 +657,7 @@ def parse_report_and_run(path, name):
         basal_schedule,
         target_range_schedule,
         last_temp_basal,
-        time_to_run,
-        counteraction_starts=test_counteraction[0],
-        counteraction_ends=test_counteraction[1],
-        counteraction_values=test_counteraction[2],
-        actual_effect_starts=test_effects[0],
-        actual_effect_ends=test_effects[1]
+        time_to_run
         )
 
 

@@ -132,6 +132,5 @@ def get_glucose_effects(
          start_date,
          end_date
          )
-    
 
     return (filtered_starts, filtered_effect_values)

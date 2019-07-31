@@ -50,4 +50,4 @@ def total_units_given(type_, value, start, end):
 
 def hours(start_date, end_date):
     """ Find hours between two dates """
-    return abs(time_interval_since(end_date, start_date))/60/60  # secs -> hrs
+    return abs(time_interval_since(end_date, start_date))/3600  # secs -> hrs

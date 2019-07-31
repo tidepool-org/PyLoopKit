@@ -617,12 +617,13 @@ def carbs_on_board_helper(
     Output:
     Carbohydrate value (g)
     """
-    time = time_interval_since(at_time, carb_start) / 60
+    time = time_interval_since(at_time, carb_start)
+    delay *= 60
 
     if time >= 0:
         value = (carb_value
                  * (1 - parabolic_percent_absorption_at_time(
-                     time - delay,
+                     (time - delay) / 60,
                      carb_absorption_time or default_absorption_time
                      )
                     )

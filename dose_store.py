@@ -99,8 +99,6 @@ def get_glucose_effects(
              basal_starts, basal_rates, basal_minutes,
              convert_to_units_hr=False
              )
-    '''for i in range(0, len(a_types)):
-        print(a_types[i], a_starts[i], a_ends[i], a_values[i], a_scheduled_rates[i])'''
 
     # trim the doses to start of interval
     for i in range(0, len(a_types)):
@@ -112,7 +110,6 @@ def get_glucose_effects(
 
         a_starts[i] = result[1]
         a_ends[i] = result[2]
-        #print(a_types[i], a_starts[i], a_ends[i], a_values[i], a_scheduled_rates[i])
 
     # get the glucose effects using the prepared dose data
     glucose_effect = glucose_effects(

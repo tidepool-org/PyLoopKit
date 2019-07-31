@@ -265,5 +265,28 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
         self.assertIsNone(recommendation[1])
 
+    def test_loop_with_day_crossing_issue_report(self):
+        recommendation = self.run_report_through_runner(
+            "simple_basal_bolus"
+        )
+        pyloop_predicted_glucoses = recommendation[0]
+        expected_predicted_glucoses = self.load_report_predicted_glucoses(
+            "simple_basal_bolus"
+        )
+
+        self.assertEqual(
+            len(pyloop_predicted_glucoses[0]),
+            len(expected_predicted_glucoses[0])
+        )
+        for i in range(0, len(pyloop_predicted_glucoses[0])):
+            self.assertAlmostEqual(
+                pyloop_predicted_glucoses[1][i],
+                expected_predicted_glucoses[1][i], -2
+            )
+
+        self.assertIsNone(recommendation[1])
+        self.assertEqual(recommendation[2][0], 1.5)
+
+
 if __name__ == '__main__':
     unittest.main()

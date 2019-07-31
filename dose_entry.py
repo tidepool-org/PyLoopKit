@@ -25,14 +25,19 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
     Bolus amount (if a bolus), or basal units given, net of whatever the
     schedule basal is
     """
+    MINIMUM_MINIMED_INCREMENT = 20
+
     if type_.lower() == "bolus":
         return value
 
     hours_ = hours(end, start)
     # don't divide by zero if it's a suspend
     if type_.lower() in ["pumpsuspend", "suspend"]:
-        return -scheduled_basal_rate * hours_
-    return (value - scheduled_basal_rate) * hours_
+        units = -scheduled_basal_rate * hours_
+    else:
+        units = (value - scheduled_basal_rate) * hours_
+
+    return round(units * MINIMUM_MINIMED_INCREMENT) / MINIMUM_MINIMED_INCREMENT
 
 
 def total_units_given(type_, value, start, end):

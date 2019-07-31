@@ -79,8 +79,8 @@ def is_continuous(date_list, interval=5):
     Whether the collection is continuous
     """
     try:
-        return (abs(time_interval_since(date_list[0], date_list[-1]))/60
-                <= interval * (len(date_list) - 1))
+        return (abs(time_interval_since(date_list[0], date_list[-1]))
+                <= interval * (len(date_list) - 1) * 60)
 
     except IndexError:
         print("Out of bounds error: list doesn't contain date values")
@@ -207,10 +207,11 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
         # Find a valid change in glucose, requiring identical
         # provenance and no calibration
         glucose_change = glucose_values[i] - start_glucose
-        time_interval = time_interval_since(dates[i], start_date)/60
+        time_interval = time_interval_since(dates[i], start_date)
 
-        if time_interval <= 4:
+        if time_interval <= 4 * 60:
             continue
+
         if (not start_prov == provenances[i]
                 or start_display
                 or displays[i]
@@ -248,7 +249,7 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
 
         discrepancy = glucose_change - effect_change
 
-        average_velocity = discrepancy / time_interval
+        average_velocity = discrepancy / time_interval * 60
 
         start_dates.append(start_date)
         end_dates.append(dates[i])

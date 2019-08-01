@@ -311,7 +311,7 @@ def update_retrospective_glucose_effect(
     assert len(counteraction_starts) == len(counteraction_ends)\
         == len(counteraction_values), "expected input shapes to match"
 
-    if not carb_effect_dates or not glucose_dates:
+    if not glucose_dates or not carb_effect_dates or not counteraction_starts:
         return ([], [])
 
     (discrepancy_starts, discrepancy_values) = subtracting(
@@ -327,8 +327,9 @@ def update_retrospective_glucose_effect(
 
     # Our last change should be recent, otherwise clear the effects
     if (time_interval_since(
-            retrospective_glucose_discrepancies_summed[1][-1],
-            now_time)
+            now_time,
+            retrospective_glucose_discrepancies_summed[1][-1]
+            )
             > recency_interval * 60
        ):
         return ([], [])
@@ -373,10 +374,13 @@ def get_pending_insulin(
     Output:
     Amount of insulin that is "pending"
     """
-    assert len(basal_starts) == len(basal_rates) == len(basal_minutes),\
+    assert len(basal_starts) == len(basal_rates),\
         "expected input shapes to match"
 
-    if not basal_starts or not last_temp_basal:
+    if (not basal_starts
+        or not last_temp_basal
+        or last_temp_basal[1] > last_temp_basal[2]
+       ):
         return 0
 
     # if the end date for the temp basal is greater than current date,

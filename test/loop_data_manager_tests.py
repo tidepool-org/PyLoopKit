@@ -6,9 +6,12 @@ Created on Thu Jul 11 15:16:42 2019
 @author: annaquinlan
 """
 # pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
+from datetime import datetime
 import unittest
 
 import path_grabber  # pylint: disable=unused-import
+from loop_data_manager import (get_pending_insulin,
+                               update_retrospective_glucose_effect)
 from loop_kit_tests import load_fixture, find_root_path
 from pyloop_parser import (
     load_momentum_effects, get_glucose_data, load_insulin_effects,
@@ -267,11 +270,11 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
     def test_loop_with_day_crossing_issue_report(self):
         recommendation = self.run_report_through_runner(
-            "simple_basal_bolus"
+            "basal_and_bolus_report"
         )
         pyloop_predicted_glucoses = recommendation[0]
         expected_predicted_glucoses = self.load_report_predicted_glucoses(
-            "simple_basal_bolus"
+            "basal_and_bolus_report"
         )
 
         self.assertEqual(
@@ -286,6 +289,235 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
         self.assertIsNone(recommendation[1])
         self.assertEqual(recommendation[2][0], 1.55)
+
+    """ Tests for get_pending_insulin """
+    def test_negative_pending_insulin(self):
+        now_time = datetime.fromisoformat("2019-08-01T12:15:00")
+        basal_schedule = self.load_report_basal_schedule("loop_issue_report")
+
+        last_temporary_basal = [
+            "tempBasal",
+            datetime.fromisoformat("2019-08-01T12:00:00"),
+            datetime.fromisoformat("2019-08-01T12:30:00"),
+            0.1
+            ]
+
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal
+            )
+
+        self.assertEqual(0, pending_insulin)
+
+    def test_short_temp_pending_insulin(self):
+        now_time = datetime.fromisoformat("2019-08-01T12:15:00")
+        basal_schedule = self.load_report_basal_schedule("loop_issue_report")
+
+        last_temporary_basal = [
+            "tempBasal",
+            datetime.fromisoformat("2019-08-01T12:00:00"),
+            datetime.fromisoformat("2019-08-01T12:16:00"),
+            1.3
+            ]
+
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal
+            )
+
+        self.assertAlmostEqual(pending_insulin, 0.0075, 5)
+
+        # add a pending bolus
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal,
+            0.5
+            )
+        self.assertAlmostEqual(pending_insulin, 0.5075, 5)
+
+    def test_pending_insulin_edge_cases(self):
+        now_time = datetime.fromisoformat("2019-08-01T12:15:00")
+        basal_schedule = self.load_report_basal_schedule("loop_issue_report")
+
+        # when there's no temp basal
+        last_temporary_basal = None
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal
+            )
+        self.assertEqual(pending_insulin, 0)
+
+        # when the temp basal has already expired
+        last_temporary_basal = [
+            "tempBasal",
+            datetime.fromisoformat("2019-08-01T11:00:00"),
+            datetime.fromisoformat("2019-08-01T11:16:00"),
+            0.8
+            ]
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal
+            )
+
+        self.assertEqual(pending_insulin, 0)
+
+        # when it isn't actually a temporary basal
+        last_temporary_basal = [
+            "Bolus",
+            datetime.fromisoformat("2019-08-01T12:00:00"),
+            datetime.fromisoformat("2019-08-01T12:30:00"),
+            5.3
+            ]
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal
+            )
+        self.assertEqual(pending_insulin, 0)
+
+        # when the start and end times are reversed
+        last_temporary_basal = [
+            "tempBasal",
+            datetime.fromisoformat("2019-08-01T12:55:00"),
+            datetime.fromisoformat("2019-08-01T12:40:00"),
+            0.95
+            ]
+        pending_insulin = get_pending_insulin(
+            now_time,
+            *basal_schedule,
+            last_temporary_basal
+            )
+        self.assertEqual(pending_insulin, 0)
+
+    """ Tests for update_retrospective_glucose_effect """
+    def test_retrospective_glucose_effect_only_bolus(self):
+        glucose_data = self.load_report_glucose_values(
+            "timezoned_issue_report"
+        )
+        carb_effects = self.load_report_carb_effects(
+            "timezoned_issue_report"
+        )
+        counteraction_effects = self.load_report_counteraction_effects(
+            "timezoned_issue_report"
+        )
+        now_time = datetime.strptime(
+            "2019-07-25 22:50:57 +0000", "%Y-%m-%d %H:%M:%S %z"
+        )
+
+        (expected_dates,
+         expected_values
+         ) = self.load_report_retrospective_effects(
+            "timezoned_issue_report"
+        )
+
+        (dates,
+         values
+         ) = update_retrospective_glucose_effect(
+             *glucose_data,
+             *carb_effects,
+             *counteraction_effects,
+             recency_interval=15,
+             retrospective_correction_grouping_interval=30,
+             now_time=now_time
+             )
+
+        self.assertEqual(len(expected_dates), len(dates))
+
+        for i in range(0, len(dates)):
+            self.assertEqual(expected_dates[i], dates[i])
+            self.assertAlmostEqual(expected_values[i], values[i], 2)
+
+    def test_retrospective_glucose_effect_date_crossing(self):
+        glucose_data = self.load_report_glucose_values(
+            "basal_and_bolus_report"
+        )
+        carb_effects = self.load_report_carb_effects(
+            "basal_and_bolus_report"
+        )
+        counteraction_effects = self.load_report_counteraction_effects(
+            "basal_and_bolus_report"
+        )
+        now_time = datetime.strptime(
+            "2019-07-29 17:06:59 +0000", "%Y-%m-%d %H:%M:%S %z"
+        )
+
+        (expected_dates,
+         expected_values
+         ) = self.load_report_retrospective_effects(
+            "basal_and_bolus_report"
+        )
+
+        (dates,
+         values
+         ) = update_retrospective_glucose_effect(
+             *glucose_data,
+             *carb_effects,
+             *counteraction_effects,
+             recency_interval=15,
+             retrospective_correction_grouping_interval=30,
+             now_time=now_time
+             )
+
+        self.assertEqual(len(expected_dates), len(dates))
+
+        for i in range(0, len(dates)):
+            self.assertEqual(expected_dates[i], dates[i])
+            self.assertAlmostEqual(expected_values[i], values[i], 2)
+
+    def test_retrospective_glucose_effect_edgecases(self):
+        # no counteraction effects
+        glucose_data = self.load_report_glucose_values(
+            "basal_and_bolus_report"
+        )
+        carb_effects = self.load_report_carb_effects(
+            "basal_and_bolus_report"
+        )
+        counteraction_effects = ([], [], [])
+        now_time = datetime.strptime(
+            "2019-07-29 17:06:59 +0000", "%Y-%m-%d %H:%M:%S %z"
+        )
+        (dates,
+         values
+         ) = update_retrospective_glucose_effect(
+             *glucose_data,
+             *carb_effects,
+             *counteraction_effects,
+             recency_interval=15,
+             retrospective_correction_grouping_interval=30,
+             now_time=now_time
+             )
+
+        self.assertEqual(0, len(dates))
+
+        # it shouldn't return effects if the "now time" is way in the future
+        glucose_data = self.load_report_glucose_values(
+            "timezoned_issue_report"
+        )
+        carb_effects = self.load_report_carb_effects(
+            "timezoned_issue_report"
+        )
+        counteraction_effects = self.load_report_counteraction_effects(
+            "timezoned_issue_report"
+        )
+        now_time = datetime.strptime(
+            "2019-07-30 17:06:59 +0000", "%Y-%m-%d %H:%M:%S %z"
+        )
+        (dates,
+         values
+         ) = update_retrospective_glucose_effect(
+             *glucose_data,
+             *carb_effects,
+             *counteraction_effects,
+             recency_interval=15,
+             retrospective_correction_grouping_interval=30,
+             now_time=now_time
+             )
+        self.assertEqual(0, len(dates))
 
 
 if __name__ == '__main__':

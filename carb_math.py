@@ -640,7 +640,8 @@ def dynamic_carbs_on_board(
         delay=10,
         delta=5,
         start=None,
-        end=None
+        end=None,
+        scaler=1
         ):
     """
     Find the carbs on board *dynamically*
@@ -682,7 +683,8 @@ def dynamic_carbs_on_board(
         delay=delay,
         delta=delta,
         start=start,
-        end=end
+        end=end,
+        scaler=scaler
         )
 
     date = start

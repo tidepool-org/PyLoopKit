@@ -228,7 +228,8 @@ def get_carbs_on_board(
             delay,
             delta,
             start=start_date,
-            end=end_date
+            end=end_date,
+            scaler=1.5
             )
     else:
         cob_data = carbs_on_board(

@@ -146,13 +146,13 @@ def predict_glucose(
         time_delta = time_interval_since(
             momentum_dates[1],
             momentum_dates[0]
-            ) / 60
+            )
         # The difference between the first momentum value
         # and the starting glucose value
         momentum_offset = time_interval_since(
             starting_date,
             momentum_dates[0]
-            ) / 60
+            )
 
         blend_slope = 1 / blend_count
         blend_offset = (momentum_offset

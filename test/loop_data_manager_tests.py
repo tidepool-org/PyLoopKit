@@ -285,7 +285,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
 
         self.assertIsNone(recommendation[1])
-        self.assertEqual(recommendation[2][0], 1.5)
+        self.assertEqual(recommendation[2][0], 1.55)
 
 
 if __name__ == '__main__':

@@ -127,8 +127,6 @@ def get_carb_glucose_effects(
             )
 
     assert len(effects[0]) == len(effects[1]), "expected output shape to match"
-    '''for i in range(0, len(effects[0])):
-        print(effects[0][i], effects[1][i])'''
 
     return effects
 
@@ -167,8 +165,8 @@ def get_carbs_on_board(
                         given insulin sensitivity values
     sensitivity_values -- list of sensitivities (mg/dL/U)
 
-    default_absorption_time -- absorption time to use for unspecified
-                               carb entries
+    default_absorption_times -- list absorption times to use for unspecified
+                               carb entries in format [fast, medium, slow]
 
     absorption_time_overrun -- multiplier to determine absorption time
                                from the specified absorption time
@@ -191,9 +189,6 @@ def get_carbs_on_board(
         return ([], [])
 
     start_date = at_date - timedelta(minutes=delta)
-    # only get the current COB if no end date is specified
-    if not end_date:
-        end_date = at_date
 
     maximum_absorption_time_interval = default_absorption_times[2] * 2
 

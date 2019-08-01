@@ -249,10 +249,8 @@ class TestDataStoreFunctions(unittest.TestCase):
 
     """ Tests for get_glucose_effects """
     def test_glucose_effects_walsh_bolus(self):
-        time_to_calculate = (
-            datetime(2015, 7, 13, 12, 2, 37)
-            - timedelta(hours=24)
-        )
+        time_to_calculate = datetime(2015, 7, 13, 11, 57, 37)
+
         (effect_dates,
          effect_values
          ) = get_glucose_effects(
@@ -304,10 +302,8 @@ class TestDataStoreFunctions(unittest.TestCase):
         )
 
     def test_glucose_effects_exponential_bolus(self):
-        time_to_calculate = (
-            datetime(2015, 7, 13, 12, 2, 37)
-            - timedelta(hours=24)
-        )
+        time_to_calculate = datetime(2015, 7, 13, 11, 57, 37)
+
         (effect_dates,
          effect_values
          ) = get_glucose_effects(
@@ -337,10 +333,8 @@ class TestDataStoreFunctions(unittest.TestCase):
             )
 
     def test_glucose_effects_walsh_basal(self):
-        time_to_calculate = (
-            datetime(2015, 7, 13, 12, 0, 0)
-            - timedelta(hours=24)
-        )
+        time_to_calculate = datetime(2015, 7, 13, 12, 0, 0)
+
         (effect_dates,
          effect_values
          ) = get_glucose_effects(
@@ -370,10 +364,7 @@ class TestDataStoreFunctions(unittest.TestCase):
             )
 
     def test_glucose_effects_walsh_doses(self):
-        time_to_calculate = (
-            datetime(2016, 2, 15, 12, 0, 0)
-            - timedelta(hours=24)
-        )
+        time_to_calculate = datetime(2016, 2, 15, 14, 55, 0)
         (effect_dates,
          effect_values
          ) = get_glucose_effects(
@@ -403,11 +394,9 @@ class TestDataStoreFunctions(unittest.TestCase):
                 expected_values[i], effect_values[i], delta=3
             )
 
-    def test_glucose_effect_walsh_doses(self):
-        time_to_calculate = (
-            datetime(2015, 7, 13, 11, 40, 0)
-            - timedelta(hours=24)
-        )
+    def test_glucose_effects_walsh_long_basal(self):
+        time_to_calculate = datetime(2015, 7, 13, 11, 40, 0)
+
         (effect_dates,
          effect_values
          ) = get_glucose_effects(

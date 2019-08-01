@@ -328,8 +328,8 @@ def update_retrospective_glucose_effect(
     # Our last change should be recent, otherwise clear the effects
     if (time_interval_since(
             retrospective_glucose_discrepancies_summed[1][-1],
-            now_time) / 60
-            > recency_interval
+            now_time)
+            > recency_interval * 60
        ):
         return ([], [])
 

@@ -100,7 +100,15 @@ def get_insulin_data(
                 float(data[i].get("value"))
             ) if convert_to_units else float(data[i].get("value"))
         )
-    if entry_to_add:
+
+    if (
+            entry_to_add and
+            not (
+                entry_to_add.get("type")[17:]
+                if entry_to_add.get("type").startswith("LoopKit.DoseType.")
+                else entry_to_add.get("type")
+            ).lower() in ["basal", "tempbasal"]
+       ):
         start = datetime.strptime(
             entry_to_add.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"

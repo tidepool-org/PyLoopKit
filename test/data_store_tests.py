@@ -10,7 +10,7 @@ from datetime import datetime, time, timedelta
 import unittest
 
 import path_grabber  # pylint: disable=unused-import
-from carb_store import get_carb_glucose_effects
+from carb_store import get_carb_glucose_effects, get_carbs_on_board
 from dose_store import get_glucose_effects
 from glucose_store import (
     get_recent_momentum_effects, get_counteraction_effects
@@ -802,6 +802,177 @@ class TestDataStoreFunctions(unittest.TestCase):
             self.assertAlmostEqual(
                 expected_values[i], effect_values[i], 2
             )
+
+    """ Tests for get_carbs_on_board """
+    def test_non_dynamic_cob(self):
+        carb_data = self.load_carb_data("carb_effect_from_history_input")
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_data("carbs_on_board_output")
+
+        (dates,
+         values
+         ) = get_carbs_on_board(
+             *carb_data,
+             datetime.fromisoformat("2015-10-15T18:45:00"),
+             [], [], [],
+             [], [],
+             [], [], [],
+             default_absorption_times=[120, 180, 240],
+             absorption_time_overrun=1,
+             delay=10,
+             delta=5
+             )
+
+        self.assertEqual(
+            len(expected_dates), len(dates)
+        )
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], values[i], 1
+            )
+
+    def test_non_dynamic_cob_edgecases(self):
+        carb_data = (
+            [datetime.fromisoformat("2015-10-15T18:45:00")], [0], [120]
+        )
+
+        (dates,
+         values
+         ) = get_carbs_on_board(
+             *carb_data,
+             datetime.fromisoformat("2015-10-15T18:45:00"),
+             [], [], [],
+             [], [],
+             [], [], [],
+             default_absorption_times=[120, 180, 240],
+             absorption_time_overrun=1,
+             delay=10,
+             delta=5
+             )
+
+        self.assertTrue(all(cob == 0 for cob in values))
+
+        (dates,
+         values
+         ) = get_carbs_on_board(
+             [], [], [],
+             datetime.fromisoformat("2015-10-15T18:45:00"),
+             [], [], [],
+             [], [],
+             [], [], [],
+             default_absorption_times=[120, 180, 240],
+             absorption_time_overrun=1,
+             delay=10,
+             delta=5
+             )
+
+        self.assertEqual(len(dates), 0)
+        self.assertEqual(len(values), 0)
+
+    def test_dynamic_cob_partial_absorption(self):
+        input_ice = self.load_glucose_velocities("ice_35_min_input")
+
+        (carb_starts,
+         carb_values,
+         carb_absorptions
+         ) = self.load_carb_data("carb_entry_input")
+
+        carb_ratio_tuple = self.load_carb_ratios()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        carb_entry_starts = [carb_starts[0]]
+        carb_entry_quantities = [carb_values[0]]
+        carb_entry_absorptions = [carb_absorptions[0]]
+
+        (expected_dates,
+         expected_values
+         ) = self.load_glucose_effect_output(
+             "ice_35_min_partial_output"
+             )
+
+        (effect_dates,
+         effect_values
+         ) = get_carbs_on_board(
+             carb_entry_starts, carb_entry_quantities, carb_entry_absorptions,
+             datetime.fromisoformat("2015-10-15T21:35:00"),
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times,
+             absorption_time_overrun=2,
+             end_date=datetime.fromisoformat("2015-10-16T03:35:00")
+             )
+
+        self.assertEqual(len(expected_dates), len(effect_dates))
+
+        for i in range(0, len(expected_dates)):
+            self.assertEqual(
+                expected_dates[i], effect_dates[i]
+            )
+            self.assertAlmostEqual(
+                expected_values[i], effect_values[i], 2
+            )
+
+    def test_dynamic_cob_edge_cases(self):
+        input_ice = self.load_glucose_velocities("ice_slow_absorption")
+
+        carb_data = ([], [], [])
+
+        carb_ratio_tuple = self.load_carb_ratios()
+
+        default_absorption_times = self.DEFAULT_ABSORPTION_TIMES
+
+        (effect_dates,
+         effect_values
+         ) = get_carbs_on_board(
+             *carb_data,
+             input_ice[0][0] + timedelta(minutes=5),
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times,
+             delay=10,
+             delta=5,
+             absorption_time_overrun=2,
+             end_date=(
+                 input_ice[0][0]
+                 + timedelta(hours=18)
+                 )
+             )
+
+        self.assertEqual(0, len(effect_dates))
+
+        (effect_dates,
+         effect_values
+         ) = get_carbs_on_board(
+             [input_ice[0][0]], [0], [120],
+             input_ice[0][0] + timedelta(minutes=5),
+             *input_ice,
+             *carb_ratio_tuple,
+             self.INSULIN_SENSITIVITY_START_DATES,
+             self.INSULIN_SENSITIVITY_END_DATES,
+             self.INSULIN_SENSITIVITY_VALUES,
+             default_absorption_times,
+             delay=10,
+             delta=5,
+             absorption_time_overrun=2,
+             end_date=(
+                 input_ice[0][0]
+                 + timedelta(hours=18)
+                 )
+             )
+
+        self.assertTrue(all(cob == 0 for cob in effect_values))
 
 
 if __name__ == '__main__':

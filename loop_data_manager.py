@@ -382,12 +382,13 @@ def get_pending_insulin(
         or not last_temp_basal
         or last_temp_basal[1] > last_temp_basal[2]
        ):
+        print("return")
         return 0
 
     # if the end date for the temp basal is greater than current date,
     # find the pending insulin
     if (last_temp_basal[2] > at_date
-            and last_temp_basal[0].lower() == "tempbasal"):
+            and last_temp_basal[0].lower() in ["tempbasal", "basal"]):
         normal_basal_rate = find_ratio_at_time(
             basal_starts, [], basal_rates, at_date
         )

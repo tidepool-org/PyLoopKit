@@ -538,9 +538,9 @@ def combined_sums(
     sum_ends = []
     sum_values = []
 
-    starts.reverse()
-    ends.reverse()
-    values.reverse()
+    starts = list(reversed(starts))
+    ends = list(reversed(ends))
+    values = list(reversed(values))
     last_valid_index = 0
 
     for i in range(0, len(starts)):

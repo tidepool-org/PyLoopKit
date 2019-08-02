@@ -22,7 +22,8 @@ from input_validation_tools import (
     is_insulin_sensitivity_schedule_valid, are_carb_ratios_valid,
     are_basal_rates_valid, are_correction_ranges_valid)
 from insulin_math import find_ratio_at_time
-from loop_math import combined_sums, decay_effect, subtracting, predict_glucose
+from loop_math import (combined_sums, decay_effect, subtracting,
+                       predict_glucose, sort_dose_lists)
 
 
 def runner(
@@ -319,11 +320,15 @@ def update_retrospective_glucose_effect(
         carb_effect_dates, [], carb_effect_values,
         delta
         )
+    '''for (time, value) in zip(discrepancy_starts, discrepancy_values):
+        print(time+timedelta(hours=5), value)'''
 
-    retrospective_glucose_discrepancies_summed = combined_sums(
-        discrepancy_starts, discrepancy_starts, discrepancy_values,
-        retrospective_correction_grouping_interval * 1.01
-        )
+    retrospective_glucose_discrepancies_summed = sort_dose_lists(
+            *combined_sums(
+                discrepancy_starts, discrepancy_starts, discrepancy_values,
+                retrospective_correction_grouping_interval * 1.01
+                )
+        )[0:3]
 
     # Our last change should be recent, otherwise clear the effects
     if (time_interval_since(

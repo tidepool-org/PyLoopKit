@@ -29,6 +29,8 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
 
     if type_.lower() == "bolus":
         return value
+    elif type_.lower() in ["basal", "basalprofilestart"]:
+        return 0
 
     hours_ = hours(end, start)
     # don't divide by zero if it's a suspend

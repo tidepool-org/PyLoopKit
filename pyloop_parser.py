@@ -583,6 +583,11 @@ def parse_report_and_run(path, name):
             offset,
             entry_to_add=issue_dict.get("get_normalized_dose_entries")[-1]
         )
+    elif issue_dict.get("get_normalized_pump_event_dose"):
+        dose_data = get_insulin_data(
+            issue_dict.get("get_normalized_pump_event_dose"),
+            offset
+        )
     elif issue_dict.get("get_normalized_dose_entries"):
         dose_data = get_insulin_data(
             issue_dict.get("get_normalized_dose_entries"),

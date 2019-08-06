@@ -80,7 +80,7 @@ def is_continuous(date_list, interval=5):
     """
     try:
         return (abs(time_interval_since(date_list[0], date_list[-1]))
-                <= interval * (len(date_list) - 1) * 60)
+                < interval * (len(date_list)) * 60)
 
     except IndexError:
         print("Out of bounds error: list doesn't contain date values")

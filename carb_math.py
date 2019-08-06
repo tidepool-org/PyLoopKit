@@ -81,6 +81,8 @@ def map_(
             - structure: [(0) timeline start time,
                           (1) timeline end time,
                           (2) absorbed value during timeline interval (g)]
+            - if a timeline is a list with only "None", less than minimum
+              absorption was observed
         - carb_entries: each index is a list of carb entry values
             - these lists are values that were calculated during map_ runtime
             - structure: [(0) carb sensitivities (mg/dL/G of carbohydrate),
@@ -223,8 +225,8 @@ def map_(
                             * builder_carb_sensitivities[b_index]
                            )
             remaining_effect = max(entry_effect - observed_effects[b_index], 0)
-            # Apply a portion of the effect to this entry
 
+            # Apply a portion of the effect to this entry
             partial_effect_value = min(remaining_effect,
                                        (carb_entry_quantities[b_index]
                                         / builder_max_absorb_times[b_index]
@@ -320,6 +322,10 @@ def map_(
             time,
             builder_max_absorb_times[builder_index]
         )
+        observed_grams = (
+            observed_effects[builder_index]
+            / builder_carb_sensitivities[builder_index]
+        )
 
         output = []
         for i in range(0, len(observed_timeline_starts[builder_index])):
@@ -329,9 +335,7 @@ def map_(
                     observed_timeline_ends[builder_index][i],
                     observed_timeline_carb_values[builder_index][i]
                 ] if (
-                    observed_effects[builder_index]
-                    / builder_carb_sensitivities[builder_index]
-                    >= min_predicted_grams
+                    observed_grams >= min_predicted_grams
                     )
                 else [None, None, None])
 
@@ -958,8 +962,7 @@ def dynamic_glucose_effects(
             carb_starts[i]
             )
         csf = insulin_sensitivity / carb_ratio
-
-        return csf * carb_status.dynamic_absorbed_carbs(
+        partial_carbs_absorbed = carb_status.dynamic_absorbed_carbs(
             carb_starts[i],
             carb_quantities[i],
             absorptions[i],
@@ -969,6 +972,8 @@ def dynamic_glucose_effects(
             delay,
             delta,
         )
+
+        return csf * partial_carbs_absorbed
 
     while date <= end:
         effect_sum = 0

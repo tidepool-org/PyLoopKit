@@ -207,19 +207,16 @@ def map_(
         # such as during activity
         effect_value = max(0, effect_values[index]) * delta
 
-        def reduce_func(previous, index_):
-            return previous + (carb_entry_quantities[index_]
-                               / builder_max_absorb_times[index_]
-                               )
+        def rate_increase(index_):
+            return (carb_entry_quantities[index_]
+                    / builder_max_absorb_times[index_]
+                    )
         # Sum the minimum absorption rates of each active entry to
         # determine how to split the active effects
-        previous = 0
         total_rate = 0
 
         for i in active_builders:
-            rate_increase = reduce_func(previous, i)
-            total_rate += rate_increase
-            previous = rate_increase
+            total_rate += rate_increase(i)
 
         for b_index in active_builders:
             entry_effect = (carb_entry_quantities[b_index]

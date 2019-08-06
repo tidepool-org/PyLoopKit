@@ -48,7 +48,7 @@ def get_recent_momentum_effects(
     if not glucose_starts or not start_date:
         return ([], [])
 
-    (filtered_starts,
+    (filtered_dates,
      ends,
      filtered_values) = filter_date_range(
          glucose_starts,
@@ -59,12 +59,12 @@ def get_recent_momentum_effects(
          )
 
     if not display_list:
-        display_list = [False for i in filtered_starts]
+        display_list = [False for i in filtered_dates]
     if not provenances:
-        provenances = ["PyLoop" for i in filtered_starts]
+        provenances = ["PyLoop" for i in filtered_dates]
 
     effects = linear_momentum_effect(
-        filtered_starts, filtered_values, display_list, provenances,
+        filtered_dates, filtered_values, display_list, provenances,
         momentum_data_interval,
         delta
         )

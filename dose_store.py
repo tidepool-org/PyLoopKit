@@ -10,7 +10,6 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 """
 # pylint: disable=R0913, R0914, C0200
 from datetime import timedelta
-import numpy
 
 from dose_math import filter_date_range_for_doses
 from insulin_math import (annotated, trim, glucose_effects, reconciled)

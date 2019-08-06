@@ -699,7 +699,6 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
     return (iob_dates, iob_values)
 
 
-# date is time calc-ed at, start_date+end_date are props of dose
 def insulin_on_board_calc(type_, start_date, end_date, value,
                           scheduled_basal_rate, date, model, delay, delta):
     """ Calculates the insulin on board for a specific dose at a specific time
@@ -931,7 +930,6 @@ def glucose_effects(
         )
 
     while date <= end:
-
         effect_sum = 0
         for i in range(0, len(dose_start_dates)):
             effect_sum += find_partial_effect(i)

@@ -52,7 +52,8 @@ def convert_to_correct_units(type_, start, end, value):
 
 
 def get_insulin_data(
-        data, offset=0, convert_to_units=False, entry_to_add=None):
+        data, offset=0, convert_to_units=False, entry_to_add=None,
+        now_time=None):
     """ Load doses from an issue report cached_doses
         or normalized_insulin_doses dictionary
 
@@ -101,33 +102,31 @@ def get_insulin_data(
             ) if convert_to_units else float(data[i].get("value"))
         )
 
-    if (
-            entry_to_add and
-            not (
-                entry_to_add.get("type")[17:]
-                if entry_to_add.get("type").startswith("LoopKit.DoseType.")
-                else entry_to_add.get("type")
-            ).lower() in ["basal", "tempbasal"]
-       ):
+    if entry_to_add and now_time:
         start = datetime.strptime(
             entry_to_add.get("startDate"),
             "%Y-%m-%d %H:%M:%S %z"
         ) + timedelta(seconds=offset)
-        end = datetime.strptime(
+        dose_end = datetime.strptime(
             entry_to_add.get("endDate"),
             "%Y-%m-%d %H:%M:%S %z"
         ) + timedelta(seconds=offset)
 
         # if this entry is truly a new entry, convert to the appropriate units
         # and add to the output
-        if not start == start_dates[-1] and not end == end_dates[-1]:
+        if not start == start_dates[-1] and not dose_end == end_dates[-1]:
             dose_types.append(
                 entry_to_add.get("type")[17:]
                 if entry_to_add.get("type").startswith("LoopKit.DoseType.")
                 else entry_to_add.get("type")
             )
             start_dates.append(start)
-            end_dates.append(end)
+            end_dates.append(
+                max(
+                    start,
+                    min(now_time, dose_end)
+                )
+            )
             values.append(
                 float(entry_to_add.get("value"))
             )
@@ -307,7 +306,7 @@ def get_counteractions(data, offset=0):
         datetime.strptime(
             dict_.get("end_time"),
             " %Y-%m-%d %H:%M:%S %z"
-        )
+        ) + timedelta(seconds=offset)
         for dict_ in data
     ]
     values = [
@@ -548,8 +547,8 @@ def parse_report_and_run(path, name):
 
     if issue_dict.get("recommended_temp_basal"):
         time_to_run = datetime.strptime(
-            issue_dict.get("recommended_temp_basal").get("date") or
-            issue_dict.get("recommended_temp_basal").get(" date"),
+            issue_dict.get("recommended_temp_basal").get("date")
+            or issue_dict.get("recommended_temp_basal").get(" date"),
             "%Y-%m-%d %H:%M:%S %z"
         ) + timedelta(seconds=offset)
     elif issue_dict.get("recommended_bolus"):
@@ -581,7 +580,8 @@ def parse_report_and_run(path, name):
         dose_data = get_insulin_data(
             issue_dict.get("get_normalized_pump_event_dose"),
             offset,
-            entry_to_add=issue_dict.get("get_normalized_dose_entries")[-1]
+            entry_to_add=issue_dict.get("get_normalized_dose_entries")[-1],
+            now_time=time_to_run
         )
     elif issue_dict.get("get_normalized_pump_event_dose"):
         dose_data = get_insulin_data(

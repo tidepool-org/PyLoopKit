@@ -257,6 +257,23 @@ def runner(
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
+    recommendations["insulin_effect_dates"] = insulin_effect_dates
+    recommendations["insulin_effect_values"] = insulin_effect_values
+
+    recommendations["momentum_effect_dates"] = momentum_effect_dates
+    recommendations["momentum_effect_values"] = momentum_effect_values
+
+    recommendations["carb_effect_dates"] = carb_effect_dates
+    recommendations["carb_effect_values"] = carb_effect_values
+
+    recommendations["retrospective_effect_dates"] = (
+        retrospective_glucose_effects[0] or None
+    )
+    recommendations["retrospective_effect_values"] = (
+        retrospective_glucose_effects[1] or None
+    )
+    recommendations["carbs_on_board"] = current_cob
+
     return recommendations
 
 

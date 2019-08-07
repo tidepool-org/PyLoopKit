@@ -177,6 +177,14 @@ def runner(
          settings_dictionary.get("model")
          )
 
+    now_to_dia_insulin_effects = get_glucose_effects(
+         *insulin_data,
+         time_to_calculate_at,
+         *scheduled_basals_data,
+         *sensitivity_data,
+         settings_dictionary.get("model")
+         )
+
     if next_effect_date < last_glucose_date and insulin_effect_dates:
         counteraction_effects = get_counteraction_effects(
             *glucose_data,
@@ -236,7 +244,7 @@ def runner(
         *glucose_data,
         momentum_effect_dates, momentum_effect_values,
         carb_effect_dates, carb_effect_values,
-        insulin_effect_dates, insulin_effect_values,
+        *now_to_dia_insulin_effects,
         *retrospective_glucose_effects,
         *target_range_data,
         settings_dictionary.get("suspend_threshold"),

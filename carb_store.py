@@ -111,7 +111,7 @@ def get_carb_glucose_effects(
             delta,
             start=at_date,
             end=end_date,
-            scaler=1.5
+            scaler=1.7
             )
 
     else:

@@ -509,6 +509,7 @@ def simulation_date_range(
                     (absorption_times[i] or default_absorption_time) * scaler
                     + delay)
             )
+
         if end_date > max_date:
             max_date = end_date
 
@@ -941,7 +942,7 @@ def dynamic_glucose_effects(
         delta=delta,
         start=start,
         end=end,
-        scaler=1.5
+        scaler=scaler
         )
 
     date = start

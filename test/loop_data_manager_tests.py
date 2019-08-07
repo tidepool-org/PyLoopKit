@@ -176,7 +176,10 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         recommendation = self.run_report_through_runner(
             "utc_issue_report"
         )
-        pyloop_predicted_glucoses = recommendation[0]
+        pyloop_predicted_glucoses = [
+            recommendation.get("predicted_glucose_dates"),
+            recommendation.get("predicted_glucose_values")
+        ]
         expected_predicted_glucoses = self.load_report_predicted_glucoses(
             "utc_issue_report"
         )
@@ -197,15 +200,18 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
 
         # check that the basal and bolus recommendations are as-expected
-        self.assertEqual(recommendation[1][0], 1.1)
-        self.assertEqual(recommendation[1][1], 30)
-        self.assertEqual(recommendation[2][0], 0)
+        self.assertEqual(recommendation.get("recommended_temp_basal")[0], 1.1)
+        self.assertEqual(recommendation.get("recommended_temp_basal")[1], 30)
+        self.assertEqual(recommendation.get("recommended_bolus")[0], 0)
 
     def test_loop_with_timezoned_issue_report(self):
         recommendation = self.run_report_through_runner(
             "timezoned_issue_report"
         )
-        pyloop_predicted_glucoses = recommendation[0]
+        pyloop_predicted_glucoses = [
+            recommendation.get("predicted_glucose_dates"),
+            recommendation.get("predicted_glucose_values")
+        ]
         expected_predicted_glucoses = self.load_report_predicted_glucoses(
             "timezoned_issue_report"
         )
@@ -221,15 +227,19 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             )
 
         # check that the basal and bolus recommendations are as-expected
-        self.assertIsNone(recommendation[1])
-        self.assertEqual(recommendation[2][0], 0)
-        self.assertAlmostEqual(recommendation[2][2][1], 68.1475, 2)
+        self.assertIsNone(recommendation.get("recommended_temp_basal"))
+        self.assertEqual(recommendation.get("recommended_bolus")[0], 0)
+        self.assertAlmostEqual(recommendation.get("recommended_bolus")[2][1],
+                               68.1475, 1)
 
     def test_loop_with_high_glucose_issue_report(self):
         recommendation = self.run_report_through_runner(
             "high_bg_recommended_basal_and_bolus_report"
         )
-        pyloop_predicted_glucoses = recommendation[0]
+        pyloop_predicted_glucoses = [
+            recommendation.get("predicted_glucose_dates"),
+            recommendation.get("predicted_glucose_values")
+        ]
         expected_predicted_glucoses = self.load_report_predicted_glucoses(
             "high_bg_recommended_basal_and_bolus_report"
         )
@@ -244,15 +254,18 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
                 expected_predicted_glucoses[1][i], 1
             )
 
-        self.assertEqual(recommendation[1][0], 1.2)
-        self.assertEqual(recommendation[1][1], 30)
-        self.assertEqual(recommendation[2][0], 0.15)
+        self.assertEqual(recommendation.get("recommended_temp_basal")[0], 1.2)
+        self.assertEqual(recommendation.get("recommended_temp_basal")[1], 30)
+        self.assertEqual(recommendation.get("recommended_bolus")[0], 0.15)
 
     def test_loop_with_one_basal_issue_report(self):
         recommendation = self.run_report_through_runner(
             "one_basal_issue_report"
         )
-        pyloop_predicted_glucoses = recommendation[0]
+        pyloop_predicted_glucoses = [
+            recommendation.get("predicted_glucose_dates"),
+            recommendation.get("predicted_glucose_values")
+        ]
         expected_predicted_glucoses = self.load_report_predicted_glucoses(
             "one_basal_issue_report"
         )
@@ -266,29 +279,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
                 pyloop_predicted_glucoses[1][i],
                 expected_predicted_glucoses[1][i], 1
             )
-        self.assertIsNone(recommendation[1])
-
-    def test_loop_with_day_crossing_issue_report(self):
-        recommendation = self.run_report_through_runner(
-            "basal_and_bolus_report"
-        )
-        pyloop_predicted_glucoses = recommendation[0]
-        expected_predicted_glucoses = self.load_report_predicted_glucoses(
-            "basal_and_bolus_report"
-        )
-
-        self.assertEqual(
-            len(pyloop_predicted_glucoses[0]),
-            len(expected_predicted_glucoses[0])
-        )
-        for i in range(0, len(pyloop_predicted_glucoses[0])):
-            self.assertAlmostEqual(
-                pyloop_predicted_glucoses[1][i],
-                expected_predicted_glucoses[1][i], -2
-            )
-
-        self.assertIsNone(recommendation[1])
-        self.assertEqual(recommendation[2][0], 1.55)
+        self.assertIsNone(recommendation.get("recommended_temp_basal"))
 
     """ Tests for get_pending_insulin """
     def test_negative_pending_insulin(self):

@@ -556,4 +556,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         rate_rounder
         )
 
-    return [predicted_glucoses, temp_basal, bolus]
+    return {"predicted_glucose_dates": predicted_glucoses[0],
+            "predicted_glucose_values": predicted_glucoses[1],
+            "recommended_temp_basal": temp_basal,
+            "recommended_bolus": bolus}

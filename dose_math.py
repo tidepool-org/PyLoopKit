@@ -285,16 +285,8 @@ def insulin_correction(
             at_date
             ) / 60
 
-        # Compute the target value as a function of time since the dose started
-        target_value = target_glucose_value(
-            (time /
-             (
-                 (60 * model[0]) if len(model) == 1
-                 else model[0]
-             )
-            ),
-            suspend_threshold_value,
-            (find_ratio_at_time(
+        average_target = (
+            find_ratio_at_time(
                 target_starts,
                 target_ends,
                 target_maxes,
@@ -307,6 +299,16 @@ def insulin_correction(
                  prediction_dates[i]
                  )
              ) / 2
+        # Compute the target value as a function of time since the dose started
+        target_value = target_glucose_value(
+            (time /
+             (
+                 (60 * model[0]) if len(model) == 1
+                 else model[0]
+             )
+            ),
+            suspend_threshold_value,
+            average_target
         )
 
         # Compute the dose required to bring this prediction to target:

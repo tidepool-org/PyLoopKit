@@ -125,7 +125,7 @@ def predict_glucose(
         for i in range(0,
                        len(correction_effect_dates)
                        ):
-            value = insulin_effect_values[i]
+            value = correction_effect_values[i]
             list_index = merged_dates.index(correction_effect_dates[i])
             merged_values[list_index] = (
                 merged_values[list_index]

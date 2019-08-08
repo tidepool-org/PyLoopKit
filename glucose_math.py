@@ -69,11 +69,12 @@ def is_calibrated(display_list):
     return True in display_list
 
 
-def is_continuous(date_list, interval=5):
+def is_continuous(date_list, delta=5):
     """ Checks whether the collection can be considered continuous
 
     Arguments:
     date_list -- list of datetime objects
+    delta -- the (expected) time interval between CGM values
 
     Output:
     Whether the collection is continuous
@@ -81,7 +82,7 @@ def is_continuous(date_list, interval=5):
     try:
         return (
             abs(time_interval_since(date_list[0], date_list[-1]))
-            < interval * (len(date_list)) * 60
+            < delta * (len(date_list)) * 60
         )
 
     except IndexError:

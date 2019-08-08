@@ -761,7 +761,7 @@ def insulin_on_board_calc(
                 )
 
     # Consider doses within the delta time window as momentary
-    # This will normally be for boluses
+    # This will normally be for boluses or short temp basals
     if time_interval_since(end_date, start_date) <= 1.05 * delta * 60:
         return net_basal_units(
             type_,

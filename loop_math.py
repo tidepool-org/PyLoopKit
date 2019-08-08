@@ -8,10 +8,10 @@ Created on Fri Jun 14 10:40:48 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
             57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/LoopMath.swift
 """
-# pylint: disable=R0913, R0914, C0200, R0912, R0915, W0102
+# pylint: disable=R0913, R0914, C0200, R0912, R0915, W0102, C0103
 # disable pylint errors for too many arguments/variables
-import numpy
 from datetime import timedelta
+import numpy
 
 from date import (date_floored_to_time_interval,
                   date_ceiled_to_time_interval, time_interval_since)
@@ -86,11 +86,9 @@ def predict_glucose(
             )
         )
     )
+
     merged_values = [0 for i in merged_dates]
 
-    # TODO: is there a way to not have to repeat this code
-    # for every effect value type?
-    # possibly as a tensor where dates are the same?
     if carb_effect_dates:
         previous_effect_value = carb_effect_values[0] or 0
         for i in range(0,
@@ -141,7 +139,7 @@ def predict_glucose(
 
         # The blend begins delta minutes after after the last glucose (1.0)
         # and ends at the last momentum point (0.0)
-        # We're assuming the first one occurs on/before the starting glucose
+        # This assumes the first one occurs on/before the starting glucose
         blend_count = len(momentum_dates) - 2
         time_delta = time_interval_since(
             momentum_dates[1],
@@ -283,7 +281,7 @@ def simulation_date_range_for_samples(
     delta -- what to round to
     start -- specified start date
     end -- specified end date
-    delay -- additional time added to interval
+    delay -- additional time added to interval in minutes
 
     Output:
     tuple with (start_time, end_time) structure
@@ -341,8 +339,11 @@ def subtracting(starts, ends, values,
     other_ends -- end times of the effect to subtract (datetime)
     other_values -- values of the effect to subtract
 
+    effect_interval -- time interval (in minutes) between times in the
+                       other_starts and other_ends lists
+
     Output:
-    The resulting array of glucose effects in the form
+    The resulting glucose effects in the form
     (start_times, end_times, values)
     """
     assert len(starts) == len(ends) == len(values),\
@@ -433,7 +434,7 @@ def filter_date_range(
         start_date,
         end_date
         ):
-    """ Returns an array of elements filtered by the specified date range.
+    """ Returns tuple of elements filtered by the specified date range.
 
     Arguments:
     starts -- start dates (datetime)
@@ -481,8 +482,8 @@ def sort_dose_lists(list_1, list_2, list_3=None, list_4=None, list_5=None):
          the property to sort by
 
     Example:
-        l1: [50, 2, 3]               ->     [2, 3, 50]
-        l2: [dog, cat, parrot]       ->     [cat, parrot, dog]
+        list_1: [50, 2, 3]               ->     [2, 3, 50]
+        list_2: [dog, cat, parrot]       ->     [cat, parrot, dog]
     """
     unsort_1 = numpy.array(list_1)
     unsort_2 = numpy.array(list_2)
@@ -526,7 +527,6 @@ def combined_sums(
     values -- glucose values
 
     duration -- duration of each resulting summed element (minutes)
-    delta -- delta between glucose effects (minutes)
 
     Output:
     Summed effects in format (start_dates, end_dates, values)

@@ -19,7 +19,7 @@ TIMEZONE_REF_TIME = datetime.datetime.strptime(
 
 
 def time_interval_since_reference_date(actual_time):
-    """ Calculates seconds since since January, 1st, 2001 @ 12:00 AM
+    """ Calculate seconds since since January, 1st, 2001 @ 12:00 AM
 
     Arguments:
     actual_time -- datetime object to compare to Jan 1st, 2001 @ 12:00 AM
@@ -34,7 +34,7 @@ def time_interval_since_reference_date(actual_time):
 
 
 def time_interval_since(date_1, date_2):
-    """ Calculates seconds between two times
+    """ Calculate seconds between two times
 
     Arguments:
     date_1 -- datetime object #1
@@ -47,7 +47,7 @@ def time_interval_since(date_1, date_2):
 
 
 def date_floored_to_time_interval(time_, interval):
-    """ Floors a datetime object to a particular minute interval
+    """ Floor a datetime object to a particular minute interval
 
     Arguments:
     time -- datetime object to be floored
@@ -61,7 +61,7 @@ def date_floored_to_time_interval(time_, interval):
     """
     if interval == 0:
         return time_
-    # this assumes the interval is in mins
+
     floored_delta = (math.floor(time_interval_since_reference_date(time_) /
                                 interval / 60) * interval * 60)
 
@@ -72,7 +72,7 @@ def date_floored_to_time_interval(time_, interval):
 
 
 def date_ceiled_to_time_interval(time, interval):
-    """ Ceils a datetime object to a particular minute interval
+    """ Ceil a datetime object to a particular minute interval
 
     Arguments:
     time -- datetime object to be ceiled
@@ -86,7 +86,7 @@ def date_ceiled_to_time_interval(time, interval):
     """
     if interval == 0:
         return time
-    # this assumes the interval is in mins
+
     ceiled_delta = (math.ceil(time_interval_since_reference_date(time) /
                               interval / 60) * interval * 60)
 

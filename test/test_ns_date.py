@@ -8,6 +8,7 @@ Created on Sun Jun 16 15:41:18 2019
 # pylint: disable=C0111, C0411, W0105
 import unittest
 from datetime import datetime, timedelta
+
 import path_grabber  # pylint: disable=unused-import
 from date import (date_floored_to_time_interval, date_ceiled_to_time_interval,
                   time_interval_since_reference_date, time_interval_since)
@@ -17,10 +18,7 @@ REF_DATE = datetime(2001, 1, 1, 0, 0, 0)
 
 class TestDateFunctions(unittest.TestCase):
 
-    """
-      Tests for date_ceiled_to_time_interval
-    """
-
+    """ Tests for date_ceiled_to_time_interval """
     def test_date_ceiled_to_interval(self):
         calendar = datetime.now()
         five_01 = calendar.replace(hour=5, minute=0, second=1, microsecond=0)
@@ -46,10 +44,7 @@ class TestDateFunctions(unittest.TestCase):
         self.assertEqual(tomorrow_midnight,
                          date_ceiled_to_time_interval(twenty_three_59, 5))
 
-    """
-      Tests for date_floored_to_time_interval
-    """
-
+    """ Tests for date_floored_to_time_interval """
     def test_date_floored_to_interval(self):
         calendar = datetime.now()
         five_01 = calendar.replace(hour=5, minute=0, second=1, microsecond=0)
@@ -65,10 +60,7 @@ class TestDateFunctions(unittest.TestCase):
         self.assertEqual(five, date_floored_to_time_interval(five, 5))
         self.assertEqual(five_01, date_floored_to_time_interval(five_01, 0))
 
-    """
-      Tests for time_interval_since_reference_date
-    """
-
+    """ Tests for time_interval_since_reference_date """
     def test_time_interval_since_reference_date(self):
         self.assertEqual(0, time_interval_since_reference_date(REF_DATE))
 

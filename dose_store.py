@@ -62,14 +62,14 @@ def get_glucose_effects(
     if len(insulin_model) == 1:  # if using Walsh model
         dose_start = (start_date
                       - timedelta(
-                              hours=insulin_model[0]
-                              )
+                          hours=insulin_model[0]
+                          )
                       )
     else:
         dose_start = (start_date
                       - timedelta(
-                              minutes=insulin_model[0]
-                              )
+                          minutes=insulin_model[0]
+                          )
                       )
 
     filtered_doses = filter_date_range_for_doses(
@@ -94,10 +94,10 @@ def get_glucose_effects(
      a_values,
      a_scheduled_rates
      ) = annotated(
-             *sorted_reconciled_doses,
-             basal_starts, basal_rates, basal_minutes,
-             convert_to_units_hr=False
-             )
+         *sorted_reconciled_doses,
+         basal_starts, basal_rates, basal_minutes,
+         convert_to_units_hr=False
+     )
 
     # trim the doses to start of interval
     for i in range(0, len(a_types)):
@@ -119,6 +119,8 @@ def get_glucose_effects(
         end=end_date
         )
 
+    # don't return effects that are less than the start date or greater than
+    # the end date (if there is one)
     (filtered_starts,
      ends,
      filtered_effect_values) = filter_date_range(

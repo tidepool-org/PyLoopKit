@@ -399,7 +399,7 @@ class TestGlucoseKitFunctions(unittest.TestCase):
             0, len(glucose_effect_dates)
         )
 
-    """ tests for counteraction_effects """
+    """ Tests for counteraction_effects """
     def test_counteraction_effects_for_falling_glucose(self):
         (i_dates,
          i_glucoses,

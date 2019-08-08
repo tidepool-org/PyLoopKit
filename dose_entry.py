@@ -20,6 +20,8 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
     value -- if bolus: amount given, if temp basal: temp rate (U/hr)
     start -- datetime object representing start of dose
     end -- datetime object representing end of dose
+    scheduled_basal_rate -- the rate scheduled during the time the dose was
+                            given (0 for boluses)
 
     Output:
     Bolus amount (if a bolus), or basal units given, net of whatever the
@@ -29,21 +31,23 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
 
     if type_.lower() == "bolus":
         return value
+
     elif type_.lower() in ["basal", "basalprofilestart"]:
         return 0
 
     hours_ = hours(end, start)
-    # don't divide by zero if it's a suspend
+
     if type_.lower() in ["pumpsuspend", "suspend"]:
         units = -scheduled_basal_rate * hours_
     else:
         units = (value - scheduled_basal_rate) * hours_
 
+    # round to the basal increments that the pump supports
     return round(units * MINIMUM_MINIMED_INCREMENT) / MINIMUM_MINIMED_INCREMENT
 
 
 def total_units_given(type_, value, start, end):
-    """ Find total units given """
+    """ Find total units given for a dose """
     if type_.lower() in ["bolus", "pumpsuspend", "suspend"]:
         return value
 
@@ -51,5 +55,7 @@ def total_units_given(type_, value, start, end):
 
 
 def hours(start_date, end_date):
-    """ Find hours between two dates """
+    """ Find hours between two dates for the purposes of calculating basal
+        delivery
+    """
     return abs(time_interval_since(end_date, start_date))/3600  # secs -> hrs

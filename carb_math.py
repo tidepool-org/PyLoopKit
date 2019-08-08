@@ -199,6 +199,7 @@ def map_(
         # Select only the entries whose dates overlap the current date interval
         # These are not always contiguous, as maxEndDate varies between entries
         active_builders = []
+
         for j in builder_entry_indexes:
             if (effect_starts[index] < builder_max_end_dates[j]
                     and effect_starts[index] >= carb_entry_starts[j]):
@@ -664,6 +665,8 @@ def dynamic_carbs_on_board(
     delta -- the differential between timeline entries
     start -- datetime to start calculation of glucose effects
     end -- datetime to stop calculation of glucose effects
+    scaler -- the factor to extend carb absorption by when calculating the
+              end time for the COB timeline
 
     Output:
     Two lists in format (carb on board start dates, carb on board values)
@@ -754,6 +757,8 @@ def carb_glucose_effects(
     delta -- the differential between timeline entries
     start -- datetime to start calculation of glucose effects
     end -- datetime to stop calculation of glucose effects
+    scaler -- the factor to extend carb absorption by when calculating the
+              end time for the COB timeline
 
     Output:
     Two lists in format (effect_start_dates, effect_values)
@@ -909,7 +914,8 @@ def dynamic_glucose_effects(
     delta -- the differential between timeline entries
     start -- datetime to start calculation of glucose effects
     end -- datetime to stop calculation of glucose effects
-    scaler -- the factor of the absorption time to have the effects go out to
+    scaler -- the factor to extend carb absorption by when calculating the
+              end time for the COB timeline
 
     Output:
     Two lists in format (effect_start_dates, effect_values)
@@ -1005,6 +1011,7 @@ def absorbed_carbs(
     carb_value -- carbs consumed
     absorption_time --  time for carbs to completely absorb (in minutes)
     at_date -- date to calculate the absorbed carbs (datetime object)
+    delay -- minutes to delay the start of absorption
 
     Output:
     Grams of absorbed carbs

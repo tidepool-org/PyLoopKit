@@ -242,6 +242,8 @@ def insulin_correction(
      min_correction_units
      ) = ([], None, None, None)
 
+    # only calculate a correction if the prediction is between
+    # "now" and now + DIA
     if len(model) == 1:  # if Walsh model
         date_range = [at_date,
                       at_date + timedelta(hours=model[0])
@@ -292,13 +294,13 @@ def insulin_correction(
                 target_maxes,
                 prediction_dates[i]
                 ) +
-             find_ratio_at_time(
-                 target_starts,
-                 target_ends,
-                 target_mins,
-                 prediction_dates[i]
-                 )
-             ) / 2
+            find_ratio_at_time(
+                target_starts,
+                target_ends,
+                target_mins,
+                prediction_dates[i]
+                )
+            ) / 2
         # Compute the target value as a function of time since the dose started
         target_value = target_glucose_value(
             (time /
@@ -326,6 +328,7 @@ def insulin_correction(
             )
         effected_sensitivity = percent_effected * sensitivity_value
 
+        # calculate the Units needed to correct that predicted glucose value
         correction_units = insulin_correction_units(
             predicted_glucose_value,
             target_value,
@@ -394,14 +397,17 @@ def insulin_correction(
                 sys.float_info.epsilon,
                 1 - percent_effect_remaining(time, model[0], model[1])
                 )
+
         units = insulin_correction_units(
             min_glucose[1],
             sum(min_glucose_targets) / len(min_glucose_targets),
             sensitivity_value * percent_effected
             )
+
         if not units:
             return None
 
+        # we're way below target
         return [
             -1,
             min_glucose[1],
@@ -409,6 +415,7 @@ def insulin_correction(
             units
             ]
 
+    # we're above target
     elif (eventual_glucose[1] > eventual_glucose_targets[1]
           and min_correction_units
           and correcting_glucose
@@ -420,6 +427,7 @@ def insulin_correction(
             eventual_glucose_targets[0],
             min_correction_units
             ]
+    # we're in range
     else:
         return [1]
 
@@ -431,7 +439,7 @@ def as_temp_basal(
         duration,
         rate_rounder=None
         ):
-    """ Determines temp basal over duration needed to perform the correction
+    """ Determine temp basal over duration needed to perform the correction
 
     Arguments:
     correction -- list of information about the total amount of insulin
@@ -505,6 +513,7 @@ def as_bolus(
     )
     units = correction_units - pending_insulin
     units = min(max_bolus, max(0, units))
+
     if volume_rounder:
         volume_rounder = 1 / volume_rounder
         units = round(units * volume_rounder) / volume_rounder
@@ -718,6 +727,7 @@ def recommended_bolus(
         volume_rounder
         )
 
-    assert bolus[0] >= 0, "Expected bolus to be a positive value"
+    if bolus[0] < 0:
+        bolus = 0
 
     return bolus

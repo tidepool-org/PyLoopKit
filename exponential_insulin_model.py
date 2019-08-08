@@ -10,7 +10,6 @@ https://github.com/tidepool-org/LoopKit/blob/
 ExponentialInsulinModel.swift
 """
 # pylint: disable=C0103
-# disable "doesn't conform to snake_case naming" for S and a
 import math
 
 

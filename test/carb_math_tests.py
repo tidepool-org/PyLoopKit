@@ -254,7 +254,6 @@ class TestCarbKitFunctions(unittest.TestCase):
             )
 
     """ Tests for dynamic COB """
-
     def test_dynamic_absorption_none_observed(self):
         input_ice = self.load_ice_input_fixture("ice_35_min_input")
 
@@ -384,6 +383,7 @@ class TestCarbKitFunctions(unittest.TestCase):
                  + timedelta(hours=6)
                  )
              )
+
 
         assert len(expected_dates) == len(cob_dates)
         for i in range(0, len(expected_dates)):
@@ -534,8 +534,6 @@ class TestCarbKitFunctions(unittest.TestCase):
             self.assertAlmostEqual(
                 expected_values[i], cob_values[i], 1
             )
-
-    # not doing groupedByOverlappingAbsorptionTimes because it's never used
 
     """ Tests for dynamic_glucose_effects """
     def test_dynamic_glucose_effect_absorption_none_observed(self):

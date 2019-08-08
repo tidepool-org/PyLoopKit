@@ -247,6 +247,28 @@ class TestDataStoreFunctions(unittest.TestCase):
 
         return (start_dates, end_dates, glucose_effects)
 
+    def load_report_glucose_values(self, report_name):
+        """ Load the cached glucose values from an issue report """
+        report = load_fixture(report_name, ".json")
+
+        assert report.get("cached_glucose_samples"),\
+            "expected issue report to contain glucose information"
+
+        return get_glucose_data(
+            report.get("cached_glucose_samples")
+        )
+
+    def load_report_momentum_effects(self, report_name):
+        """ Load the expected momentum effects from an issue report """
+        report = load_fixture(report_name, ".json")
+
+        assert report.get("glucose_momentum_effect"),\
+            "expected issue report to contain momentum information"
+
+        return load_momentum_effects(
+            report.get("glucose_momentum_effect")
+        )
+
     """ Tests for get_glucose_effects """
     def test_glucose_effects_walsh_bolus(self):
         time_to_calculate = datetime(2015, 7, 13, 11, 57, 37)
@@ -278,28 +300,6 @@ class TestDataStoreFunctions(unittest.TestCase):
             self.assertAlmostEqual(
                 expected_values[i], effect_values[i], 0
             )
-
-    def load_report_glucose_values(self, report_name):
-        """ Load the cached glucose values from an issue report """
-        report = load_fixture(report_name, ".json")
-
-        assert report.get("cached_glucose_samples"),\
-            "expected issue report to contain glucose information"
-
-        return get_glucose_data(
-            report.get("cached_glucose_samples")
-        )
-
-    def load_report_momentum_effects(self, report_name):
-        """ Load the expected momentum effects from an issue report """
-        report = load_fixture(report_name, ".json")
-
-        assert report.get("glucose_momentum_effect"),\
-            "expected issue report to contain momentum information"
-
-        return load_momentum_effects(
-            report.get("glucose_momentum_effect")
-        )
 
     def test_glucose_effects_exponential_bolus(self):
         time_to_calculate = datetime(2015, 7, 13, 11, 57, 37)

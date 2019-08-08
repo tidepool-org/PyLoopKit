@@ -85,7 +85,7 @@ def get_carb_glucose_effects(
         end_date
         )
 
-    # if we have effects, generate our carb-related glucose effects
+    # if we have counteraction effects, generate our carb glucose effects
     # with a dynamic model
     if effect_starts and effect_starts[0]:
         (absorption_results,
@@ -113,7 +113,7 @@ def get_carb_glucose_effects(
             end=end_date,
             scaler=1.7
             )
-
+    # otherwise, use a static model
     else:
         effects = carb_glucose_effects(
             *filtered_carbs,
@@ -204,6 +204,7 @@ def get_carbs_on_board(
         end_date
         )
 
+    # If we have counteraction effects, use a dynamic model
     if (effect_starts and effect_starts[0]
             and carb_ratio_starts
             and sensitivity_starts
@@ -231,6 +232,7 @@ def get_carbs_on_board(
             end=end_date,
             scaler=1.5
             )
+    # otherwise, use a static model
     else:
         cob_data = carbs_on_board(
             *filtered_carbs,

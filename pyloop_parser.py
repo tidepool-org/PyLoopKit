@@ -67,6 +67,7 @@ def get_insulin_data(
                     as it sometimes lacks the last insulin dose. This function
                     assumes that if it is a basal, it will need to be converted
                     to U/hr.
+    now_time -- the time to run the loop at ("datetime.now")
 
     Output:
     4 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
@@ -239,7 +240,7 @@ def get_basal_schedule(data):
         from an issue report basal_rate_schedule dictionary
 
     Arguments:
-    data -- dictionary containing CR information
+    data -- dictionary containing basal schedule information
 
     Output:
     3 lists in (rate_start_time, rate_length (minutes), rate (U/hr)) format
@@ -529,6 +530,14 @@ def remove_too_new_values(
 def parse_report_and_run(path, name):
     """ Get relevent information from a Loop issue report and use it to
         run PyLoopKit
+
+    Arguments:
+    path -- the path to the issue report
+    name -- the name of the file, with the .json extension
+
+    Output:
+    A dictionary of all 4 effects, the predicted glucose values, and the
+    recommended basal and bolus
     """
     data_path_and_name = os.path.join(path, name)
 
@@ -603,6 +612,7 @@ def parse_report_and_run(path, name):
     else:
         print("No insulin dose information found")
         dose_data = ([], [], [], [])
+
     dose_data = remove_too_new_values(
         time_to_run,
         *sort_dose_lists(*dose_data)[0:4],

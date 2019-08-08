@@ -26,10 +26,11 @@ def load_fixture(resource_name, extension):
     return json.load(open(path))
 
 
-# this will return the FIRST instance of the file
 def find_full_path(resource_name, extension):
     """ Find file path, given name and extension
-        example: "/home/pi/Media/tidepool_demo.json")
+        example: "/home/pi/Media/tidepool_demo.json"
+
+        This will return the *first* instance of the file
 
     Arguments:
     resource_name -- name of file without the extension
@@ -49,10 +50,11 @@ def find_full_path(resource_name, extension):
     return ""
 
 
-# this will return the FIRST instance of the file
 def find_root_path(resource_name, extension):
     """ Find root path, given name and extension
         (example: "/home/pi/Media")
+
+        This will return the *first* instance of the file
 
     Arguments:
     resource_name -- name of file without the extension

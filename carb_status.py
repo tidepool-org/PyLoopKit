@@ -14,6 +14,7 @@ from datetime import timedelta
 from date import time_interval_since
 import carb_math
 
+
 def dynamic_carbs_on_board_helper(
         carb_start,
         carb_value,
@@ -49,10 +50,10 @@ def dynamic_carbs_on_board_helper(
     Carbohydrate value (g)
     """
 
+    # We have to have absorption info for dynamic calculation
     if (at_date < carb_start - timedelta(minutes=delta)
             or not absorption_dict
        ):
-        # We have to have absorption info for dynamic calculation
         return carb_math.carbs_on_board_helper(
             carb_start,
             carb_value,
@@ -61,8 +62,9 @@ def dynamic_carbs_on_board_helper(
             delay,
             carb_absorption_time
             )
+
+    # Less than minimum observed; calc based on min absorption rate
     if observed_timeline and None in observed_timeline[0]:
-        # Less than minimum observed; calc based on min absorption rate
         time = time_interval_since(at_date, carb_start) / 60 - delay
         estimated_date_duration = (
             time_interval_since(
@@ -92,7 +94,7 @@ def dynamic_carbs_on_board_helper(
             absorption_time
         )
 
-    # Observed absorption
+    # There was observed absorption
     total = carb_value
     def partial_absorption(dict_):
         if dict_[1] > at_date:
@@ -140,10 +142,10 @@ def dynamic_absorbed_carbs(
     Carbohydrate value (g)
     """
 
+    # We have to have absorption info for dynamic calculation
     if (at_date < carb_start
             or not absorption_dict
        ):
-        # We have to have absorption info for dynamic calculation
         return carb_math.absorbed_carbs(
             carb_start,
             carb_value,
@@ -151,8 +153,8 @@ def dynamic_absorbed_carbs(
             at_date,
             delay,
             )
+    # Less than minimum observed; calc based on min absorption rate
     if observed_timeline and None in observed_timeline[0]:
-        # Less than minimum observed; calc based on min absorption rate
         time = time_interval_since(at_date, carb_start) / 60 - delay
         estimated_date_duration = (
             time_interval_since(
@@ -184,7 +186,7 @@ def dynamic_absorbed_carbs(
 
     sum_ = 0
 
-    # Observed absorption
+    # There was observed absorption
     def filter_dates(sub_timeline):
         return sub_timeline[0] + timedelta(minutes=delta) <= at_date
 

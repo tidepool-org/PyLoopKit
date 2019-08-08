@@ -335,7 +335,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
         )
 
     """ Tests for insulin_on_board """
-
     def test_iob_from_suspend(self):
         (i_types,
          i_start_dates,
@@ -1405,9 +1404,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
         self.assertEqual(
             datetime.fromisoformat("2016-02-15T14:58:02"), t_ends[0]
         )
-
-    # not including appendedUnion because it's more for dose-management and
-    # not really used
 
 
 if __name__ == '__main__':

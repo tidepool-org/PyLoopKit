@@ -34,7 +34,7 @@ def get_recent_momentum_effects(
     now_date -- the date to assume as the "now" time (aka datetime.now())
 
     momentum_data_interval -- time to generate momentum effects out to (mins)
-    delta -- time between blood glucose measurements
+    delta -- time between blood glucose measurements (mins)
 
     display_list -- list of display_only booleans
     provenances -- list of provenances (Strings)

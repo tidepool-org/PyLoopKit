@@ -45,4 +45,5 @@ def walsh_percent_effect_remaining(minutes, action_duration):
     if dia == 6:
         return -1.493e-10 * pow(minutes, 4) + 1.413e-7 * pow(minutes, 3)\
             - 4.095e-5 * pow(minutes, 2) + 6.365e-4 * minutes + 0.99700
+
     raise RuntimeError

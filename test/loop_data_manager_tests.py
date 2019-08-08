@@ -244,11 +244,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
             "high_bg_recommended_basal_and_bolus_report"
         )
 
-        self.assertEqual(
-            len(pyloop_predicted_glucoses[0]),
-            len(expected_predicted_glucoses[0])
-        )
-        for i in range(0, len(pyloop_predicted_glucoses[0])):
+        for i in range(0, len(expected_predicted_glucoses[0])):
             self.assertAlmostEqual(
                 pyloop_predicted_glucoses[1][i],
                 expected_predicted_glucoses[1][i], 1
@@ -403,8 +399,8 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_report_retrospective_effects(
-            "timezoned_issue_report"
-        )
+             "timezoned_issue_report"
+         )
 
         (dates,
          values
@@ -440,8 +436,8 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         (expected_dates,
          expected_values
          ) = self.load_report_retrospective_effects(
-            "basal_and_bolus_report"
-        )
+             "basal_and_bolus_report"
+         )
 
         (dates,
          values

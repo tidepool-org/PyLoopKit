@@ -8,7 +8,7 @@ Created on Wed Jul 10 16:04:15 2019
 Github URL: https://github.com/tidepool-org/Loop/blob/
 8c1dfdba38fbf6588b07cee995a8b28fcf80ef69/Loop/Managers/LoopDataManager.swift
 """
-# pylint: disable=R0913, R0914, W0105, C0200
+# pylint: disable=R0913, R0914, W0105, C0200, R0916
 from datetime import timedelta
 
 from carb_store import get_carb_glucose_effects, get_carbs_on_board
@@ -23,7 +23,7 @@ from input_validation_tools import (
     are_basal_rates_valid, are_correction_ranges_valid)
 from insulin_math import find_ratio_at_time
 from loop_math import (combined_sums, decay_effect, subtracting,
-                       predict_glucose, sort_dose_lists)
+                       predict_glucose)
 
 
 def runner(
@@ -142,8 +142,7 @@ def runner(
             or not is_insulin_sensitivity_schedule_valid(*sensitivity_data)
             or not are_carb_ratios_valid(*carb_ratio_data)
             or not are_basal_rates_valid(*scheduled_basals_data)
-            or not are_correction_ranges_valid(*target_range_data)
-       ):
+            or not are_correction_ranges_valid(*target_range_data)):
         return []
 
     last_glucose_date = glucose_data[0][len(glucose_data[0]) - 1]
@@ -154,6 +153,7 @@ def runner(
             "retrospective_correction_integration_interval"))
     )
 
+    # calculate a maximum of 24 hours of effects
     earliest_effect_date = time_to_calculate_at - timedelta(hours=24)
     next_effect_date = earliest_effect_date
 
@@ -167,6 +167,8 @@ def runner(
          5
          )
 
+    # calculate previous insulin effects in order to later calculate the
+    # insulin counteraction effects
     (insulin_effect_dates,
      insulin_effect_values
      ) = get_glucose_effects(
@@ -177,14 +179,17 @@ def runner(
          settings_dictionary.get("model")
          )
 
+    # calculate future insulin effects for the purposes of predicting glucose
     now_to_dia_insulin_effects = get_glucose_effects(
-         *insulin_data,
-         time_to_calculate_at,
-         *scheduled_basals_data,
-         *sensitivity_data,
-         settings_dictionary.get("model")
-         )
+        *insulin_data,
+        time_to_calculate_at,
+        *scheduled_basals_data,
+        *sensitivity_data,
+        settings_dictionary.get("model")
+        )
 
+    # if our BG data is current and we know the expected insulin effects,
+    # calculate tbe counteraction effects
     if next_effect_date < last_glucose_date and insulin_effect_dates:
         counteraction_effects = get_counteraction_effects(
             *glucose_data,
@@ -326,7 +331,8 @@ def update_retrospective_glucose_effect(
     delta -- time interval between glucose values (mins)
 
     Output:
-    Retrospective glucose effect information
+    Retrospective glucose effect information in format
+    (retrospective_effect_dates, retrospective_effect_values)
     """
     assert len(glucose_dates) == len(glucose_values),\
         "expected input shapes to match"
@@ -354,8 +360,7 @@ def update_retrospective_glucose_effect(
     # Our last change should be recent, otherwise clear the effects
     if (time_interval_since(
             now_time,
-            retrospective_glucose_discrepancies_summed[1][-1]
-            )
+            retrospective_glucose_discrepancies_summed[1][-1])
             > recency_interval * 60
        ):
         return ([], [])
@@ -390,12 +395,12 @@ def get_pending_insulin(
     at_date -- the "now" time (roughly equivalent to datetime.now)
 
     basal_starts -- list of times the basal rates start at
-    basal_rates -- list of basal rates(U/hr)
+    basal_rates -- list of basal rates (U/hr)
     basal_minutes -- list of basal lengths (in mins)
 
     last_temp_basal -- information about the last temporary basal in the form
                        [type, start time, end time, basal rate]
-    pending_bolus_amount -- amount of unconfirmed bolus insulin in U
+    pending_bolus_amount -- amount of unconfirmed bolus insulin (U)
 
     Output:
     Amount of insulin that is "pending"
@@ -404,10 +409,9 @@ def get_pending_insulin(
         "expected input shapes to match"
 
     if (not basal_starts
-        or not last_temp_basal
-        or last_temp_basal[1] > last_temp_basal[2]
+            or not last_temp_basal
+            or last_temp_basal[1] > last_temp_basal[2]
        ):
-        print("return")
         return 0
 
     # if the end date for the temp basal is greater than current date,
@@ -581,7 +585,9 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         rate_rounder
         )
 
-    return {"predicted_glucose_dates": predicted_glucoses[0],
-            "predicted_glucose_values": predicted_glucoses[1],
-            "recommended_temp_basal": temp_basal,
-            "recommended_bolus": bolus}
+    return {
+        "predicted_glucose_dates": predicted_glucoses[0],
+        "predicted_glucose_values": predicted_glucoses[1],
+        "recommended_temp_basal": temp_basal,
+        "recommended_bolus": bolus
+    }

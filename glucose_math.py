@@ -27,7 +27,7 @@ def linear_regression(x_list, y_list):
     Output:
     A tuple of slope and intercept values
     """
-    assert len(x_list) == len(y_list), "expected input shape to match"
+    assert len(x_list) == len(y_list), "expected input shapes to match"
     sum_x = 0.0
     sum_y = 0.0
     sum_xy = 0.0
@@ -79,40 +79,45 @@ def is_continuous(date_list, interval=5):
     Whether the collection is continuous
     """
     try:
-        return (abs(time_interval_since(date_list[0], date_list[-1]))
-                < interval * (len(date_list)) * 60)
+        return (
+            abs(time_interval_since(date_list[0], date_list[-1]))
+            < interval * (len(date_list)) * 60
+        )
 
     except IndexError:
         print("Out of bounds error: list doesn't contain date values")
         return False
 
 
-def has_single_provenance(prov_list):
+def has_single_provenance(provenance_list):
     """ Checks whether the collection is all from the same source
     Runtime: O(n)
 
     Arguments:
-    obj_list -- list of Glucose-related objects with
+    provenance_list -- list of Glucose-related objects with
                 provenance_identifier property
 
     Output:
     True if the samples are from same source
     """
     try:
-        first_provenance = prov_list[0]
+        first_provenance = provenance_list[0]
 
     except IndexError:
         print("Out of bounds error: list doesn't contain objects")
 
-    for prov in prov_list:
-        if prov != first_provenance:
+    for provenance in provenance_list:
+        if provenance != first_provenance:
             return False
 
     return True
 
 
-def linear_momentum_effect(date_list, glucose_value_list, display_list,
-                           provenance_list, duration=30, delta=5):
+def linear_momentum_effect(
+        date_list, glucose_value_list, display_list, provenance_list,
+        duration=30,
+        delta=5
+    ):
     """ Calculates the short-term predicted momentum effect using
         linear regression
 
@@ -167,8 +172,10 @@ def linear_momentum_effect(date_list, glucose_value_list, display_list,
     return (momentum_effect_dates, momentum_effect_values)
 
 
-def counteraction_effects(dates, glucose_values, displays, provenances,
-                          effect_dates, effect_values):
+def counteraction_effects(
+        dates, glucose_values, displays, provenances,
+        effect_dates, effect_values
+    ):
     """ Calculates a timeline of effect velocity (glucose/time) observed
         in glucose readings that counteract the specified effects.
 
@@ -232,11 +239,15 @@ def counteraction_effects(dates, glucose_values, displays, provenances,
             # the glucose effect at position "j" will happen after the
             # starting glucose date, then make start_effect equal to that
             # effect
-            if (not start_effect_date and effect_dates[j] >= start_date):
+            if (not start_effect_date
+                    and effect_dates[j] >= start_date
+               ):
                 start_effect_date = effect_dates[j]
                 start_effect_value = effect_values[j]
 
-            elif (not end_effect_date and effect_dates[j] >= dates[i]):
+            elif (not end_effect_date
+                  and effect_dates[j] >= dates[i]
+                 ):
                 end_effect_date = effect_dates[j]
                 end_effect_value = effect_values[j]
                 break

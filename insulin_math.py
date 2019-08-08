@@ -330,9 +330,7 @@ def annotated(
 
     convert_to_units_hr -- set to True if you want to convert the doses to U/hr
         (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr);
-        this will normally be reservoir values
-
-    offset -- the offset in hours from UTC time
+        this will normally be for reservoir values
 
     Output:
     5 lists of annotated dose properties
@@ -390,8 +388,6 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
         If the dose crosses a schedule boundary, it will be split into
         multiple doses so each dose has a single scheduled basal rate.
 
-        * basal "value" MUST be in units/hr! *
-
     Arguments:
     dose_type -- type of dose (basal, bolus, etc)
     dose_start_date -- start date of the dose (datetime obj)
@@ -403,7 +399,6 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     basal_minutes -- list of basal lengths (in mins)
     convert_to_units_hr -- set to True if you want to convert a dose to U/hr
         (ex: 0.05 U given from 1/1/01 1:00:00 to 1/1/01 1:05:00 -> 0.6 U/hr)
-
 
     Output:
     Tuple with properties of doses, annotated with the current basal rates
@@ -468,8 +463,11 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
             )
 
 
-def between(basal_start_times, basal_rates, basal_minutes, start_date,
-            end_date, repeat_interval=24):
+def between(
+        basal_start_times, basal_rates, basal_minutes,
+        start_date, end_date,
+        repeat_interval=24
+    ):
     """ Returns a slice of scheduled basal rates that occur between two dates
 
     Arguments:
@@ -478,6 +476,8 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
     basal_minutes -- list of basal lengths (in mins)
     start_date -- start date of the range (datetime obj)
     end_date -- end date of the range (datetime obj)
+    repeat_interval -- the duration over which the rates repeat themselves
+                       (24 hours by default)
 
     Output:
     Tuple in format (basal_start_times, basal_rates, basal_minutes) within
@@ -504,6 +504,7 @@ def between(basal_start_times, basal_rates, basal_minutes, start_date,
         + timedelta(seconds=time_interval_since(end_date, start_date))
     )
 
+    # if a dose is crosses days, split it into separate doses
     if end_offset > max_time_interval:
         boundary_date = start_date + (max_time_interval - start_offset)
         (start_times_1,
@@ -604,8 +605,7 @@ def schedule_offset(date_to_offset, reference_time,
     """
     reference_time_seconds = (reference_time.hour * 3600
                               + reference_time.minute * 60
-                              + reference_time.second
-                             )
+                              + reference_time.second)
     interval = time_interval_since_reference_date(date_to_offset)
 
     return timedelta(seconds=(interval - reference_time_seconds)
@@ -613,9 +613,14 @@ def schedule_offset(date_to_offset, reference_time,
                      + reference_time_seconds)
 
 
-def insulin_on_board(dose_types, start_dates, end_dates, values,
-                     scheduled_basal_rates, model, start=None, end=None,
-                     delay=10, delta=5):
+def insulin_on_board(
+        dose_types, start_dates, end_dates, values, scheduled_basal_rates,
+        model,
+        start=None,
+        end=None,
+        delay=10,
+        delta=5
+    ):
     """ Calculates the timeline of insulin remaining for a collection of doses
 
         This model allows us to specify time of peak activity, as well as
@@ -699,8 +704,13 @@ def insulin_on_board(dose_types, start_dates, end_dates, values,
     return (iob_dates, iob_values)
 
 
-def insulin_on_board_calc(type_, start_date, end_date, value,
-                          scheduled_basal_rate, date, model, delay, delta):
+def insulin_on_board_calc(
+        type_, start_date, end_date, value, scheduled_basal_rate,
+        date,
+        model,
+        delay,
+        delta
+    ):
     """ Calculates the insulin on board for a specific dose at a specific time
 
     Arguments:
@@ -780,8 +790,14 @@ def insulin_on_board_calc(type_, start_date, end_date, value,
             )
 
 
-def continuous_delivery_insulin_on_board(start_date, end_date, at_date,
-                                         model, delay, delta):
+def continuous_delivery_insulin_on_board(
+        start_date,
+        end_date,
+        at_date,
+        model,
+        delay,
+        delta
+    ):
     """ Calculates the percent of original insulin that is still on board
          at a specific time for a dose given over a period greater than
          1.05x the delta (this will almost always be a basal)
@@ -872,6 +888,9 @@ def glucose_effects(
 
     delay -- the time to delay the dose effect
     delta -- the differential between timeline entries
+
+    start -- datetime to start calculating the effects at
+    end -- datetime to end calculation of effects
 
     Output:
     Tuple in format (times_glucose_effect_was_calculated_at,
@@ -1014,9 +1033,18 @@ def is_time_between(start, end, time_to_check):
     return time_to_check >= start or time_to_check <= end
 
 
-def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
-                   scheduled_basal_rate, date, model,
-                   insulin_sensitivity, delay, delta):
+def glucose_effect(
+        dose_type,
+        dose_start_date,
+        dose_end_date,
+        dose_value,
+        scheduled_basal_rate,
+        date,
+        model,
+        insulin_sensitivity,
+        delay,
+        delta
+    ):
     """ Calculates the timeline of glucose effects for a specific dose
 
     Arguments:
@@ -1086,8 +1114,13 @@ def glucose_effect(dose_type, dose_start_date, dose_end_date, dose_value,
             )
 
 
-def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
-                                       model, delay, delta):
+def continuous_delivery_glucose_effect(
+        dose_start_date, dose_end_date,
+        at_date,
+        model,
+        delay,
+        delta
+    ):
     """ Calculates the percent of glucose effect at a specific time for
         a dose given over a period greater than 1.05x the delta
         (this will almost always be a basal)
@@ -1146,8 +1179,11 @@ def continuous_delivery_glucose_effect(dose_start_date, dose_end_date, at_date,
     return activity
 
 
-def trim(dose_type, start, end, value, scheduled_basal_rate,
-         start_interval=None, end_interval=None):
+def trim(
+        dose_type, start, end, value, scheduled_basal_rate,
+        start_interval=None,
+        end_interval=None
+    ):
     """ Trim doses to be within a particular interval
 
     Arguments:
@@ -1187,14 +1223,14 @@ def trim(dose_type, start, end, value, scheduled_basal_rate,
             ]
 
 
-def overlay_basal_schedule(dose_types, starts, ends, values,
-                           basal_start_times, basal_rates, basal_minutes,
-                           starting_at, ending_at, inserting_basal_entries):
+def overlay_basal_schedule(
+        dose_types, starts, ends, values,
+        basal_start_times, basal_rates, basal_minutes,
+        starting_at, ending_at,
+        inserting_basal_entries
+    ):
     """ Applies the current basal schedule to a collection of reconciled doses
         in chronological order
-
-        The scheduled basal rate is associated doses that override it, for
-        later derivation of net delivery
 
     Arguments:
     dose_types -- types of doses (basal, bolus, etc)

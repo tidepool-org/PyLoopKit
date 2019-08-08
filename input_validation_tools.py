@@ -7,6 +7,7 @@ Created on Mon Jul 29 16:39:23 2019
 """
 # pylint: disable=R0911, W0613
 
+
 def are_settings_valid(settings):
     """ Checks that a settings dictionary has needed properties, and
         that the values of those properties are reasonable

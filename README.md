@@ -11,7 +11,7 @@ URL of LoopKit repo version used for algorithm: https://github.com/tidepool-org/
 is located (likely the PyLoopKit folder).
 3. Run `conda env create`; this will download all of the package dependencies
 and install them in a virtual environment named py-loop. PLEASE NOTE: this
-may take close to 30 minutes to complete.
+may take up to 30 minutes to complete.
 
 ## To use the Virtual Environment
 In Bash run `source activate py-loop`, or in the Anaconda Prompt

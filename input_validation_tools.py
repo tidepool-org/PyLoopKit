@@ -36,16 +36,16 @@ def are_settings_valid(settings):
         print("Expected positive absorption time")
         return False
 
-    if (settings.get("max_basal_rate") <= 0
+    if (settings.get("max_basal_rate") < 0
             or settings.get("max_basal_rate") > 35
        ):
-        print("Expected maximum basal rate greater than 0 and less than 35")
+        print("Expected maximum basal rate of at least 0 and less than 35")
         return False
 
-    if (settings.get("max_bolus") <= 0
+    if (settings.get("max_bolus") < 0
             or settings.get("max_bolus") > 30
        ):
-        print("Expected maximum bolus greater than 0 and less than 30")
+        print("Expected maximum bolus of at least 0 and less than 30")
         return False
 
     return True
@@ -76,6 +76,34 @@ def are_carb_readings_valid(dates, carb_values, absorption_times):
     return True
 
 
+def are_insulin_doses_valid(types, start_times, end_times, values):
+    """ Checks that dose inputs are reasonable """
+    if any(type_.lower() not in
+           ["tempbasal", "basal", "basalprofilestart", "bolus",
+            "pumpsuspend", "suspend", "resume"] for type_ in types):
+        print("There are types in the insulin doses that PyLoop" +
+              "does't recognize. The algorithm will still be run, but" +
+              "be aware that some doses may not be accounted for.")
+
+    if any(value < 0 or value > 35 for value in values):
+        print("Expected reasonable dose values" +
+              "(between 0 and 35 U or U/hr)")
+        return False
+
+    if any(
+            start > end for (start, end) in
+            list(
+                zip(
+                    start_times, end_times
+                    )
+                )
+            ):
+        print("Expected dose start times <= ratio end times")
+        return False
+
+    return True
+
+
 def is_insulin_sensitivity_schedule_valid(start_times, end_times, ratios):
     """ Checks that an insulin sensitivity schedule is reasonable """
     if any(value < 10 or value > 400 for value in ratios):
@@ -89,7 +117,7 @@ def is_insulin_sensitivity_schedule_valid(start_times, end_times, ratios):
                 zip(
                     start_times, end_times
                     )
-                )[:-1]):
+                )[:-1]):  # don't include the last entry because start > end
         print("Expected sensitivity ratio start times <= ratio end times")
         return False
 
@@ -122,7 +150,7 @@ def are_basal_rates_valid(start_times, rates, minutes_active):
 
 def are_correction_ranges_valid(
         start_times, end_times, minimum_values, maximum_values):
-    """ Checks that correction ranges preasonable """
+    """ Checks that correction ranges are reasonable """
     if (any(value < 60 or value > 180 for value in minimum_values)
             or any(value < 60 or value > 180 for value in maximum_values)):
         print("Expected reasonable correction ranges" +

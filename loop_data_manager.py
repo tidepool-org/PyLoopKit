@@ -20,7 +20,8 @@ from glucose_store import (get_recent_momentum_effects,
 from input_validation_tools import (
     are_settings_valid, are_glucose_readings_valid, are_carb_readings_valid,
     is_insulin_sensitivity_schedule_valid, are_carb_ratios_valid,
-    are_basal_rates_valid, are_correction_ranges_valid)
+    are_basal_rates_valid, are_correction_ranges_valid,
+    are_insulin_doses_valid)
 from insulin_math import find_ratio_at_time
 from loop_math import (combined_sums, decay_effect, subtracting,
                        predict_glucose)
@@ -142,7 +143,8 @@ def runner(
             or not is_insulin_sensitivity_schedule_valid(*sensitivity_data)
             or not are_carb_ratios_valid(*carb_ratio_data)
             or not are_basal_rates_valid(*scheduled_basals_data)
-            or not are_correction_ranges_valid(*target_range_data)):
+            or not are_correction_ranges_valid(*target_range_data)
+            or not are_insulin_doses_valid(*insulin_data)):
         return []
 
     last_glucose_date = glucose_data[0][len(glucose_data[0]) - 1]

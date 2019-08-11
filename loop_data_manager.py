@@ -211,7 +211,8 @@ def runner(
          else ([], [], []),
          *carb_ratio_data,
          *sensitivity_data,
-         settings_dictionary.get("default_absorption_times")
+         settings_dictionary.get("default_absorption_times"),
+         delay=settings_dictionary.get("carb_delay") or 10
          )
 
     (cob_dates,
@@ -224,7 +225,8 @@ def runner(
          else ([], [], []),
          *carb_ratio_data,
          *sensitivity_data,
-         settings_dictionary.get("default_absorption_times")
+         settings_dictionary.get("default_absorption_times"),
+         delay=settings_dictionary.get("carb_delay") or 10
          )
 
     current_cob = cob_values[

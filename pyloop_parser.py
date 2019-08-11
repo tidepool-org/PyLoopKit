@@ -399,6 +399,7 @@ def get_settings(data):
     settings["retrospective_correction_grouping_interval"] = 30
     settings["rate_rounder"] = 0.05
     settings["insulin_delay"] = 10
+    settings["carb_delay"] = 10
 
     settings["default_absorption_times"] = [
         float(data.get("carb_default_absorption_times_fast")) / 60,

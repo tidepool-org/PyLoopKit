@@ -268,8 +268,8 @@ def runner(
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
-    recommendations["insulin_effect_dates"] = insulin_effect_dates
-    recommendations["insulin_effect_values"] = insulin_effect_values
+    recommendations["insulin_effect_dates"] = now_to_dia_insulin_effects[0]
+    recommendations["insulin_effect_values"] = now_to_dia_insulin_effects[1]
 
     recommendations["counteraction_effect_dates"] = counteraction_effects[0]
     recommendations["counteraction_effect_values"] = counteraction_effects[1]
@@ -287,6 +287,8 @@ def runner(
         retrospective_glucose_effects[1] or None
     )
     recommendations["carbs_on_board"] = current_cob
+    recommendations["cob_timeline_dates"] = cob_dates
+    recommendations["cob_timeline_values"] = cob_values
 
     return recommendations
 

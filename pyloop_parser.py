@@ -629,7 +629,15 @@ def parse_report_and_run(path, name):
 
     settings = get_settings(issue_dict)
 
-    if issue_dict.get("insulin_sensitivity_factor_schedule"):
+    if issue_dict.get(
+            "insulinSensitivityScheduleApplyingOverrideHistory_schedule"):
+        sensitivity_schedule = get_sensitivities(
+            issue_dict.get(
+                "insulinSensitivityScheduleApplyingOverrideHistory_schedule"
+            )
+        )
+        sensitivity_schedule = sort_by_first_list(*sensitivity_schedule)[0:3]
+    elif issue_dict.get("insulin_sensitivity_factor_schedule"):
         sensitivity_schedule = get_sensitivities(
             issue_dict.get("insulin_sensitivity_factor_schedule")
         )
@@ -637,7 +645,12 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No insulin sensitivity information found")
 
-    if issue_dict.get("carb_ratio_schedule"):
+    if issue_dict.get("carbRatioScheduleApplyingOverrideHistory_schedule"):
+        carb_ratio_schedule = get_carb_ratios(
+            issue_dict.get("carbRatioScheduleApplyingOverrideHistory_schedule")
+        )
+        carb_ratio_schedule = sort_by_first_list(*carb_ratio_schedule)[0:2]
+    elif issue_dict.get("carb_ratio_schedule"):
         carb_ratio_schedule = get_carb_ratios(
             issue_dict.get("carb_ratio_schedule")
         )
@@ -645,7 +658,12 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No carb ratio information found")
 
-    if issue_dict.get("basal_rate_schedule"):
+    if issue_dict.get("basalProfileApplyingOverrideHistory_schedule"):
+        basal_schedule = get_basal_schedule(
+            issue_dict.get("basalProfileApplyingOverrideHistory_schedule")
+        )
+        basal_schedule = sort_by_first_list(*basal_schedule)[0:3]
+    elif issue_dict.get("basal_rate_schedule"):
         basal_schedule = get_basal_schedule(
             issue_dict.get("basal_rate_schedule")
         )

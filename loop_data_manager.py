@@ -267,6 +267,9 @@ def runner(
     recommendations["insulin_effect_dates"] = insulin_effect_dates
     recommendations["insulin_effect_values"] = insulin_effect_values
 
+    recommendations["counteraction_effect_dates"] = counteraction_effects[0]
+    recommendations["counteraction_effect_values"] = counteraction_effects[1]
+
     recommendations["momentum_effect_dates"] = momentum_effect_dates
     recommendations["momentum_effect_values"] = momentum_effect_values
 

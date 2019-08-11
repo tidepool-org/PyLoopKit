@@ -22,6 +22,7 @@ def get_glucose_effects(
         basal_starts, basal_rates, basal_minutes,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
         insulin_model,
+        delay=10,
         end_date=None
         ):
     """ Get the glucose effects at a particular time, given a list of
@@ -115,6 +116,7 @@ def get_glucose_effects(
         a_types, a_starts, a_ends, a_values, a_scheduled_rates,
         insulin_model,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
+        delay=delay,
         start=start_date,
         end=end_date
         )

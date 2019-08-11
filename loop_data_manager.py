@@ -178,7 +178,8 @@ def runner(
          next_effect_date,
          *scheduled_basals_data,
          *sensitivity_data,
-         settings_dictionary.get("model")
+         settings_dictionary.get("model"),
+         delay=settings_dictionary.get("insulin_delay") or 10
          )
 
     # calculate future insulin effects for the purposes of predicting glucose
@@ -187,7 +188,8 @@ def runner(
         time_to_calculate_at,
         *scheduled_basals_data,
         *sensitivity_data,
-        settings_dictionary.get("model")
+        settings_dictionary.get("model"),
+        delay=settings_dictionary.get("insulin_delay") or 10
         )
 
     # if our BG data is current and we know the expected insulin effects,

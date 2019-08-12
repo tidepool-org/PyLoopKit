@@ -11,7 +11,7 @@ import os
 from datetime import datetime, time, timedelta
 import numpy
 
-from loop_data_manager import runner
+from loop_data_manager import update
 from loop_math import sort_dose_lists
 
 
@@ -632,10 +632,10 @@ def parse_report_and_run(path, name):
     settings = get_settings(issue_dict)
 
     if issue_dict.get(
-            "insulinSensitivityScheduleApplyingOverrideHistory_schedule"):
+            "insulinSensitivityScheduleApplyingOverrideHistory_items"):
         sensitivity_schedule = get_sensitivities(
             issue_dict.get(
-                "insulinSensitivityScheduleApplyingOverrideHistory_schedule"
+                "insulinSensitivityScheduleApplyingOverrideHistory_items"
             )
         )
         sensitivity_schedule = sort_by_first_list(*sensitivity_schedule)[0:3]
@@ -647,9 +647,9 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No insulin sensitivity information found")
 
-    if issue_dict.get("carbRatioScheduleApplyingOverrideHistory_schedule"):
+    if issue_dict.get("carbRatioScheduleApplyingOverrideHistory_items"):
         carb_ratio_schedule = get_carb_ratios(
-            issue_dict.get("carbRatioScheduleApplyingOverrideHistory_schedule")
+            issue_dict.get("carbRatioScheduleApplyingOverrideHistory_items")
         )
         carb_ratio_schedule = sort_by_first_list(*carb_ratio_schedule)[0:2]
     elif issue_dict.get("carb_ratio_schedule"):
@@ -660,9 +660,9 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No carb ratio information found")
 
-    if issue_dict.get("basalProfileApplyingOverrideHistory_schedule"):
+    if issue_dict.get("basalProfileApplyingOverrideHistory_items"):
         basal_schedule = get_basal_schedule(
-            issue_dict.get("basalProfileApplyingOverrideHistory_schedule")
+            issue_dict.get("basalProfileApplyingOverrideHistory_items")
         )
         basal_schedule = sort_by_first_list(*basal_schedule)[0:3]
     elif issue_dict.get("basal_rate_schedule"):
@@ -689,7 +689,7 @@ def parse_report_and_run(path, name):
         last_temp_basal = []
         print("No information found about the last temporary basal rate")
 
-    recommendations = runner(
+    recommendations = update(
         glucose_data,
         dose_data,
         carb_data,

@@ -27,7 +27,7 @@ from loop_math import (combined_sums, decay_effect, subtracting,
                        predict_glucose)
 
 
-def runner(
+def update(
         glucose_data,
         insulin_data,
         carb_data,

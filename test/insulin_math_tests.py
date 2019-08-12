@@ -1250,11 +1250,11 @@ class TestInsulinKitFunctions(unittest.TestCase):
             == len(i_values), "expected fixture to include data for all doses"
 
         trimmed = trim(
-            i_types[len(i_types)-1],
-            i_start_dates[len(i_types)-1],
-            i_end_dates[len(i_types)-1],
-            i_values[len(i_types)-1],
-            i_scheduled_basal_rates[len(i_types)-1],
+            i_types[-1],
+            i_start_dates[-1],
+            i_end_dates[-1],
+            i_values[-1],
+            i_scheduled_basal_rates[-1],
             end_interval=self.TRIM_END_DATE
         )
         self.assertEqual(

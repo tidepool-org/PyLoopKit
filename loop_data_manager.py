@@ -147,7 +147,7 @@ def update(
             or not are_insulin_doses_valid(*insulin_data)):
         return []
 
-    last_glucose_date = glucose_data[0][len(glucose_data[0]) - 1]
+    last_glucose_date = glucose_data[0][-1]
 
     retrospective_start = (
         last_glucose_date

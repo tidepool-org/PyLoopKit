@@ -9,11 +9,14 @@ from generate_graphs import plot_graph
 from loop_kit_tests import find_root_path
 from pyloop_parser import parse_report_and_run
 
-path = find_root_path("high_bg_recommended_basal_and_bolus_report", ".json")
+# find the path to the file in the repo
 name = "high_bg_recommended_basal_and_bolus_report.json"
+path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 
+# run the Loop algorithm with the issue report data
 recommendations = parse_report_and_run(path, name)
 
+# visualize some of that data
 plot_graph(
     recommendations.get("insulin_effect_dates"),
     recommendations.get("insulin_effect_values"),

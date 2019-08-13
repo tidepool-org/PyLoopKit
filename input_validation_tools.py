@@ -6,6 +6,7 @@ Created on Mon Jul 29 16:39:23 2019
 @author: annaquinlan
 """
 # pylint: disable=R0911, W0613
+import warnings
 
 
 def are_settings_valid(settings):
@@ -18,61 +19,96 @@ def are_settings_valid(settings):
             or model[0] > 24 if len(model) == 1 else model[1] > 120
             or model[1] > model[0] if len(model) == 2 else False
        ):
-        print("Expected valid insulin model")
+        warnings.warn(
+            "Error: expected insulin model with DIA between 0"
+            + "and 24 hours, peak <= 120 mins, and peak < DIA; stopping run."
+        )
         return False
 
     if settings.get("momentum_time_interval") < 5:
-        print("Expected momentum interval to be at least 5 minutes")
-        return False
+        warnings.warn(
+            "Warning: momentum interval is less than 5"
+            + " minutes; continuing anyway")
 
     if (settings.get("suspend_threshold")
-            and settings.get("suspend_threshold") < 50
+            and settings.get("suspend_threshold") < 54
        ):
-        print("Expected suspend threshold >= 50")
-        return False
+        warnings.warn(
+            "Warning: suspend threshold < 54 mg/dL; continuing anyway"
+        )
+    elif (settings.get("suspend_threshold")
+            and settings.get("suspend_threshold") > 180
+       ):
+        warnings.warn(
+            "Warning: suspend threshold > 180 mg/dL; continuing anyway"
+        )
 
     if any(absorption <= 0 for absorption in settings.get(
                 "default_absorption_times")):
-        print("Expected positive absorption time")
+        warnings.warn(
+            "Error: default absorption times must be positive; stopping run"
+        )
         return False
 
     if (settings.get("max_basal_rate") < 0
             or settings.get("max_basal_rate") > 35
        ):
-        print("Expected maximum basal rate of at least 0 and less than 35")
-        return False
+        warnings.warn(
+            "Warning: maximum basal rate is typically at least 0 and less"
+            + "than 35 U/hr; continuing anyway"
+        )
 
     if (settings.get("max_bolus") < 0
             or settings.get("max_bolus") > 30
        ):
-        print("Expected maximum bolus of at least 0 and less than 30")
-        return False
+        warnings.warn(
+            "Warning: maximum bolus is typically at least 0 and less than"
+            + " 30 U; continuing anyway"
+        )
 
     return True
 
 
 def are_glucose_readings_valid(dates, glucose_values):
     """ Checks that glucose readings are reasonable """
-    if any(value < 30 or value > 450 for value in glucose_values):
-        print("Expected valid glucose measurement (between 30 and 450 mg/dL)")
+    if any(value < 0 for value in glucose_values):
+        warnings.warn(
+            "Error: glucose measurements cannot be negative; stopping run"
+        )
         return False
+
+    if any(value < 40 or value > 400 for value in glucose_values):
+        warnings.warn(
+            "Warning: glucose measurements are typically between 40 and"
+            + "400 mg/dL; continuing anyway"
+        )
 
     return True
 
 
 def are_carb_readings_valid(dates, carb_values, absorption_times):
     """ Checks that carbohydrate inputs are reasonable """
-    if any(value < 0 or value > 200 for value in carb_values):
-        print("Expected reasonable carbohydrate input" +
-              "(between 0 and 200 grams of carbohydrates)")
+    if any(value < 0 for value in carb_values):
+        warnings.warn(
+            "Error: carbohydrate value cannot be negative; stopping run."
+        )
         return False
+
+    if any(value > 250 for value in carb_values):
+        warnings.warn(
+            "Warning: data contains carbohydrate values > 250 g; continuing"
+            + " anyway"
+        )
 
     if any(
             absorption < 0 or absorption > 1440
             for absorption in absorption_times):
-        print("Expected reasonable carbohydrate absorption time" +
-              "(between 0 and 1440 minutes)")
+        warnings.warn(
+            "Error: expected carbohydrate absorption times to be between"
+            + "0 & 1440 minutes (0 & 24 hours); stopping run"
+        )
         return False
+
     return True
 
 
@@ -81,14 +117,16 @@ def are_insulin_doses_valid(types, start_times, end_times, values):
     if any(type_.lower() not in
            ["tempbasal", "basal", "basalprofilestart", "bolus",
             "pumpsuspend", "suspend", "resume"] for type_ in types):
-        print("There are types in the insulin doses that PyLoop" +
-              "does't recognize. The algorithm will still be run, but" +
-              "be aware that some doses may not be accounted for.")
+        warnings.warn(
+            "Warning: there are types in the insulin doses that PyLoopKit" +
+            " doesn't recognize; continuing anyway"
+        )
 
     if any(value < 0 or value > 35 for value in values):
-        print("Expected reasonable dose values" +
-              "(between 0 and 35 U or U/hr)")
-        return False
+        warnings.warn(
+            "Warning: expected dose values to be between 0 and 35 U or U/hr;"
+            + " continuing anyway"
+        )
 
     if any(
             start > end for (start, end) in
@@ -98,7 +136,9 @@ def are_insulin_doses_valid(types, start_times, end_times, values):
                     )
                 )
             ):
-        print("Expected dose start times <= ratio end times")
+        warnings.warn(
+            "Error: dose start times cannot be greater than dose end times;"
+            + " stopping run")
         return False
 
     return True
@@ -106,10 +146,11 @@ def are_insulin_doses_valid(types, start_times, end_times, values):
 
 def is_insulin_sensitivity_schedule_valid(start_times, end_times, ratios):
     """ Checks that an insulin sensitivity schedule is reasonable """
-    if any(value < 10 or value > 400 for value in ratios):
-        print("Expected reasonable insulin sensitivity factor" +
-              "(between 10 and 400 mg/dL per Unit)")
-        return False
+    if any(value < 10 or value > 500 for value in ratios):
+        warnings.warn(
+            "Warning: data contains sensitivity values < 10 or > 500"
+            + " mg/dL per Unit; continuing anyway"
+            )
 
     if any(
             start > end for (start, end) in
@@ -118,7 +159,10 @@ def is_insulin_sensitivity_schedule_valid(start_times, end_times, ratios):
                     start_times, end_times
                     )
                 )[:-1]):  # don't include the last entry because start > end
-        print("Expected sensitivity ratio start times <= ratio end times")
+        warnings.warn(
+            "Error: sensitivity ratio start times cannot be greater than ratio"
+            + " end times; stopping run."
+        )
         return False
 
     return True
@@ -127,23 +171,32 @@ def is_insulin_sensitivity_schedule_valid(start_times, end_times, ratios):
 def are_carb_ratios_valid(dates, ratios):
     """ Checks that carbohydrate ratios are reasonable """
     if any(value < 1 or value > 150 for value in ratios):
-        print("Expected reasonable carbohydrate ratios" +
-              "(between 1 and 150 grams of carbohydrates per Unit)")
-        return False
+        warnings.warn(
+            "Warning: data contains carb ratios < 1 or > 150 grams of carbs"
+            + " per Unit; continuing anyway")
 
     return True
 
 
 def are_basal_rates_valid(start_times, rates, minutes_active):
-    """ Checks that carbohydrate ratios are reasonable """
-    if any(value < 0 or value > 35 for value in rates):
-        print("Expected reasonable basal rates" +
-              "(between 0 and 35 Units per hour)")
+    """ Checks that scheduled basal rates are reasonable """
+    if any(value < 0 for value in rates):
+        warnings.warn(
+            "Error: data contains negative scheduled basal rates; stopping run"
+        )
         return False
+    elif any(value > 35 for value in rates):
+        warnings.warn(
+            "Warning: data contains scheduled basal rates > 35 U/hr;"
+            + " continuing anyway"
+        )
 
-    if any(duration > 86400 for duration in minutes_active):
-        print("Expected scheduled duration of basal rates to be less than" +
-              "a day (86400 minutes)")
+    if any(duration > 1440 for duration in minutes_active):
+        warnings.warn(
+            "Error: data contains basal rates with scheduled duration greater"
+            + " than a day (1440 mins); stopping run"
+        )
+        return False
 
     return True
 
@@ -153,9 +206,9 @@ def are_correction_ranges_valid(
     """ Checks that correction ranges are reasonable """
     if (any(value < 60 or value > 180 for value in minimum_values)
             or any(value < 60 or value > 180 for value in maximum_values)):
-        print("Expected reasonable correction ranges" +
-              "(somewhere between 60 and 180 mg/dL)")
-        return False
+        warnings.warn(
+            "Warning: correction ranges are typically between 60 and"
+            + "180 mg/dL; continuing anyway")
 
     if any(
             start > end for (start, end) in
@@ -164,7 +217,10 @@ def are_correction_ranges_valid(
                     start_times, end_times
                     )
                 )[:-1]):
-        print("Expected correction range start times <= range end times")
+        warnings.warn(
+            "Error: correction range start times cannot be greater than range"
+            + " end times; stopping run"
+        )
         return False
 
     return True

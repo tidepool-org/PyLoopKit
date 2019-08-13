@@ -5,6 +5,9 @@ Created on Sun Aug 11 13:03:07 2019
 
 @author: annaquinlan
 """
+import json
+import datetime
+
 from generate_graphs import plot_graph
 from loop_kit_tests import find_root_path
 from pyloop_parser import parse_report_and_run
@@ -15,6 +18,24 @@ path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 
 # run the Loop algorithm with the issue report data
 recommendations = parse_report_and_run(path, name)
+
+
+# save dictionary as json file
+def convert_times(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    if isinstance(obj, datetime.time):
+        return obj.isoformat()
+
+
+with open(name.split(".")[0] + "-output.json", "w") as f:
+    json.dump(
+        recommendations,
+        f,
+        sort_keys=True,
+        indent=4,
+        default=convert_times
+    )
 
 # visualize some of that data
 plot_graph(

@@ -38,10 +38,28 @@ with open(name.split(".")[0] + "-output.json", "w") as f:
     )
 
 # visualize some of that data
+
 plot_graph(
     recommendations.get("insulin_effect_dates"),
     recommendations.get("insulin_effect_values"),
-    title="Insulin Effect"
+    title="Insulin Effect",
+    grid=True,
+    )
+
+plot_graph(
+    recommendations.get("counteraction_effect_start_times")[-len(recommendations.get("insulin_effect_dates")):],
+    recommendations.get("counteraction_effect_values")[-len(recommendations.get("insulin_effect_dates")):],
+    title="Counteraction Effects",
+    fill_color="#f09a37",
+    grid=True
+    )
+
+plot_graph(
+    recommendations.get("carb_effect_dates"),
+    recommendations.get("carb_effect_values"),
+    title="Carb Effect",
+    line_color="#5FCB49",
+    grid=True
     )
 
 plot_graph(
@@ -55,5 +73,6 @@ plot_graph(
     recommendations.get("predicted_glucose_dates"),
     recommendations.get("predicted_glucose_values"),
     title="Predicted Glucose",
-    line_color="#5ac6fa"
+    line_color="#5ac6fa",
+    grid=True
     )

@@ -23,7 +23,11 @@ def load_fixture(resource_name, extension):
     contents of file
     """
     path = find_full_path(resource_name, extension)
-    return json.load(open(path))
+
+    with open(path) as json_file:
+        file = json.load(json_file)
+
+    return file
 
 
 def find_full_path(resource_name, extension):

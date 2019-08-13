@@ -542,9 +542,8 @@ def parse_report_and_run(path, name):
     """
     data_path_and_name = os.path.join(path, name)
 
-    issue_dict = json.load(
-        open(data_path_and_name, "r")
-    )
+    with open(data_path_and_name, "r") as file:
+        issue_dict = json.load(file)
     input_dict = {}
 
     if issue_dict.get("basal_rate_timeZone") is not None:

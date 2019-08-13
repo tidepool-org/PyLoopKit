@@ -35,6 +35,14 @@ class TestInsulinKitFunctions(unittest.TestCase):
     INSULIN_SENSITIVITY_END_DATES = [time(23, 59)]
     INSULIN_SENSITIVITY_VALUES = [40]
 
+    MULTIPLE_INSULIN_SENSITIVITY_START_DATES = [
+        time(0, 0), time(19, 00), time(21, 00)
+    ]
+    MULTIPLE_INSULIN_SENSITIVITY_END_DATES = [
+        time(19, 00), time(21, 00), time(0, 0)
+    ]
+    MULTIPLE_INSULIN_SENSITIVITY_VALUES = [40, 140, 10]
+
     TRIM_END_DATE = datetime.fromisoformat("2015-10-15T22:25:50")
     DISTANT_FUTURE = datetime.fromisoformat("2050-01-01T00:00:00")
 
@@ -1141,6 +1149,36 @@ class TestInsulinKitFunctions(unittest.TestCase):
             self.assertTrue(
                 -3 < expected_effect_values[i] - effect_values[i] < 3
             )
+
+    def test_glucose_effect_from_history_multiple(self):
+        (i_types,
+         i_start_dates,
+         i_end_dates,
+         i_values,
+         i_scheduled_basal_rates
+         ) = self.load_dose_fixture("normalized_doses")
+
+        sensitivity_start_dates = self.MULTIPLE_INSULIN_SENSITIVITY_START_DATES
+        sensitivity_end_dates = self.MULTIPLE_INSULIN_SENSITIVITY_END_DATES
+        sensitivity_values = self.MULTIPLE_INSULIN_SENSITIVITY_VALUES
+        model = self.WALSH_MODEL
+
+        (effect_dates,
+         effect_values
+         ) = glucose_effects(
+             i_types,
+             i_start_dates,
+             i_end_dates,
+             i_values,
+             i_scheduled_basal_rates,
+             model,
+             sensitivity_start_dates,
+             sensitivity_end_dates,
+             sensitivity_values
+             )
+
+        for i in range(0, len(effect_dates)):
+            print(effect_dates[i], effect_values[i])
 
     def test_glucose_effect_from_history_exponential(self):
         (i_types,

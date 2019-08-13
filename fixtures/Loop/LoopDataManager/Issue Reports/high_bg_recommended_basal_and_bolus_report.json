@@ -4981,6 +4981,16 @@
     "insulin_sensitivity_factor_timeZone": -25200,
     "insulin_sensitivity_factor_unit": "mg/dL",
     "is_watch_app_installed": "false",
+    "last_temp_basal": {
+        " description": "nil",
+        " endDate": "2019-07-26 22:33:17 +0000",
+        " scheduledBasalRate": "nil",
+        " startDate": "2019-07-26 22:13:17 +0000",
+        " syncIdentifier": "Optional(\"42323439433932452d443930412d344437422d413443372d413542344544343843433730\"",
+        " type": "LoopKit.DoseType.basal",
+        " unit": "LoopKit.DoseUnit.unitsPerHour",
+        " value": 0.0
+    },
     "loop_version": "Loop v1.10.0dev",
     "maximum_basal_rate": 7.0,
     "maximum_bolus": 8.0,

@@ -962,48 +962,44 @@ def glucose_effects(
     return (effect_dates, effect_values)
 
 
-def find_ratio_at_time(sensitivity_start_times, sensitivity_end_times,
-                       sensitivity_values, time_to_check, type_="isf"
+def find_ratio_at_time(ratio_start_times, ratio_end_times,
+                       ratio_values, time_to_check
                        ):
-    """ Finds sensitivity setting value at a given time
+    """ Finds ratio or correction range value at a given time
 
     Arguments:
-    sensitivity_start_times -- list of time objects of start times of
-                               given insulin sensitivity values
-    sensitivity_end_times -- list of time objects of start times of
-                             given insulin sensitivity values
-    sensitivity_values -- list of sensitivities (mg/dL/U)
-    time_to_check -- finding the sensitivity value at this time
-    type_ -- type of ratio ("isf" for insulin sensitivity or
-                            "cr" for carb ratio)
+    ratio_start_times -- list of time objects of start times of
+                               given ratio/correction range values
+    ratio_end_times -- list of time objects of start times of
+                             given ratio/correction range values
+    ratio_values -- list of ratio/correction range values
+    time_to_check -- finding the value at this time
 
     Output:
-    Sensitivity value (mg/dL/U) or carb ratio (G/U)
+    Value at time_to_check
     """
-    assert type_.lower() in ["isf", "cr"], "expected type to be ISF or CR"
 
-    if type_.lower == "isf":
-        assert len(sensitivity_start_times) == len(sensitivity_end_times) ==\
-            len(sensitivity_values), "expected input shapes to match"
+    assert len(ratio_start_times) == len(ratio_values),\
+        "expected input shapes to match"
 
-    for i in range(0, len(sensitivity_start_times)):
-        if type_.lower == "isf":
+    for i in range(0, len(ratio_start_times)):
+        if ratio_end_times:
             if is_time_between(
-                    sensitivity_start_times[i],
-                    sensitivity_end_times[i],
+                    ratio_start_times[i],
+                    ratio_end_times[i],
                     time_to_check
                     ):  # pylint: disable=C0330
-                return sensitivity_values[i]
+                return ratio_values[i]
         else:
             if is_time_between(
-                    sensitivity_start_times[i],
-                    (sensitivity_start_times[i+1]
-                     if i+1 < len(sensitivity_start_times)
-                     else sensitivity_start_times[0]
+                    ratio_start_times[i],
+                    (ratio_start_times[i+1]
+                     if i+1 < len(ratio_start_times)
+                     else ratio_start_times[0]
                     ),
                     time_to_check
                     ):  # pylint: disable=C0330
-                return sensitivity_values[i]
+                return ratio_values[i]
     return 0
 
 

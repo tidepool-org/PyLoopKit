@@ -184,7 +184,7 @@ def update(input_dict):
     retrospective_start = (
         last_glucose_date
         - timedelta(minutes=settings_dictionary.get(
-            "retrospective_correction_integration_interval"))
+            "retrospective_correction_integration_interval") or 30)
     )
 
     # calculate a maximum of 24 hours of effects
@@ -251,7 +251,7 @@ def update(input_dict):
          retrospective_start,
          *counteraction_effects if
          settings_dictionary.get("dynamic_carb_absorption_enabled")
-         else ([], [], []),
+         is not False else ([], [], []),
          carb_ratio_starts, carb_ratio_values,
          sensitivity_starts, sensitivity_ends, sensitivity_values,
          settings_dictionary.get("default_absorption_times"),
@@ -265,7 +265,7 @@ def update(input_dict):
          time_to_calculate_at,
          *counteraction_effects if
          settings_dictionary.get("dynamic_carb_absorption_enabled")
-         else ([], [], []),
+         is not False else ([], [], []),
          carb_ratio_starts, carb_ratio_values,
          sensitivity_starts, sensitivity_ends, sensitivity_values,
          settings_dictionary.get("default_absorption_times"),
@@ -286,10 +286,10 @@ def update(input_dict):
             glucose_dates, glucose_values,
             carb_effect_dates, carb_effect_values,
             counteraction_starts, counteraction_ends, counteraction_values,
-            settings_dictionary.get("recency_interval"),
+            settings_dictionary.get("recency_interval") or 15,
             settings_dictionary.get(
                 "retrospective_correction_grouping_interval"
-            ),
+            ) or 30,
             time_to_calculate_at
             )
     else:

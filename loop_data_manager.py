@@ -37,8 +37,8 @@ def update(input_dict):
         "glucose_values" -- glucose measurements in mg/dL)
 
         "dose_types" -- types of dose (tempBasal, bolus, etc)
-        "dose_starts" -- start times of insulin delivery
-        "dose_ends" -- end times of insulin delivery
+        "dose_start_times" -- start times of insulin delivery
+        "dose_end_times" -- end times of insulin delivery
         "dose_values" -- amounts of insulin (U/hr if a basal, U if a bolus)
 
         "carb_dates" -- times of carbohydrate entries
@@ -120,8 +120,8 @@ def update(input_dict):
     glucose_values = input_dict.get("glucose_values")
 
     dose_types = input_dict.get("dose_types")
-    dose_starts = input_dict.get("dose_starts")
-    dose_ends = input_dict.get("dose_ends")
+    dose_starts = input_dict.get("dose_start_times")
+    dose_ends = input_dict.get("dose_end_times")
     dose_values = input_dict.get("dose_values")
 
     carb_dates = input_dict.get("carb_dates")

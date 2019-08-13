@@ -656,8 +656,8 @@ def parse_report_and_run(path, name):
          is_dose_data=True
     )[0:4]
     input_dict["dose_types"] = dose_types
-    input_dict["dose_starts"] = dose_starts
-    input_dict["dose_ends"] = dose_ends
+    input_dict["dose_start_times"] = dose_starts
+    input_dict["dose_end_times"] = dose_ends
     input_dict["dose_values"] = dose_values
     input_dict["dose_value_units"] = "U or U/hr"
 

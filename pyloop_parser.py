@@ -8,6 +8,7 @@ Created on Fri Jul 12 13:35:43 2019
 # pylint: disable=C0200, C0103, R0912, R0913, R0914, R0915
 import json
 import os
+import warnings
 from datetime import datetime, time, timedelta
 import numpy
 
@@ -633,7 +634,7 @@ def parse_report_and_run(path, name):
             convert_to_units=True
         )
     else:
-        print("No insulin dose information found")
+        warnings.warn("Warning: no insulin dose information found")
         (dose_types,
          dose_starts,
          dose_ends,
@@ -805,7 +806,9 @@ def parse_report_and_run(path, name):
         )
     else:
         last_temp_basal = []
-        print("No information found about the last temporary basal rate")
+        warnings.warn(
+            "No information found about the last temporary basal rate"
+        )
 
     input_dict["last_temporary_basal"] = last_temp_basal
 

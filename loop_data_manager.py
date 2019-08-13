@@ -10,6 +10,7 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 """
 # pylint: disable=R0913, R0914, W0105, C0200, R0916
 from datetime import timedelta
+import warnings
 
 from carb_store import get_carb_glucose_effects, get_carbs_on_board
 from date import time_interval_since
@@ -589,7 +590,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
             and not carb_effect_dates
             and not insulin_effect_dates
        ):
-        print("Expected to receive effect data")
+        warnings.warn("Warning: expected to receive effect data")
         return (None, None, None)
 
     predicted_glucoses = predict_glucose(

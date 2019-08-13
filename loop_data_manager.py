@@ -27,127 +27,158 @@ from loop_math import (combined_sums, decay_effect, subtracting,
                        predict_glucose)
 
 
-def update(
-        glucose_data,
-        insulin_data,
-        carb_data,
-        settings_dictionary,
-        sensitivity_data,
-        carb_ratio_data,
-        scheduled_basals_data,
-        target_range_data,
-        last_temp_basal,
-        time_to_calculate_at
-        ):
+def update(input_dict):
     """ Run data through the Loop algorithm and return the predicted glucose
         values, recommended temporary basal, and recommended bolus
 
     Arguments:
-    glucose_data -- tuple in form
-        (times of glucose measurements,
-         glucose measurements in mg/dL)
+    input_dict - dictionary containing the following keys/data:
+        "glucose_dates" -- times of glucose measurements
+        "glucose_values" -- glucose measurements in mg/dL)
 
-    insulin_data -- tuple in form
-        (types of dose (tempBasal, bolus, etc),
-         start times of insulin delivery,
-         end times of insulin delivery,
-         amounts of insulin (in U/hr if a basal or U if a bolus)
-         )
+        "dose_types" -- types of dose (tempBasal, bolus, etc)
+        "dose_starts" -- start times of insulin delivery
+        "dose_ends" -- end times of insulin delivery
+        "dose_values" -- amounts of insulin (U/hr if a basal, U if a bolus)
 
-    carb_data -- tuple in form
-        (times of carbohydrate entries,
-        amount of carbohydrates eaten,
-        absorption times for carbohydrate entries)
+        "carb_dates" -- times of carbohydrate entries
+        "carb_values" -- amount of carbohydrates eaten
+        "carb_absorption_times" -- absorption times for carbohydrate entries)
 
-    settings_dictionary -- a dictionary containing the needed settings:
-        - "model" (the insulin model)
-            - if exponential, format is
-                [duration of insulin action (in minutes), peak (in minutes)]
-                    - child model is typically peaks at 65 mins
-                    - adult model is typically peaks at 65 mins
-            - if Walsh curve, format is
-                [duration of insulin action (in *hours*)]
-        - "momentum_time_interval"
-            - the interval of glucose data to use for momentum calculation
-            - in Loop, default is 15 (minutes)
-        - "suspend_threshold"
-            - value at which to suspend all insulin delivery (mg/dL)
-        - "dynamic_carb_absorption_enabled"
-            - whether carb absorption can be calculated dynamically
-              (based on deviations in blood glucose levels versus what would
-              be expected based on insulin alone)
-        - "retrospective_correction_integration_interval"
-            - the maximum duration over which to integrate retrospective
-              correction changes
-            - in Loop, default is 30 (minutes)
-        - "recency_interval"
-            - the amount of time since a given date that data should be
-              considered valid
-            - in Loop, default is 15 (minutes)
-        - "retrospective_correction_grouping_interval"
-            - the interval over which to aggregate changes in glucose for
-              retrospective correction
-            - in Loop, default is 30 (minutes)
-        - "default_absorption_times"
-            - the default absorption times to use if unspecified in a
-              carbohydrate entry
-            - list of default absorption times in minutes in the format
-              [slow, medium, fast]
-            - in Loop, default is [120 (fast), 180 (medium), 240 (slow)]
-        - "max_basal_rate"
-            - the maximum basal rate that Loop is allowed to give
-        - "max_bolus"
-            - the maximum bolus that Loop is allowed to give or recommend
+        "settings_dictionary" -- a dictionary containing the needed settings:
+            - "model" (the insulin model)
+                - if exponential, format is
+                    [duration of insulin action (in mins), peak (in mins)]
+                        - child model typically peaks at 65 mins
+                        - adult model typically peaks at 65 mins
+                - if Walsh curve, format is
+                    [duration of insulin action (in *hours*)]
+            - "momentum_time_interval"
+                - the interval of glucose data to use for momentum calculation
+                - in Loop, default is 15 (minutes)
+            - "suspend_threshold"
+                - value at which to suspend all insulin delivery (mg/dL)
+            - "dynamic_carb_absorption_enabled"
+                - whether carb absorption can be calculated dynamically
+                  (based on deviations in blood glucose levels versus what
+                   would be expected based on insulin alone)
+            - "retrospective_correction_integration_interval"
+                - the maximum duration over which to integrate retrospective
+                  correction changes
+                - in Loop, default is 30 (minutes)
+            - "recency_interval"
+                - the amount of time since a given date that data should be
+                  considered valid
+                - in Loop, default is 15 (minutes)
+            - "retrospective_correction_grouping_interval"
+                - the interval over which to aggregate changes in glucose for
+                  retrospective correction
+                - in Loop, default is 30 (minutes)
+            - "default_absorption_times"
+                - the default absorption times to use if unspecified in a
+                  carbohydrate entry
+                - list of default absorption times in minutes in the format
+                  [slow, medium, fast]
+                - in Loop, default is [120 (fast), 180 (medium), 240 (slow)]
+            - "max_basal_rate"
+                - the maximum basal rate that Loop is allowed to give
+            - "max_bolus"
+                - the maximum bolus that Loop is allowed to give or recommend
 
-    sensitivity_data -- tuple in form
-        (start times for sensitivity ratios,
-        end times for sensitivity ratios,
-        the sensitivity ratios in mg/dL per U)
+        "sensitivity_ratio_start_times" -- start times for sensitivity ratios
+        "sensitivity_ratio_end_times" -- end times for sensitivity ratios
+        "sensitivity_ratio_values" -- the sensitivity ratios in mg/dL per U
 
-    carb_ratio_data -- tuple in form
-        (start times for carb ratios,
-        carb ratios in grams of carbohydrate per U)
+        "carb_ratio_start_times" -- start times for carb ratios
+        "carb_ratio_values" -- carb ratios in grams of carbohydrate per U
 
-    scheduled_basals_data -- tuple in form
-        (start times for basal rates,
-        basal rates in U/hour,
-         minutes the basal rate is active for)
+        "basal_rate_start_times" -- start times for basal rates
+        "basal_rate_end_times" -- basal rates in U/hour
+        "basal_rate_values" -- minutes the basal rate is active for
 
-    target_range_data -- tuple in form
-        (start times for the target ranges,
-        end times for the target ranges,
-        target range minimum values in mg/dL,
-        target range maximum values in mg/dL)
+        "target_range_start_times" -- start times for the target ranges
+        "target_range_end_times" -- end times for the target ranges
+        "target_range_minimum_values" - minimum values of target range in mg/dL
+        "target_range_maximum_values" - maximum values of target range in mg/dL
 
-    last_temp_basal -- list of information about the last temporary basal
-         in the form
-         [type of dose,
-          start time for the basal,
-          end time for the basal,
-          value of the basal rate in U/hr]
+        last_temp_basal -- list of information about the last temporary basal
+             in the form
+             [type of dose,
+              start time for the basal,
+              end time for the basal,
+              value of the basal rate in U/hr]
 
-    time_to_calculate_at -- the "now" time and the time at which to recommend
-        the basal rate and bolus
+        time_to_calculate_at -- the "now" time and the time at which to
+            recommend the basal rate and bolus
 
     Output:
-        Tuple in format
-         ([time of glucose prediction, predicted glucose value in mg/dL],
-          recommended basal rate,
-          recommended bolus)
+        Dictionary containing all of the calculated effects, the input
+        dictionary, the predicted glucose values, and the recommended
+        temp basal/bolus
     """
+    glucose_dates = input_dict.get("glucose_dates")
+    glucose_values = input_dict.get("glucose_values")
+
+    dose_types = input_dict.get("dose_types")
+    dose_starts = input_dict.get("dose_starts")
+    dose_ends = input_dict.get("dose_ends")
+    dose_values = input_dict.get("dose_values")
+
+    carb_dates = input_dict.get("carb_dates")
+    carb_values = input_dict.get("carb_values")
+    carb_absorptions = input_dict.get("carb_absorption_times")
+
+    settings_dictionary = input_dict.get("settings_dictionary")
+
+    sensitivity_starts = input_dict.get("sensitivity_ratio_start_times")
+    sensitivity_ends = input_dict.get("sensitivity_ratio_end_times")
+    sensitivity_values = input_dict.get("sensitivity_ratio_values")
+
+    carb_ratio_starts = input_dict.get("carb_ratio_start_times")
+    carb_ratio_values = input_dict.get("carb_ratio_values")
+
+    basal_starts = input_dict.get("basal_rate_start_times")
+    basal_rates = input_dict.get("basal_rate_values")
+    basal_minutes = input_dict.get("basal_rate_minutes")
+
+    target_range_starts = input_dict.get("target_range_start_times")
+    target_range_ends = input_dict.get("target_range_end_times")
+    target_range_mins = input_dict.get("target_range_minimum_values")
+    target_range_maxes = input_dict.get("target_range_maximum_values")
+
+    last_temp_basal = input_dict.get("last_temporary_basal")
+
+    time_to_calculate_at = input_dict.get("time_to_calculate_at")
+
     # check that the inputs make sense before doing math with them
     if (
             not are_settings_valid(settings_dictionary)
-            or not are_glucose_readings_valid(*glucose_data)
-            or not are_carb_readings_valid(*carb_data)
-            or not is_insulin_sensitivity_schedule_valid(*sensitivity_data)
-            or not are_carb_ratios_valid(*carb_ratio_data)
-            or not are_basal_rates_valid(*scheduled_basals_data)
-            or not are_correction_ranges_valid(*target_range_data)
-            or not are_insulin_doses_valid(*insulin_data)):
+            or not are_glucose_readings_valid(
+                glucose_dates, glucose_values,
+            )
+            or not are_carb_readings_valid(
+                carb_dates, carb_values, carb_absorptions
+            )
+            
+            or not are_insulin_doses_valid(
+                dose_types, dose_starts, dose_ends, dose_values
+            )
+            or not is_insulin_sensitivity_schedule_valid(
+                sensitivity_starts, sensitivity_ends, sensitivity_values
+            )
+            or not are_carb_ratios_valid(
+                carb_ratio_starts, carb_ratio_values
+            )
+            or not are_basal_rates_valid(
+                basal_starts, basal_rates, basal_minutes
+            )
+            or not are_correction_ranges_valid(
+                target_range_starts, target_range_ends,
+                target_range_mins, target_range_maxes
+            )):
         return []
 
-    last_glucose_date = glucose_data[0][-1]
+    last_glucose_date = glucose_dates[-1]
 
     retrospective_start = (
         last_glucose_date
@@ -157,12 +188,18 @@ def update(
 
     # calculate a maximum of 24 hours of effects
     earliest_effect_date = time_to_calculate_at - timedelta(hours=24)
-    next_effect_date = earliest_effect_date
+    # if running with counteraction effect data present from a previous run
+    # (which is how Loop runs), add the dates to the input dictionary
+    next_effect_date = (
+        input_dict.get("previous_counteraction_effect_dates")[-1] if
+        input_dict.get("previous_counteraction_effect_dates")
+        else earliest_effect_date
+    )
 
     (momentum_effect_dates,
      momentum_effect_values
      ) = get_recent_momentum_effects(
-         *glucose_data,
+         glucose_dates, glucose_values,
          next_effect_date,
          time_to_calculate_at,
          settings_dictionary.get("momentum_time_interval") or 15,
@@ -174,20 +211,22 @@ def update(
     (insulin_effect_dates,
      insulin_effect_values
      ) = get_glucose_effects(
-         *insulin_data,
+         dose_types, dose_starts, dose_ends, dose_values,
          next_effect_date,
-         *scheduled_basals_data,
-         *sensitivity_data,
+         basal_starts, basal_rates, basal_minutes,
+         sensitivity_starts, sensitivity_ends, sensitivity_values,
          settings_dictionary.get("model"),
          delay=settings_dictionary.get("insulin_delay") or 10
          )
 
     # calculate future insulin effects for the purposes of predicting glucose
-    now_to_dia_insulin_effects = get_glucose_effects(
-        *insulin_data,
+    (now_to_dia_insulin_effect_dates,
+     now_to_dia_insulin_effect_values
+     ) = get_glucose_effects(
+        dose_types, dose_starts, dose_ends, dose_values,
         time_to_calculate_at,
-        *scheduled_basals_data,
-        *sensitivity_data,
+        basal_starts, basal_rates, basal_minutes,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
         settings_dictionary.get("model"),
         delay=settings_dictionary.get("insulin_delay") or 10
         )
@@ -195,22 +234,25 @@ def update(
     # if our BG data is current and we know the expected insulin effects,
     # calculate tbe counteraction effects
     if next_effect_date < last_glucose_date and insulin_effect_dates:
-        counteraction_effects = get_counteraction_effects(
-            *glucose_data,
-            next_effect_date,
-            insulin_effect_dates, insulin_effect_values
-            )
+        (counteraction_starts,
+         counteraction_ends,
+         counteraction_values
+         ) = counteraction_effects = get_counteraction_effects(
+             glucose_dates, glucose_values,
+             next_effect_date,
+             insulin_effect_dates, insulin_effect_values
+             )
 
     (carb_effect_dates,
      carb_effect_values
      ) = get_carb_glucose_effects(
-         *carb_data,
+         carb_dates, carb_values, carb_absorptions,
          retrospective_start,
          *counteraction_effects if
          settings_dictionary.get("dynamic_carb_absorption_enabled")
          else ([], [], []),
-         *carb_ratio_data,
-         *sensitivity_data,
+         carb_ratio_starts, carb_ratio_values,
+         sensitivity_starts, sensitivity_ends, sensitivity_values,
          settings_dictionary.get("default_absorption_times"),
          delay=settings_dictionary.get("carb_delay") or 10
          )
@@ -218,13 +260,13 @@ def update(
     (cob_dates,
      cob_values
      ) = get_carbs_on_board(
-         *carb_data,
+         carb_dates, carb_values, carb_absorptions,
          time_to_calculate_at,
          *counteraction_effects if
          settings_dictionary.get("dynamic_carb_absorption_enabled")
          else ([], [], []),
-         *carb_ratio_data,
-         *sensitivity_data,
+         carb_ratio_starts, carb_ratio_values,
+         sensitivity_starts, sensitivity_ends, sensitivity_values,
          settings_dictionary.get("default_absorption_times"),
          delay=settings_dictionary.get("carb_delay") or 10
          )
@@ -237,10 +279,12 @@ def update(
         ] if cob_dates else 0
 
     if settings_dictionary.get("retrospective_correction_enabled"):
-        retrospective_glucose_effects = update_retrospective_glucose_effect(
-            *glucose_data,
+        (retrospective_effect_dates,
+         retrospective_effect_values
+         ) = update_retrospective_glucose_effect(
+            glucose_dates, glucose_values,
             carb_effect_dates, carb_effect_values,
-            *counteraction_effects,
+            counteraction_starts, counteraction_ends, counteraction_values,
             settings_dictionary.get("recency_interval"),
             settings_dictionary.get(
                 "retrospective_correction_grouping_interval"
@@ -248,31 +292,34 @@ def update(
             time_to_calculate_at
             )
     else:
-        retrospective_glucose_effects = ([], [])
+        (retrospective_effect_dates,
+         retrospective_effect_values
+         ) = ([], [])
 
     recommendations = update_predicted_glucose_and_recommended_basal_and_bolus(
         time_to_calculate_at,
-        *glucose_data,
+        glucose_dates, glucose_values,
         momentum_effect_dates, momentum_effect_values,
         carb_effect_dates, carb_effect_values,
-        *now_to_dia_insulin_effects,
-        *retrospective_glucose_effects,
-        *target_range_data,
+        now_to_dia_insulin_effect_dates, now_to_dia_insulin_effect_values,
+        retrospective_effect_dates, retrospective_effect_values,
+        target_range_starts, target_range_ends, target_range_mins, target_range_maxes,
         settings_dictionary.get("suspend_threshold"),
-        *sensitivity_data,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
         settings_dictionary.get("model"),
-        *scheduled_basals_data,
+        basal_starts, basal_rates, basal_minutes,
         settings_dictionary.get("max_basal_rate"),
         settings_dictionary.get("max_bolus"),
         last_temp_basal,
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
-    recommendations["insulin_effect_dates"] = now_to_dia_insulin_effects[0]
-    recommendations["insulin_effect_values"] = now_to_dia_insulin_effects[1]
+    recommendations["insulin_effect_dates"] = now_to_dia_insulin_effect_dates
+    recommendations["insulin_effect_values"] = now_to_dia_insulin_effect_values
 
-    recommendations["counteraction_effect_dates"] = counteraction_effects[0]
-    recommendations["counteraction_effect_values"] = counteraction_effects[1]
+    recommendations["counteraction_effect_start_times"] = counteraction_starts
+    recommendations["counteraction_effect_end_times"] = counteraction_ends
+    recommendations["counteraction_effect_values"] = counteraction_values
 
     recommendations["momentum_effect_dates"] = momentum_effect_dates
     recommendations["momentum_effect_values"] = momentum_effect_values
@@ -281,14 +328,15 @@ def update(
     recommendations["carb_effect_values"] = carb_effect_values
 
     recommendations["retrospective_effect_dates"] = (
-        retrospective_glucose_effects[0] or None
+        retrospective_effect_dates or None
     )
     recommendations["retrospective_effect_values"] = (
-        retrospective_glucose_effects[1] or None
+        retrospective_effect_values or None
     )
     recommendations["carbs_on_board"] = current_cob
     recommendations["cob_timeline_dates"] = cob_dates
     recommendations["cob_timeline_values"] = cob_values
+    recommendations["input_data"] = input_dict
 
     return recommendations
 

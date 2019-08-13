@@ -545,6 +545,7 @@ def parse_report_and_run(path, name):
     issue_dict = json.load(
         open(data_path_and_name, "r")
     )
+    input_dict = {}
 
     if issue_dict.get("basal_rate_timeZone") is not None:
         offset = issue_dict.get("basal_rate_timeZone")
@@ -554,6 +555,7 @@ def parse_report_and_run(path, name):
         offset = issue_dict.get("insulin_sensitivity_factor_timeZone")
     else:
         offset = 0
+    input_dict["offset_applied_to_dates"] = offset
 
     if issue_dict.get("recommended_temp_basal"):
         time_to_run = datetime.strptime(
@@ -570,116 +572,233 @@ def parse_report_and_run(path, name):
     else:
         raise RuntimeError("No information found about report time")
 
+    input_dict["time_to_calculate_at"] = time_to_run
+
     if issue_dict.get("cached_glucose_samples"):
-        glucose_data = get_glucose_data(
+        (glucose_dates, glucose_values) = get_glucose_data(
             issue_dict.get("cached_glucose_samples"),
             offset
         )
-        glucose_data = remove_too_new_values(
+        (glucose_dates, glucose_values) = remove_too_new_values(
             time_to_run,
             *sort_by_first_list(
-                *glucose_data
+                glucose_dates, glucose_values
             )[0:2]
         )[0:2]
+        input_dict["glucose_dates"] = glucose_dates
+        input_dict["glucose_values"] = glucose_values
+        input_dict["glucose_units"] = "mg/dL"
 
     else:
         raise RuntimeError("No glucose information found")
 
     if (issue_dict.get("get_normalized_pump_event_dose")
             and issue_dict.get("get_normalized_dose_entries")):
-        dose_data = get_insulin_data(
+        (dose_types,
+         dose_starts,
+         dose_ends,
+         dose_values
+         ) = get_insulin_data(
             issue_dict.get("get_normalized_pump_event_dose"),
             offset,
             entry_to_add=issue_dict.get("get_normalized_dose_entries")[-1],
             now_time=time_to_run
         )
     elif issue_dict.get("get_normalized_pump_event_dose"):
-        dose_data = get_insulin_data(
+        (dose_types,
+         dose_starts,
+         dose_ends,
+         dose_values
+         ) = get_insulin_data(
             issue_dict.get("get_normalized_pump_event_dose"),
             offset
         )
     elif issue_dict.get("get_normalized_dose_entries"):
-        dose_data = get_insulin_data(
+        (dose_types,
+         dose_starts,
+         dose_ends,
+         dose_values
+         ) = get_insulin_data(
             issue_dict.get("get_normalized_dose_entries"),
             offset,
             convert_to_units=True
         )
     elif issue_dict.get("cached_dose_entries"):
-        dose_data = get_insulin_data(
+        (dose_types,
+         dose_starts,
+         dose_ends,
+         dose_values
+         ) = get_insulin_data(
             issue_dict.get("cached_dose_entries"),
             offset,
             convert_to_units=True
         )
     else:
         print("No insulin dose information found")
-        dose_data = ([], [], [], [])
+        (dose_types,
+         dose_starts,
+         dose_ends,
+         dose_values
+         ) = ([], [], [], [])
 
-    dose_data = remove_too_new_values(
-        time_to_run,
-        *sort_dose_lists(*dose_data)[0:4],
-        is_dose_data=True
+    (dose_types,
+     dose_starts,
+     dose_ends,
+     dose_values
+     ) = remove_too_new_values(
+         time_to_run,
+         *sort_dose_lists(
+             dose_types,
+             dose_starts,
+             dose_ends,
+             dose_values
+         )[0:4],
+         is_dose_data=True
     )[0:4]
+    input_dict["dose_types"] = dose_types
+    input_dict["dose_starts"] = dose_starts
+    input_dict["dose_ends"] = dose_ends
+    input_dict["dose_values"] = dose_values
+    input_dict["dose_value_units"] = "U or U/hr"
 
     if issue_dict.get("cached_carb_entries"):
-        carb_data = get_carb_data(
-            issue_dict.get("cached_carb_entries"),
-            offset,
-        )
-        carb_data = sort_by_first_list(*carb_data)[0:3]
+        (carb_dates,
+         carb_values,
+         carb_absorptions
+         ) = sort_by_first_list(
+                 *get_carb_data(
+                     issue_dict.get("cached_carb_entries"),
+                     offset,
+                 )
+        )[0:3]
     else:
-        carb_data = ([], [], [])
+        (carb_dates,
+         carb_values,
+         carb_absorptions
+         ) = ([], [], [])
+
+    input_dict["carb_dates"] = carb_dates
+    input_dict["carb_values"] = carb_values
+    input_dict["carb_absorption_times"] = carb_absorptions
+    input_dict["carb_value_units"] = "g"
 
     settings = get_settings(issue_dict)
+    input_dict["settings_dictionary"] = settings
 
     if issue_dict.get(
             "insulinSensitivityScheduleApplyingOverrideHistory_items"):
-        sensitivity_schedule = get_sensitivities(
+        (sensitivity_start_times,
+         sensitivity_end_times,
+         sensitivity_values
+         ) = get_sensitivities(
             issue_dict.get(
                 "insulinSensitivityScheduleApplyingOverrideHistory_items"
             )
         )
-        sensitivity_schedule = sort_by_first_list(*sensitivity_schedule)[0:3]
     elif issue_dict.get("insulin_sensitivity_factor_schedule"):
-        sensitivity_schedule = get_sensitivities(
+        (sensitivity_start_times,
+         sensitivity_end_times,
+         sensitivity_values
+         ) = get_sensitivities(
             issue_dict.get("insulin_sensitivity_factor_schedule")
         )
-        sensitivity_schedule = sort_by_first_list(*sensitivity_schedule)[0:3]
     else:
         raise RuntimeError("No insulin sensitivity information found")
+    (sensitivity_start_times,
+     sensitivity_end_times,
+     sensitivity_values
+     ) = sort_by_first_list(
+         sensitivity_start_times,
+         sensitivity_end_times,
+         sensitivity_values
+    )[0:3]
+
+    input_dict["sensitivity_ratio_start_times"] = sensitivity_start_times
+    input_dict["sensitivity_ratio_end_times"] = sensitivity_end_times
+    input_dict["sensitivity_ratio_values"] = sensitivity_values
+    input_dict["sensitivity_ratio_value_units"] = "mg/dL/U"
 
     if issue_dict.get("carbRatioScheduleApplyingOverrideHistory_items"):
-        carb_ratio_schedule = get_carb_ratios(
+        (carb_ratio_starts,
+         carb_ratio_values
+         ) = get_carb_ratios(
             issue_dict.get("carbRatioScheduleApplyingOverrideHistory_items")
         )
-        carb_ratio_schedule = sort_by_first_list(*carb_ratio_schedule)[0:2]
     elif issue_dict.get("carb_ratio_schedule"):
-        carb_ratio_schedule = get_carb_ratios(
+        (carb_ratio_starts,
+         carb_ratio_values
+         ) = get_carb_ratios(
             issue_dict.get("carb_ratio_schedule")
         )
-        carb_ratio_schedule = sort_by_first_list(*carb_ratio_schedule)[0:2]
     else:
         raise RuntimeError("No carb ratio information found")
+    (carb_ratio_starts,
+     carb_ratio_values
+     ) = sort_by_first_list(
+         carb_ratio_starts,
+         carb_ratio_values
+     )[0:2]
+
+    input_dict["carb_ratio_start_times"] = carb_ratio_starts
+    input_dict["carb_ratio_values"] = carb_ratio_values
+    input_dict["carb_ratio_value_units"] = "g/U"
 
     if issue_dict.get("basalProfileApplyingOverrideHistory_items"):
-        basal_schedule = get_basal_schedule(
+        (basal_rate_starts,
+         basal_rate_values,
+         basal_rate_minutes
+         ) = get_basal_schedule(
             issue_dict.get("basalProfileApplyingOverrideHistory_items")
         )
-        basal_schedule = sort_by_first_list(*basal_schedule)[0:3]
     elif issue_dict.get("basal_rate_schedule"):
-        basal_schedule = get_basal_schedule(
+        (basal_rate_starts,
+         basal_rate_values,
+         basal_rate_minutes
+         ) = get_basal_schedule(
             issue_dict.get("basal_rate_schedule")
         )
-        basal_schedule = sort_by_first_list(*basal_schedule)[0:3]
     else:
         raise RuntimeError("No basal rate information found")
+    (basal_rate_starts,
+     basal_rate_minutes,
+     basal_rate_values
+     ) = sort_by_first_list(
+         basal_rate_starts,
+         basal_rate_minutes,
+         basal_rate_values
+     )[0:3]
+
+    input_dict["basal_rate_start_times"] = basal_rate_starts
+    input_dict["basal_rate_minutes"] = basal_rate_minutes
+    input_dict["basal_rate_values"] = basal_rate_values
+    input_dict["basal_rate_units"] = "U/hr"
 
     if issue_dict.get("correction_range_schedule"):
-        target_range_schedule = get_target_range_schedule(
+        (target_range_starts,
+         target_range_ends,
+         target_range_minimum_values,
+         target_range_maximum_values
+         ) = get_target_range_schedule(
             issue_dict.get("correction_range_schedule")
         )
-        target_range_schedule = sort_by_first_list(*target_range_schedule)[0:4]
+        (target_range_starts,
+         target_range_ends,
+         target_range_minimum_values,
+         target_range_maximum_values
+         ) = sort_by_first_list(
+             target_range_starts,
+             target_range_ends,
+             target_range_minimum_values,
+             target_range_maximum_values
+         )[0:4]
     else:
         raise RuntimeError("No target range rate information found")
+
+    input_dict["target_range_start_times"] = target_range_starts
+    input_dict["target_range_end_times"] = target_range_ends
+    input_dict["target_range_minimum_values"] = target_range_minimum_values
+    input_dict["target_range_maximum_values"] = target_range_maximum_values
+    input_dict["target_range_value_units"] = "mg/dL"
 
     if issue_dict.get("last_temp_basal"):
         last_temp_basal = get_last_temp_basal(
@@ -689,17 +808,10 @@ def parse_report_and_run(path, name):
         last_temp_basal = []
         print("No information found about the last temporary basal rate")
 
+    input_dict["last_temporary_basal"] = last_temp_basal
+
     recommendations = update(
-        glucose_data,
-        dose_data,
-        carb_data,
-        settings,
-        sensitivity_schedule,
-        carb_ratio_schedule,
-        basal_schedule,
-        target_range_schedule,
-        last_temp_basal,
-        time_to_run
+        input_dict
         )
 
     return recommendations

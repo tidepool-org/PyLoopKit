@@ -76,6 +76,7 @@ def plot_graph(
         plt.grid(grid)
     if file_name:
         plt.savefig(file_name + ".png")
+    plt.show()
 
 
 def plot_relative_graph(
@@ -135,7 +136,7 @@ def plot_relative_graph(
         plt.grid(grid)
     if file_name:
         plt.savefig(file_name + ".png")
-
+    plt.show()
 
 def plot_multiple_relative_graphs(
         dates, values,
@@ -193,3 +194,4 @@ def plot_multiple_relative_graphs(
         plt.grid(grid)
     if file_name:
         plt.savefig(file_name + ".png")
+    plt.show()

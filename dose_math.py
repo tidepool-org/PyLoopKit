@@ -252,6 +252,9 @@ def insulin_correction(
         date_range = [at_date,
                       at_date + timedelta(minutes=model[0])
                       ]
+
+    # if we don't know the suspend threshold, it defaults to the lower
+    # bound of the correction range at the time the "loop" is being run at
     if not suspend_threshold_value:
         suspend_threshold_value = find_ratio_at_time(
             target_starts,

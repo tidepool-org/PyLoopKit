@@ -1150,36 +1150,6 @@ class TestInsulinKitFunctions(unittest.TestCase):
                 -3 < expected_effect_values[i] - effect_values[i] < 3
             )
 
-    def test_glucose_effect_from_history_multiple(self):
-        (i_types,
-         i_start_dates,
-         i_end_dates,
-         i_values,
-         i_scheduled_basal_rates
-         ) = self.load_dose_fixture("normalized_doses")
-
-        sensitivity_start_dates = self.MULTIPLE_INSULIN_SENSITIVITY_START_DATES
-        sensitivity_end_dates = self.MULTIPLE_INSULIN_SENSITIVITY_END_DATES
-        sensitivity_values = self.MULTIPLE_INSULIN_SENSITIVITY_VALUES
-        model = self.WALSH_MODEL
-
-        (effect_dates,
-         effect_values
-         ) = glucose_effects(
-             i_types,
-             i_start_dates,
-             i_end_dates,
-             i_values,
-             i_scheduled_basal_rates,
-             model,
-             sensitivity_start_dates,
-             sensitivity_end_dates,
-             sensitivity_values
-             )
-
-        for i in range(0, len(effect_dates)):
-            print(effect_dates[i], effect_values[i])
-
     def test_glucose_effect_from_history_exponential(self):
         (i_types,
          i_start_dates,

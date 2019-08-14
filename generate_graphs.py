@@ -288,19 +288,27 @@ def plot_loop_inspired_glucose_graph(
     ]
 
     # plot correction range
-    ax.fill_between(
-        fill_length,
-        [target_min, target_min],
-        [target_max, target_max],
-        facecolor='#B5E7FF',
-        lw=0
-    )
-    plt.plot(
-        [], [],
-        color='#B5E7FF',
-        linewidth=10,
-        label="Target Range: %d-%d" % (target_min, target_max)
-    )
+    if abs(target_min - target_min) > 0:
+        ax.fill_between(
+            fill_length,
+            [target_min, target_min],
+            [target_max, target_max],
+            facecolor='#B5E7FF',
+            lw=0
+        )
+        plt.plot(
+            [], [],
+            color='#B5E7FF',
+            lw=10,
+            label="Target Range: %d-%d" % (target_min, target_max)
+        )
+    else:
+        plt.axhline(
+            y=target_min,
+            color='#B5E7FF',
+            lw=3,
+            label="Target Range: %d-%d" % (target_min, target_max)
+        )
 
     # set labels and title
     if x_label:

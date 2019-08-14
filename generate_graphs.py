@@ -32,6 +32,13 @@ def plot_graph(
             date.hour + date.minute / 60 + date.second / 3600
         )
 
+    font = {
+        'family': 'DejaVu Sans',
+        'weight': 'bold',
+        'size': 15
+    }
+    plt.rc('font', **font)
+
     figure_size_inches = (15, 7)
     fig, ax = plt.subplots(figsize=figure_size_inches)
 
@@ -84,6 +91,7 @@ def plot_relative_graph(
         x_label=None, y_label=None, title=None,
         line_color=None, fill_color=None, file_name=None, grid=False,
         line_style="-", scatter=False):
+
     relative_dates = []
 
     # convert from exact dates to relative dates
@@ -91,6 +99,13 @@ def plot_relative_graph(
         relative_dates.append(
             time_interval_since(date, dates[0]) / 3600
         )
+
+    font = {
+        'family': 'DejaVu Sans',
+        'weight': 'bold',
+        'size': 15
+    }
+    plt.rc('font', **font)
 
     figure_size_inches = (15, 7)
     fig, ax = plt.subplots(figsize=figure_size_inches)
@@ -138,12 +153,21 @@ def plot_relative_graph(
         plt.savefig(file_name + ".png")
     plt.show()
 
+
 def plot_multiple_relative_graphs(
         dates, values,
         x_label=None, y_label=None, title=None,
         line_color=None, fill_color=None, file_name=None, grid=False,
         ls_list=None):
+
     assert len(dates) == len(values)
+
+    font = {
+        'family': 'DejaVu Sans',
+        'weight': 'bold',
+        'size': 15
+    }
+    plt.rc('font', **font)
 
     figure_size_inches = (15, 7)
     fig, ax = plt.subplots(figsize=figure_size_inches)

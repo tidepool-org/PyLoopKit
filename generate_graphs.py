@@ -18,10 +18,15 @@ def plot_graph(
     relative_dates = []
 
     # convert from exact dates to relative dates
-    for date in dates:
-        relative_dates.append(
-            date.hour + date.minute / 60 + date.second / 3600
-        )
+    for i in range(0, len(dates)):
+        date = dates[i]
+        hours = date.hour + date.minute / 60 + date.second / 3600
+
+        # adjust if the times cross midnight
+        if (len(relative_dates) > 0
+                and relative_dates[i-1] > hours):
+            hours += 24
+        relative_dates.append(hours)
 
     font = {
         'family': 'DejaVu Sans',
@@ -48,6 +53,13 @@ def plot_graph(
     x_ticks_duplicates = [date.hour for date in dates]
     x_ticks = list(OrderedDict.fromkeys(x_ticks_duplicates))
     labels = ["%d:00" % x1 for x1 in x_ticks]
+
+    # if we cross midnight, adjust so the graph displays correctly
+    if not sorted(x_ticks) == x_ticks:
+        for i in range(1, len(x_ticks)):
+            if x_ticks[i-1] > x_ticks[i]:
+                x_ticks[i] = x_ticks[i] + 24
+
     plt.xticks(x_ticks, labels)
 
     if x_label:

@@ -54,7 +54,7 @@ def update(input_dict):
                         - adult model typically peaks at 65 mins
                 - if Walsh curve, format is
                     [duration of insulin action (in *hours*)]
-            - "momentum_time_interval"
+            - "momentum_data_interval"
                 - the interval of glucose data to use for momentum calculation
                 - in Loop, default is 15 (minutes)
             - "suspend_threshold"
@@ -203,7 +203,7 @@ def update(input_dict):
          glucose_dates, glucose_values,
          next_effect_date,
          time_to_calculate_at,
-         settings_dictionary.get("momentum_time_interval") or 15,
+         settings_dictionary.get("momentum_data_interval") or 15,
          5
          )
 

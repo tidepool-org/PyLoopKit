@@ -307,7 +307,7 @@ def plot_loop_inspired_glucose_graph(
     ]
 
     # plot correction range
-    if abs(target_min - target_min) > 0:
+    if abs(target_max - target_min) > 0:
         ax.fill_between(
             fill_length,
             [target_min, target_min],
@@ -365,7 +365,11 @@ def plot_loop_inspired_glucose_graph(
     if previous_glucose_dates:
         ax.scatter(
             scatter_dates, previous_glucose_values,
-            color=line_color or "#5ac6fa", lw=4, ls="-", s=10
+            color=line_color or "#5ac6fa",
+            lw=4,
+            ls="-",
+            s=10,
+            label="CGM Data"
         )
 
     # Plot the overall prediction line
@@ -411,5 +415,15 @@ def plot_loop_inspired_glucose_graph(
     # save the output graph
     if file_name:
         plt.savefig(file_name + ".png")
+
+    # display the eventual BG
+    ax.text(
+        max(ax.get_xlim()),
+        max(ax.get_ylim()) + 4,
+        "Eventually %d mg/dL" % overall_values[-1],
+        horizontalalignment="right",
+        size=15,
+        color="#a6a5a2"
+    )
 
     plt.show()

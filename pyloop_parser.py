@@ -384,9 +384,9 @@ def get_settings(data):
 
     momentum_interval = data.get("glucose_store").get("momentumDataInterval")
     if momentum_interval is not None:
-        settings["momentum_time_interval"] = float(momentum_interval) / 60
+        settings["momentum_data_interval"] = float(momentum_interval) / 60
     else:
-        settings["momentum_time_interval"] = 15
+        settings["momentum_data_interval"] = 15
 
     suspend_threshold = data.get("suspend_threshold")
     if suspend_threshold is not None:

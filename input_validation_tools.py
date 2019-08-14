@@ -25,7 +25,8 @@ def are_settings_valid(settings):
         )
         return False
 
-    if settings.get("momentum_time_interval") < 5:
+    if (settings.get("momentum_data_interval")
+            and settings.get("momentum_data_interval") < 5):
         warnings.warn(
             "Warning: momentum interval is less than 5"
             + " minutes; continuing anyway")

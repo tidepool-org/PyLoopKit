@@ -15,7 +15,7 @@ from loop_math import predict_glucose
 from pyloop_parser import parse_report_and_run
 
 # find the path to the file in the repo
-name = "high_bg_recommended_basal_and_bolus_report.json"
+name = "example_issue_report.json"
 path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 
 # run the Loop algorithm with the issue report data

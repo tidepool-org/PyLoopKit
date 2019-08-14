@@ -8,7 +8,8 @@ Created on Sun Aug 11 13:03:07 2019
 import json
 import datetime
 
-from generate_graphs import plot_graph
+from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
+from insulin_math import find_ratio_at_time
 from loop_kit_tests import find_root_path
 from pyloop_parser import parse_report_and_run
 
@@ -69,10 +70,26 @@ plot_graph(
     line_color="#5FCB49", fill_color="#63ed47"
     )
 
-plot_graph(
+inputs = recommendations.get("input_data")
+
+plot_loop_inspired_glucose_graph(
     recommendations.get("predicted_glucose_dates"),
     recommendations.get("predicted_glucose_values"),
     title="Predicted Glucose",
     line_color="#5ac6fa",
-    grid=True
+    grid=True,
+    previous_glucose_dates=inputs.get("glucose_dates")[-15:],
+    previous_glucose_values=inputs.get("glucose_values")[-15:],
+    target_min=find_ratio_at_time(
+        inputs.get("target_range_start_times"),
+        inputs.get("target_range_end_times"),
+        inputs.get("target_range_minimum_values"),
+        inputs.get("time_to_calculate_at")
+        ),
+    target_max=find_ratio_at_time(
+        inputs.get("target_range_start_times"),
+        inputs.get("target_range_end_times"),
+        inputs.get("target_range_maximum_values"),
+        inputs.get("time_to_calculate_at")
+        )
     )

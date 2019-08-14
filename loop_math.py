@@ -70,7 +70,8 @@ def predict_glucose(
             "expected input shapes to match"
 
     # if we didn't get any effect data, we won't predict the glucose
-    if (not carb_effect_dates and
+    if (not momentum_dates and
+            not carb_effect_dates and
             not insulin_effect_dates and
             not correction_effect_dates
        ):
@@ -336,7 +337,7 @@ def subtracting(starts, ends, values,
     values -- values of effect that is subtracted-from (datetime)
 
     other_starts -- start times of the effect to subtract (datetime)
-    other_ends -- end times of the effect to subtract (datetime)
+    other_ends -- end times of the effect to subtract (datetime) (optional)
     other_values -- values of the effect to subtract
 
     effect_interval -- time interval (in minutes) between times in the

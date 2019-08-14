@@ -77,10 +77,10 @@ def are_glucose_readings_valid(dates, glucose_values):
         )
         return False
 
-    if any(value < 40 or value > 400 for value in glucose_values):
+    if any(value < 39 or value > 400 for value in glucose_values):
         warnings.warn(
-            "Warning: glucose measurements are typically between 40 and"
-            + "400 mg/dL; continuing anyway"
+            "Warning: glucose measurements are typically between 39 and"
+            + " 400 mg/dL; continuing anyway"
         )
 
     return True
@@ -116,7 +116,7 @@ def are_insulin_doses_valid(types, start_times, end_times, values):
     """ Checks that dose inputs are reasonable """
     if any(type_.lower() not in
            ["tempbasal", "basal", "basalprofilestart", "bolus",
-            "pumpsuspend", "suspend", "resume"] for type_ in types):
+            "pumpsuspend", "suspend", "resume", "meal"] for type_ in types):
         warnings.warn(
             "Warning: there are types in the insulin doses that PyLoopKit" +
             " doesn't recognize; continuing anyway"

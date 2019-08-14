@@ -29,24 +29,24 @@ starting_glucose = recommendations.get("input_data").get("glucose_values")[-1]
  momentum_predicted_glucose_values
  ) = predict_glucose(
      starting_date, starting_glucose,
-     recommendations.get("momentum_effect_dates"),
-     recommendations.get("momentum_effect_values")
+     momentum_dates=recommendations.get("momentum_effect_dates"),
+     momentum_values=recommendations.get("momentum_effect_values")
      )
 
 (insulin_predicted_glucose_dates,
  insulin_predicted_glucose_values
  ) = predict_glucose(
      starting_date, starting_glucose,
-     recommendations.get("insulin_effect_dates"),
-     recommendations.get("insulin_effect_values")
+     insulin_effect_dates=recommendations.get("insulin_effect_dates"),
+     insulin_effect_values=recommendations.get("insulin_effect_values")
      )
 
 (carb_predicted_glucose_dates,
  carb_predicted_glucose_values
  ) = predict_glucose(
      starting_date, starting_glucose,
-     recommendations.get("carb_effect_dates"),
-     recommendations.get("carb_effect_values")
+     carb_effect_dates=recommendations.get("carb_effect_dates"),
+     carb_effect_values=recommendations.get("carb_effect_values")
      )
 
 if recommendations.get("retrospective_effect_dates"):
@@ -54,8 +54,12 @@ if recommendations.get("retrospective_effect_dates"):
      retrospective_predicted_glucose_values
      ) = predict_glucose(
          starting_date, starting_glucose,
-         recommendations.get("retrospective_effect_dates"),
-         recommendations.get("retrospective_effect_values")
+         correction_effect_dates=recommendations.get(
+             "retrospective_effect_dates"
+            ),
+         correction_effect_values=recommendations.get(
+            "retrospective_effect_values"
+            )
          )
 else:
     (retrospective_predicted_glucose_dates,
@@ -125,6 +129,29 @@ if recommendations.get("cob_timeline_values"):
         )
 
 inputs = recommendations.get("input_data")
+
+plot_loop_inspired_glucose_graph(
+    recommendations.get("predicted_glucose_dates"),
+    recommendations.get("predicted_glucose_values"),
+    title="Predicted Glucose",
+    line_color="#5ac6fa",
+    grid=True,
+    previous_glucose_dates=inputs.get("glucose_dates")[-15:],
+    previous_glucose_values=inputs.get("glucose_values")[-15:],
+    target_min=find_ratio_at_time(
+        inputs.get("target_range_start_times"),
+        inputs.get("target_range_end_times"),
+        inputs.get("target_range_minimum_values"),
+        inputs.get("time_to_calculate_at")
+        ),
+    target_max=find_ratio_at_time(
+        inputs.get("target_range_start_times"),
+        inputs.get("target_range_end_times"),
+        inputs.get("target_range_maximum_values"),
+        inputs.get("time_to_calculate_at")
+        )
+    )
+
 
 plot_loop_inspired_glucose_graph(
     recommendations.get("predicted_glucose_dates"),

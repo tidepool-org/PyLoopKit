@@ -225,7 +225,11 @@ def plot_multiple_relative_graphs(
 
 
 def plot_loop_inspired_glucose_graph(
-        dates, values,
+        overall_dates, overall_values,
+        momentum_dates=None, momentum_values=None,
+        insulin_dates=None, insulin_values=None,
+        carb_dates=None, carb_values=None,
+        retrospective_dates=None, retrospective_values=None,
         x_label=None, y_label=None, title=None,
         previous_glucose_dates=None, previous_glucose_values=None,
         line_color=None, file_name=None, grid=False,
@@ -233,19 +237,26 @@ def plot_loop_inspired_glucose_graph(
     """ Create a Loop-inspired graph. Limitation: can only do one correction
         range.
     """
-    scatter_dates = []
-    line_dates = []
+    def plot_line(
+            absolute_dates, values,
+            line_color="#5ac6fa",
+            style="--",
+            thickness=4,
+            label=None):
+        relative_dates = []
+        for i in range(0, len(absolute_dates)):
+            date = absolute_dates[i]
+            hours = date.hour + date.minute / 60 + date.second / 3600
 
-    # convert from exact dates to relative dates
-    if previous_glucose_dates:
-        for date in previous_glucose_dates:
-            scatter_dates.append(
-                date.hour + date.minute / 60 + date.second / 3600
-            )
+            # adjust if the times cross midnight
+            if (len(relative_dates) > 0
+                    and relative_dates[i-1] > hours):
+                hours += 24
+            relative_dates.append(hours)
 
-    for date in dates:
-        line_dates.append(
-            date.hour + date.minute / 60 + date.second / 3600
+        ax.plot(
+            relative_dates, values, color=line_color,
+            ls=style, lw=thickness, label=label
         )
 
     font = {
@@ -273,15 +284,23 @@ def plot_loop_inspired_glucose_graph(
     if previous_glucose_dates:
         x_ticks_duplicates = [
             date.hour for date in previous_glucose_dates
-            ] + [date.hour for date in dates]
+            ] + [date.hour for date in overall_dates]
 
     else:
-        x_ticks_duplicates = [date.hour for date in dates]
+        x_ticks_duplicates = [date.hour for date in overall_dates]
+
     x_ticks = list(OrderedDict.fromkeys(x_ticks_duplicates))
     labels = ["%d:00" % x1 for x1 in x_ticks]
+
+    # if the times cross midnight, adjust
+    if not sorted(x_ticks) == x_ticks:
+        for i in range(1, len(x_ticks)):
+            if x_ticks[i-1] > x_ticks[i]:
+                x_ticks[i] = x_ticks[i] + 24
+
     plt.xticks(x_ticks, labels)
 
-    # find the correct length to fill the correction range for
+    # find the correct length to fill the correction range
     fill_length = [
         x_ticks[0],
         x_ticks[-1] if x_ticks[0] != x_ticks[-1] else x_ticks[0] + 1
@@ -318,15 +337,74 @@ def plot_loop_inspired_glucose_graph(
     if title:
         plt.title(title, loc="left", fontweight='bold')
 
+    scatter_dates = []
+    line_dates = []
+
+    # convert from exact dates to relative dates, adjusting for date changes
+    if previous_glucose_dates:
+        for i in range(0, len(previous_glucose_dates)):
+            date = previous_glucose_dates[i]
+            hours = date.hour + date.minute / 60 + date.second / 3600
+
+            # adjust if the times cross midnight
+            if (len(scatter_dates) > 0
+                    and scatter_dates[i-1] > hours):
+                hours += 24
+            scatter_dates.append(hours)
+
+    for i in range(0, len(overall_dates)):
+        date = overall_dates[i]
+        hours = date.hour + date.minute / 60 + date.second / 3600
+
+        # adjust if the times cross midnight
+        if (len(line_dates) > 0
+                and line_dates[i-1] > hours):
+            hours += 24
+        line_dates.append(hours)
+
     if previous_glucose_dates:
         ax.scatter(
             scatter_dates, previous_glucose_values,
-            color=line_color or "#f09a37", lw=4, ls="-", s=10
+            color=line_color or "#5ac6fa", lw=4, ls="-", s=10
         )
 
-    ax.plot(
-            line_dates, values, color=line_color or "#f09a37", ls="--", lw=2
+    # Plot the overall prediction line
+    plot_line(
+        overall_dates, overall_values,
+        label="Predicted Glucose (Overall)"
+    )
+
+    # Plot each individual effect, if it exists
+    if momentum_dates:
+        plot_line(
+            momentum_dates, momentum_values,
+            line_color="#eb5905", thickness=3,
+            label="Predicted Glucose (Momentum Only)"
         )
+    if insulin_dates:
+        plot_line(
+            insulin_dates, insulin_values,
+            line_color="#f29741", thickness=3,
+            label="Predicted Glucose (Insulin Only)"
+        )
+    if carb_dates:
+        plot_line(
+            carb_dates, carb_values,
+            line_color="#5FCB49", thickness=3,
+            label="Predicted Glucose (Carb Only)"
+        )
+    if retrospective_dates:
+        plot_line(
+            retrospective_dates, retrospective_values,
+            line_color="#4253ed", thickness=3,
+            label="Predicted Glucose (RC Only)"
+        )
+
+    # add a legend
+    leg = plt.legend(numpoints=1)
+    for text in leg.get_texts():
+        text.set_color('#606060')
+        text.set_weight('normal')
 
     # add a grid
     plt.grid(grid)

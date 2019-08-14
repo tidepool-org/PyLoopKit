@@ -144,7 +144,7 @@ def update(input_dict):
 
     target_range_starts = input_dict.get("target_range_start_times")
     target_range_ends = input_dict.get("target_range_end_times")
-    target_range_mins = input_dict.get("target_range_minimum_values")
+    target_range_mins = input_dict.get("target_range_minimum_values") or []
     target_range_maxes = input_dict.get("target_range_maximum_values")
 
     last_temp_basal = input_dict.get("last_temporary_basal")

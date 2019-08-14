@@ -973,7 +973,7 @@ def find_ratio_at_time(ratio_start_times, ratio_end_times,
     ratio_end_times -- list of time objects of start times of
                              given ratio/correction range values
     ratio_values -- list of ratio/correction range values
-    time_to_check -- finding the value at this time
+    time_to_check -- finding the value at this (date)time
 
     Output:
     Value at time_to_check

@@ -1,0 +1,5018 @@
+{
+    "basal_rate_schedule": [
+        {
+            "startTime": 0.0,
+            "value": 0.85
+        },
+        {
+            "startTime": 43200.0,
+            "value": 0.65
+        },
+        {
+            "startTime": 48600.0,
+            "value": 0.7
+        }
+    ],
+    "basal_rate_timeZone": -25200,
+    "cached_carb_entries": [
+        {
+            "absorptionTime": " 7200.0",
+            "createdByCurrentApp": " true",
+            "externalID": " ",
+            "foodType": " ",
+            "isUploaded": " false",
+            "quantity": 15.0,
+            "quantity_units": "g",
+            "sampleUUID": " 79549022-D7C7-43ED-8F44-2ECF0421997F",
+            "startDate": " 2019-08-15 19:01:06 +0000",
+            "syncIdentifier": " 8D513BE4-EF2E-4565-8862-09DD9F777A98",
+            "syncVersion": " 1"
+        }
+    ],
+    "cached_dose_entries": [],
+    "cached_glucose_samples": [
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.8431,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "61977E9A-EBB9-4380-B3F7-2C8A1E445ECA",
+            "startDate": "2019-08-14 22:59:34 +0000",
+            "syncIdentifier": "\"C00FF0B7-3219-4FC0-8109-84208B567370\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 78.6174,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D21FF12D-F963-453D-8930-9E4513082C86",
+            "startDate": "2019-08-14 23:04:34 +0000",
+            "syncIdentifier": "\"739600F2-0A26-4BF8-AF17-59582B8A3AD7\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.7099,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BF110A7E-1A00-4A7A-A082-B784C76BACE8",
+            "startDate": "2019-08-14 23:09:34 +0000",
+            "syncIdentifier": "\"D3AAAB26-7E7E-45F6-8CD9-9324478AD41B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.6911,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "35B8FCB0-9D69-423A-84B4-3ECBF81AD8ED",
+            "startDate": "2019-08-14 23:14:34 +0000",
+            "syncIdentifier": "\"5E07361F-E981-41A1-B1A8-3C756224E1A0\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.3619,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C573EA09-23E6-44E5-B95F-0EA0B65B7677",
+            "startDate": "2019-08-14 23:19:34 +0000",
+            "syncIdentifier": "\"DFD35BC0-595A-4DDF-93E0-7C530D20A6C7\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.7085,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DB579DB1-9B64-4A53-8410-E1506FD0EC3D",
+            "startDate": "2019-08-14 23:24:34 +0000",
+            "syncIdentifier": "\"CF84298F-DB08-48AE-9C2F-33D094473ACD\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.2515,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B08C9FC7-64BC-4BF2-83BE-0AD667E2ACCE",
+            "startDate": "2019-08-14 23:29:34 +0000",
+            "syncIdentifier": "\"6DCC5D0C-AF35-4473-92F3-F3E1C09EDDFF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.5302,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F851992D-635C-4798-9A6E-70F5759D02D7",
+            "startDate": "2019-08-14 23:34:34 +0000",
+            "syncIdentifier": "\"D2851AF0-7E88-48F8-B88F-2380E7DFE8D2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.6933,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "E180F0A0-C865-4D3C-8D68-5935FA948D93",
+            "startDate": "2019-08-14 23:39:34 +0000",
+            "syncIdentifier": "\"B740EB3D-49AC-4052-96CD-7A32AA994776\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.7026,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5DAD2A1A-1C79-4690-AC89-00974EBB38D5",
+            "startDate": "2019-08-14 23:44:34 +0000",
+            "syncIdentifier": "\"3BFF0C3D-79A6-4ACA-9E09-5C40768DC440\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.1816,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "07B99365-0643-4DE3-81C7-9FA3AAAF31F1",
+            "startDate": "2019-08-14 23:49:34 +0000",
+            "syncIdentifier": "\"25C69E76-9DA8-4166-A74C-C02FB5D88A2F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.1534,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "25CCB319-C010-415B-8EFC-4EDF8E080418",
+            "startDate": "2019-08-14 23:54:34 +0000",
+            "syncIdentifier": "\"935D0C11-0EBA-4EF9-B8A7-000C8BF3B219\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.2052,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A98FCC16-2129-487D-B1CD-CC19C453216A",
+            "startDate": "2019-08-14 23:59:34 +0000",
+            "syncIdentifier": "\"3E8D2717-274A-4A0B-AFFE-7F101A7C2C44\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.7937,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "60CAD4AF-886E-4F87-8C6F-9D49503A10DF",
+            "startDate": "2019-08-15 00:04:34 +0000",
+            "syncIdentifier": "\"A8DAFC76-62DD-438C-AA60-E315E686390D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.7537,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "85BE4F2F-3682-4D82-9FDE-84ABF7331813",
+            "startDate": "2019-08-15 00:09:34 +0000",
+            "syncIdentifier": "\"ECB6DBD5-32A5-4032-9CDA-CCB6F60F750F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 81.0337,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "45900F65-C2BE-4D3F-894C-E5A55C3E15C9",
+            "startDate": "2019-08-15 00:14:34 +0000",
+            "syncIdentifier": "\"4E74897F-568E-441C-AEA2-DC5DBA0ABA2B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 85.1745,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7E3F9D16-7B63-44D6-AF52-A88CC9C3ABB5",
+            "startDate": "2019-08-15 00:19:34 +0000",
+            "syncIdentifier": "\"7CF983E8-5635-4B8F-AAC8-9AE7163B9058\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 88.0466,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4DF01572-FC29-4E09-8BEF-413F4FAEC73A",
+            "startDate": "2019-08-15 00:24:34 +0000",
+            "syncIdentifier": "\"6D9CF461-361D-4B4C-A85C-A1BDE214B29C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 87.6304,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C95F5711-6D87-45F1-B32F-7BAA67C786C3",
+            "startDate": "2019-08-15 00:29:34 +0000",
+            "syncIdentifier": "\"5373060D-AA86-4D10-A3B5-B7AAD6576958\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 89.0616,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "095B43C6-681A-4735-8876-3EBE780A0876",
+            "startDate": "2019-08-15 00:34:34 +0000",
+            "syncIdentifier": "\"703F3B93-9F61-4CF5-9850-9C3AEFCB084F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.8319,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "EA45BCDC-BF38-4692-91AE-AA05141904A8",
+            "startDate": "2019-08-15 00:39:34 +0000",
+            "syncIdentifier": "\"F034DACF-15B8-4D39-B2D1-449838BB8B73\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 94.8804,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "05D9B47A-83EC-4A87-AF87-5CB18D59ACBB",
+            "startDate": "2019-08-15 00:44:34 +0000",
+            "syncIdentifier": "\"C328C9FE-3383-4672-BD24-73FFD88AB1FE\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 97.1487,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7A042540-7E3B-4399-A7B9-44A01E1E7D4E",
+            "startDate": "2019-08-15 00:49:34 +0000",
+            "syncIdentifier": "\"128FCDF6-2AA2-478C-9139-5BB161D249B9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 98.6019,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "CCC8D41D-0042-4274-B171-BA5B10803208",
+            "startDate": "2019-08-15 00:54:34 +0000",
+            "syncIdentifier": "\"79E6483A-1B32-4E01-8503-C986A8843FC8\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 102.117,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "810D0AF5-2A79-4EF6-954A-21F54E6D2534",
+            "startDate": "2019-08-15 00:59:34 +0000",
+            "syncIdentifier": "\"08D7213B-AE38-437C-8BEA-D793AE4D764F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 103.847,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DF88529C-AC77-4BBD-8572-126680791083",
+            "startDate": "2019-08-15 01:04:34 +0000",
+            "syncIdentifier": "\"6EC5166A-4366-49D8-9767-156047D57EA5\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 104.079,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "9DAFC1C9-8838-4602-85B4-D79FBD959763",
+            "startDate": "2019-08-15 01:09:34 +0000",
+            "syncIdentifier": "\"37434BDA-EB1A-4C44-82E3-0C17CF88564C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 105.067,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BC077F7D-B3F3-4B12-9509-B03E1E7E7C30",
+            "startDate": "2019-08-15 01:14:34 +0000",
+            "syncIdentifier": "\"EC529B29-C418-4F3C-8841-27E90F8FB2B1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 109.949,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F95AF2E2-E42A-4874-A090-53F9152F4016",
+            "startDate": "2019-08-15 01:19:34 +0000",
+            "syncIdentifier": "\"0F501EB3-F297-47F9-85EA-81EAE9622643\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 111.65,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "24413D90-EC70-4FF8-AFA0-4DE90F58B0CF",
+            "startDate": "2019-08-15 01:24:34 +0000",
+            "syncIdentifier": "\"7EF6E772-5DF2-41CE-9052-E52017931313\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 113.074,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DEE3F72C-2AF8-4ADE-A341-18D92E4C4CBA",
+            "startDate": "2019-08-15 01:29:34 +0000",
+            "syncIdentifier": "\"F5D543F3-16C3-4246-8524-132B224C9FDC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 113.513,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C8F2DCDD-A38B-4035-9141-92FD845D9690",
+            "startDate": "2019-08-15 01:34:34 +0000",
+            "syncIdentifier": "\"41E2B1DC-73AC-45DB-A427-F9AF40D4F46F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 117.764,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A7285A40-4FD5-49A5-BB79-3468048B5C3C",
+            "startDate": "2019-08-15 01:39:34 +0000",
+            "syncIdentifier": "\"600C06F4-410D-46B5-9252-A5B20D263F4B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 119.16,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "1BC80BC2-4021-4998-A7F8-CD2A57430DFE",
+            "startDate": "2019-08-15 01:44:34 +0000",
+            "syncIdentifier": "\"FF7FBBBF-BC21-4CD8-9FC6-1EAAE39EB829\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 118.075,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B99F8D59-C711-4D2F-89AC-EFBA6142D657",
+            "startDate": "2019-08-15 01:49:34 +0000",
+            "syncIdentifier": "\"FD965D7F-2C06-4D5D-BFF7-86768EF2542C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 120.223,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A08D8703-3E89-49FC-91DC-32A7677FB18B",
+            "startDate": "2019-08-15 01:54:34 +0000",
+            "syncIdentifier": "\"FC5CC549-6962-492F-AF64-090318CB38E7\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 119.881,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5826648F-D61F-42C4-83C6-E3EBBBF9F808",
+            "startDate": "2019-08-15 01:59:34 +0000",
+            "syncIdentifier": "\"451EEDC6-1277-4315-B2F0-939199775423\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 123.29,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "792B3B9D-070F-4DDE-83D5-207504F8AD20",
+            "startDate": "2019-08-15 02:04:34 +0000",
+            "syncIdentifier": "\"928F07B2-BC4A-417B-9593-57D86B8FA2EE\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 124.093,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B6AD09D8-EEC7-470B-A333-548909F8094A",
+            "startDate": "2019-08-15 02:14:34 +0000",
+            "syncIdentifier": "\"415FC332-9079-4D6C-957F-2BC97776A1D7\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.948,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "9223F5A0-6FB4-490F-8CF4-7FF4A80D0F93",
+            "startDate": "2019-08-15 02:19:34 +0000",
+            "syncIdentifier": "\"ED10C8AA-8117-44FD-A21D-58CEB0CCC00D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 123.64,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7E57D690-38AE-45EB-8D87-101D7118C8C7",
+            "startDate": "2019-08-15 02:24:34 +0000",
+            "syncIdentifier": "\"3A23E4C4-A31C-4365-AF81-E70783204884\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 126.71,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "537F4AC3-5D38-48E2-B0B9-7359DD581AE9",
+            "startDate": "2019-08-15 02:29:34 +0000",
+            "syncIdentifier": "\"60DB2C80-B639-4752-829D-8FFA9A94DA35\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 126.822,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FBCF91ED-7E0A-4A08-BB03-8383C4616A96",
+            "startDate": "2019-08-15 02:34:34 +0000",
+            "syncIdentifier": "\"A1CC8CC8-A508-440B-AF2D-FF4DDCF99A83\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.682,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2BE21179-012B-4E9D-8377-D04CA6799062",
+            "startDate": "2019-08-15 02:39:34 +0000",
+            "syncIdentifier": "\"2E46571F-5B56-4421-966B-BA8970873C8D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 124.479,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D3A69D6F-FCC2-4F5A-9AB0-91163F3B7DFB",
+            "startDate": "2019-08-15 02:44:34 +0000",
+            "syncIdentifier": "\"147E148D-720E-401B-9337-38B36382F442\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 124.334,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B90D17AA-115C-4DE3-8042-BC55218A7FCD",
+            "startDate": "2019-08-15 02:49:34 +0000",
+            "syncIdentifier": "\"4D50F1BB-947A-4CD2-8D3B-24D99A935D43\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 124.035,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "0EB76A19-079D-489F-BC21-E9D7101937B1",
+            "startDate": "2019-08-15 02:54:34 +0000",
+            "syncIdentifier": "\"256F727E-A953-4660-82FC-073581F230C2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 119.836,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D46A5886-6D3A-42E4-8D94-9A26CFAE20C1",
+            "startDate": "2019-08-15 02:59:34 +0000",
+            "syncIdentifier": "\"E92FCAFC-0745-457B-8C49-4D3D24B83488\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 116.497,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DC6FA2E4-6F58-44FF-AFB4-13D942B8681B",
+            "startDate": "2019-08-15 03:04:34 +0000",
+            "syncIdentifier": "\"0D97E123-BC5C-4FCF-88F6-5014E05E18C2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 118.028,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "3F3CE737-2019-457D-B7A8-011C46BEF990",
+            "startDate": "2019-08-15 03:09:34 +0000",
+            "syncIdentifier": "\"293DC0CB-A84E-4D97-8990-676ECDF549F8\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 117.654,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BB82A891-03D0-43F7-AFC3-225236F98FF2",
+            "startDate": "2019-08-15 03:14:34 +0000",
+            "syncIdentifier": "\"30FEC9F5-CFFA-46DA-BC04-DA82EF46C2BB\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 114.739,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "EE746624-1ACA-4FF9-B1D9-DFFEAE809289",
+            "startDate": "2019-08-15 03:19:34 +0000",
+            "syncIdentifier": "\"9AA5D9B7-C191-4C05-824A-6BF3274136B3\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 114.294,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "68621D2F-1AE6-4709-A83F-4C4F70FD95CD",
+            "startDate": "2019-08-15 03:24:34 +0000",
+            "syncIdentifier": "\"A62843CF-2981-41FA-A129-D0AD72C16193\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 109.69,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5227954A-ABA4-4156-86FC-084D74AA7491",
+            "startDate": "2019-08-15 03:34:34 +0000",
+            "syncIdentifier": "\"5A691063-85FA-4EEA-A8EA-C1F1F40F32B0\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 107.602,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "348C0AE6-A8CB-4F91-84D4-2AE209730AF7",
+            "startDate": "2019-08-15 03:39:34 +0000",
+            "syncIdentifier": "\"ECC60CD5-FD6F-43F2-B6B6-1EDB1058D811\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 105.903,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "070F674A-E95F-483B-8913-E701F18694C4",
+            "startDate": "2019-08-15 03:44:34 +0000",
+            "syncIdentifier": "\"13FBEADA-8428-4673-AF72-EDDB6EE21914\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 103.382,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "062388C7-06DA-47C9-B58C-2E65BF88394B",
+            "startDate": "2019-08-15 03:49:34 +0000",
+            "syncIdentifier": "\"7F52D4DA-2ACA-422E-A615-D4F25304F6E9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 102.263,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "AC7BDBFD-12CE-4274-B9F9-726A31651E6E",
+            "startDate": "2019-08-15 03:54:34 +0000",
+            "syncIdentifier": "\"9DE0BFCE-0A7C-4CCF-B0F2-B7641A941975\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 101.098,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B244CB57-7FA9-4C37-B1A0-4566DE6F674C",
+            "startDate": "2019-08-15 03:59:34 +0000",
+            "syncIdentifier": "\"B4A7B2B8-F005-4C03-A9BB-BA1492F562BC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 96.0431,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "1CC6F605-3DEA-4D93-912C-D45D63985A8F",
+            "startDate": "2019-08-15 04:04:34 +0000",
+            "syncIdentifier": "\"06672C19-1AE5-45BE-8420-14F353A4CE63\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 96.7679,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A4C19E65-9687-48A6-8F05-92D1E6EDBC44",
+            "startDate": "2019-08-15 04:09:34 +0000",
+            "syncIdentifier": "\"DCC6B085-755B-4A92-86C6-7A5F58FC6AF6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 92.608,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D24D10E6-50EB-453C-8807-E83FC9CE0D9A",
+            "startDate": "2019-08-15 04:14:34 +0000",
+            "syncIdentifier": "\"5F1B1853-035C-4259-8BC2-2C07FD79FA3B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.2174,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "E3612AC1-D284-4441-9C2B-3D5E384D67F0",
+            "startDate": "2019-08-15 04:19:34 +0000",
+            "syncIdentifier": "\"5DE68F85-2D0F-41F4-A179-85291992A521\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 88.4772,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "E9E8AD3E-198F-4572-954D-054E8902938B",
+            "startDate": "2019-08-15 04:24:34 +0000",
+            "syncIdentifier": "\"7DDA22AC-206B-4904-B04C-B999010C84A2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 86.6316,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "125A81C5-B58F-40B6-AAED-8371C8708F8F",
+            "startDate": "2019-08-15 04:29:34 +0000",
+            "syncIdentifier": "\"C2F12861-2312-4619-A9AA-C5F233C39743\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 86.4879,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "81289E68-D8EF-45A8-9D7E-EF5AC8940D67",
+            "startDate": "2019-08-15 04:34:34 +0000",
+            "syncIdentifier": "\"DC606BC7-44B5-4C6F-A8EA-F6C69ED5C99E\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 83.8147,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5221B71E-96AC-4EFF-9AF9-B6211F9F05D5",
+            "startDate": "2019-08-15 04:39:34 +0000",
+            "syncIdentifier": "\"35C0F354-7BAA-4C95-AC64-0A6C4F8D39FA\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 83.7989,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4DC523A3-B44D-4808-9D63-21250553C2FF",
+            "startDate": "2019-08-15 04:44:34 +0000",
+            "syncIdentifier": "\"5FD7B3D6-FD1D-447C-A571-3E3483EF03FC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.9742,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7C9775F3-8630-4FDC-A897-3D7A2BB60EAF",
+            "startDate": "2019-08-15 04:49:34 +0000",
+            "syncIdentifier": "\"71252465-1B71-449A-8898-887511832864\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.8581,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D13D46EE-B0E3-4224-AEAE-33022968388E",
+            "startDate": "2019-08-15 04:54:34 +0000",
+            "syncIdentifier": "\"69D01E70-D2E9-4E6C-9CBE-98AD232EFB4E\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.0695,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "CB14E97F-15CC-4E0A-946A-5BD746401FDB",
+            "startDate": "2019-08-15 04:59:34 +0000",
+            "syncIdentifier": "\"CDE2E154-7A89-4CC2-8DBB-B1949A4138FF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.8335,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B2F37877-B8C3-4517-BBC5-1416C6EAEF97",
+            "startDate": "2019-08-15 05:04:34 +0000",
+            "syncIdentifier": "\"A6B1DC84-BCB9-43F7-A752-A89D0921A9E2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.9333,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "23316489-F815-454A-AC23-46AEB1A127C1",
+            "startDate": "2019-08-15 05:09:34 +0000",
+            "syncIdentifier": "\"B3C4A589-445F-4001-9E08-1F51A77AF51A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.2657,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "649DC259-AC17-474C-A1AA-7C0C70F903D9",
+            "startDate": "2019-08-15 05:14:34 +0000",
+            "syncIdentifier": "\"CC1765FB-618D-4D13-BD6B-4B11E9BA72AB\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.4788,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "281F9AF0-7F18-4325-B776-059343303408",
+            "startDate": "2019-08-15 05:19:34 +0000",
+            "syncIdentifier": "\"5193444D-5794-4D91-A137-74E187BDD780\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.5883,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DA20A638-F0A2-4649-90D2-277591C80BD7",
+            "startDate": "2019-08-15 05:24:34 +0000",
+            "syncIdentifier": "\"2949127C-2666-432B-BC28-AA77C0DC9A6F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.2023,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A942B619-18D9-46B8-A13D-261137625C7A",
+            "startDate": "2019-08-15 05:29:34 +0000",
+            "syncIdentifier": "\"B1DACE66-E109-4EE7-9583-7E715A5D05F9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.54,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "8741FAB7-ACCC-4A87-BDB5-6888D85FA569",
+            "startDate": "2019-08-15 05:34:34 +0000",
+            "syncIdentifier": "\"F7A0BCBB-5C80-4063-9205-50E7A438F631\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.7773,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7AC5AE4F-CE55-49CD-B6AE-252308A1F788",
+            "startDate": "2019-08-15 05:39:34 +0000",
+            "syncIdentifier": "\"CEB378BE-E4F4-468F-897F-D6388FF76257\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.6489,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DF0DA28D-180A-475C-8A63-6766C5237532",
+            "startDate": "2019-08-15 05:44:34 +0000",
+            "syncIdentifier": "\"DF282B51-3F8F-4306-B533-76296DF1E65C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.2713,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "8FF175ED-75BA-40A6-8EEC-3C025329BF9B",
+            "startDate": "2019-08-15 05:49:34 +0000",
+            "syncIdentifier": "\"A6CB3578-ABB8-4A16-AE2C-C892716466F6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.085,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "3322F9A4-93FE-44AD-B14C-0260B5C7E717",
+            "startDate": "2019-08-15 05:54:34 +0000",
+            "syncIdentifier": "\"B92ACBDD-93D0-4B1F-8919-EE4A02E1B9F0\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.9986,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "3DA00616-9F6F-45E3-AB25-EB7F9034D347",
+            "startDate": "2019-08-15 05:59:34 +0000",
+            "syncIdentifier": "\"8FBBD317-6A4A-411D-A7AC-FE116F655E50\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.8621,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "15F4676C-F897-40C3-9B22-342E29D2E0A6",
+            "startDate": "2019-08-15 06:04:34 +0000",
+            "syncIdentifier": "\"BDE10320-51A9-4C8F-B70E-C6F8E12B0E2C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 81.4842,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C6C61139-B20D-499F-9AE2-4B0A00568CF5",
+            "startDate": "2019-08-15 06:09:34 +0000",
+            "syncIdentifier": "\"3F0FF0A4-E289-4F9D-B900-4A35A8BBF037\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 83.8608,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F08A2959-DFFF-4DE8-973F-580662127CA0",
+            "startDate": "2019-08-15 06:14:34 +0000",
+            "syncIdentifier": "\"3E1DFA31-436F-4F95-BDC0-6B9A0C7BE31C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 85.3719,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2833B996-812F-4B17-8058-2EC8CE882F0C",
+            "startDate": "2019-08-15 06:19:34 +0000",
+            "syncIdentifier": "\"BCFD2B59-B6BF-4962-86C7-43392B0AE4A1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 85.1984,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "AB56E53C-0A1E-4D1F-A91B-5E3D31B3B804",
+            "startDate": "2019-08-15 06:24:34 +0000",
+            "syncIdentifier": "\"9B6D60B3-A984-450D-86F0-E0A7FF650D1B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 87.5674,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "3EF737DE-1FBC-4765-8877-9683A0AB228F",
+            "startDate": "2019-08-15 06:29:34 +0000",
+            "syncIdentifier": "\"067EF411-F861-421A-BAE5-A77C2E116DAC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.2177,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BAE46E09-A34C-464F-AAAE-DB68A63BA471",
+            "startDate": "2019-08-15 06:34:34 +0000",
+            "syncIdentifier": "\"5D72FD3D-0840-4A46-9F4B-FBA778A533FA\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 93.1499,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "EF30B339-442A-4257-AF3D-E88F92782B00",
+            "startDate": "2019-08-15 06:39:34 +0000",
+            "syncIdentifier": "\"6939B6CD-2CDB-4973-83D4-0B46B73B78FE\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 95.4969,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D37094FE-5BA0-4138-9071-C88B05C56CD0",
+            "startDate": "2019-08-15 06:44:34 +0000",
+            "syncIdentifier": "\"6966D94D-8AF4-4D97-A4D2-6F87FC0BF7CD\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 96.8808,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "140966F7-B5D9-4548-8E44-ADEDA926E7A7",
+            "startDate": "2019-08-15 06:49:34 +0000",
+            "syncIdentifier": "\"15246902-B054-4D37-8662-27829C1BE86C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 99.5071,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2419CAB2-EF84-4EF5-94CA-337F164F9C95",
+            "startDate": "2019-08-15 06:54:34 +0000",
+            "syncIdentifier": "\"B5CF86E6-218D-47CE-A1A4-6F4232F719C5\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 101.683,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DCAFB3A8-C3B8-4F7F-B24E-D7E548995C37",
+            "startDate": "2019-08-15 06:59:34 +0000",
+            "syncIdentifier": "\"7C3E53D8-31EC-4D3B-B8A2-E382F4B3DA31\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 100.801,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "8C7CD68E-7839-40C8-906D-419651A896D4",
+            "startDate": "2019-08-15 07:04:34 +0000",
+            "syncIdentifier": "\"FD1ACB38-9EDD-4AA0-90BC-0694A23B69AA\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 104.866,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D3DA64BC-75EF-4CBC-86D3-D96323F1F3C8",
+            "startDate": "2019-08-15 07:09:34 +0000",
+            "syncIdentifier": "\"56259BA3-455D-4991-B5DC-D23ABF48BA8A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 109.019,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "ACF25D14-EF12-4896-9EEE-4E670FA9B51A",
+            "startDate": "2019-08-15 07:19:34 +0000",
+            "syncIdentifier": "\"2CF0B846-94D2-4EC1-9F85-4BDA4F89E19B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 111.677,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4AF57443-FB4D-4146-A0C1-ED958FA72770",
+            "startDate": "2019-08-15 07:24:34 +0000",
+            "syncIdentifier": "\"C0430B31-8409-44DF-9588-BD3F84482BCF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 111.283,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "80278E8D-4493-4459-88DE-7FA10DDB10F3",
+            "startDate": "2019-08-15 07:29:34 +0000",
+            "syncIdentifier": "\"ACB4172B-3B1C-4C68-8BDB-9251406A918E\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 114.608,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2F363F95-0483-4813-B53C-E77D5FCE3AD6",
+            "startDate": "2019-08-15 07:34:34 +0000",
+            "syncIdentifier": "\"03EF7A61-5C64-4122-BC50-FE8CC7644910\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 114.652,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "9C6DEE7F-4D2F-434C-8BD5-61C4EBB1A3DA",
+            "startDate": "2019-08-15 07:39:34 +0000",
+            "syncIdentifier": "\"82EDB0D4-7E46-4D42-9784-983ABBAA7630\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 118.283,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "86936636-9608-4FC9-8E6C-19DEA9D2BE2C",
+            "startDate": "2019-08-15 07:49:34 +0000",
+            "syncIdentifier": "\"66466647-147E-411F-A5A4-BA422C9F6C01\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 120.204,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "68A92D3B-8FA1-46EB-B812-9F2E4F163795",
+            "startDate": "2019-08-15 07:54:34 +0000",
+            "syncIdentifier": "\"B26529B0-92A3-4315-8289-526CF69500A4\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 121.518,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "575A66B8-24A8-48C5-B9AE-7FACBECD3312",
+            "startDate": "2019-08-15 07:59:34 +0000",
+            "syncIdentifier": "\"A18E7D6D-E648-4FF8-8B36-8A7AB5C667F9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.023,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B361F7CE-46C4-4E55-BE69-6F10C9792E06",
+            "startDate": "2019-08-15 08:04:34 +0000",
+            "syncIdentifier": "\"03E08C53-B9C7-4FB6-B06A-FB3648C697B1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 123.037,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C2F4A438-C111-40CE-8A89-421587430220",
+            "startDate": "2019-08-15 08:09:34 +0000",
+            "syncIdentifier": "\"84A3DFF9-74FE-4D12-A0F8-81603A4E9421\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 126.006,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D300DB18-0CFB-4C13-A38E-DD0FB63D3FD7",
+            "startDate": "2019-08-15 08:14:34 +0000",
+            "syncIdentifier": "\"A426C6EC-3F51-4D10-8232-91F611B3CC44\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.888,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "063E8765-E5A7-4184-8631-9D31B5B7EAD7",
+            "startDate": "2019-08-15 08:19:34 +0000",
+            "syncIdentifier": "\"9D845717-5C88-47B3-A4A2-B2E112C04D19\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 124.091,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "1EC8B1A9-CBDE-4440-ACCF-66510125802D",
+            "startDate": "2019-08-15 08:24:34 +0000",
+            "syncIdentifier": "\"BEA00D43-35A3-452B-A88F-46802645CCB6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 126.679,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4C299A8D-0163-4100-95BA-088BD20FF131",
+            "startDate": "2019-08-15 08:29:34 +0000",
+            "syncIdentifier": "\"4B9C70D9-B5B8-4531-BEE1-2A8E1E6B5DEA\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.76,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FE923EDB-FF69-48EB-8AAB-E5C1D7AA7143",
+            "startDate": "2019-08-15 08:34:34 +0000",
+            "syncIdentifier": "\"D2DD8633-C9D3-474F-A13C-05125CC17ECB\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 123.031,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "202F61EF-D805-4C84-8B35-80673F4B8E4F",
+            "startDate": "2019-08-15 08:44:34 +0000",
+            "syncIdentifier": "\"B935AE8E-10F7-46FF-B255-9CA030528A93\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.901,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "E95F748F-6F03-48DC-899F-50C613A743AA",
+            "startDate": "2019-08-15 08:49:34 +0000",
+            "syncIdentifier": "\"88781AAB-3C85-44BC-A302-14DA6840C87D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.161,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BEBC92AF-E2FD-4D1C-888A-B38C0113F8BA",
+            "startDate": "2019-08-15 08:54:34 +0000",
+            "syncIdentifier": "\"C1B9BCB8-6808-43D7-9E11-8AA7C0FE62A2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 121.252,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "331C2295-0AE5-4309-A657-B1FD61BD676C",
+            "startDate": "2019-08-15 08:59:34 +0000",
+            "syncIdentifier": "\"029103F1-7FF5-485E-9E0B-270F1B93A45A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 118.454,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F45EB39F-4D80-44F2-99B1-0D0DC401650A",
+            "startDate": "2019-08-15 09:04:34 +0000",
+            "syncIdentifier": "\"0E9A400D-6545-4639-B836-02B9A85B5758\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 120.972,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "24FE0779-3B0F-4F5D-8B25-F700E75989E8",
+            "startDate": "2019-08-15 09:09:34 +0000",
+            "syncIdentifier": "\"D6161971-E34F-47A9-929D-5FD7E0AF5F65\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 116.615,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D0B6847E-9C49-4CBD-B044-B1C4AFCCB6DB",
+            "startDate": "2019-08-15 09:14:34 +0000",
+            "syncIdentifier": "\"991E339A-FC14-4EEF-BCF8-CCD06A861AAA\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 115.944,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FD48A0FF-FB48-4B29-8D4E-58AEC0C315A0",
+            "startDate": "2019-08-15 09:19:34 +0000",
+            "syncIdentifier": "\"E121E97A-056E-4EA0-AD0D-69CD46B14276\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 115.212,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DFB172C2-A2B9-413D-843C-43D03362DBF1",
+            "startDate": "2019-08-15 09:24:34 +0000",
+            "syncIdentifier": "\"797FAEF6-1EE2-4191-ADA2-EB35510FF8C2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 113.465,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "0C48807C-3D4C-4F7A-9D50-9DE6EEEDCA8D",
+            "startDate": "2019-08-15 09:29:34 +0000",
+            "syncIdentifier": "\"D05CC0E5-8234-4D70-8E76-2E7206DF8890\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 112.111,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4E125B6D-7A8F-43DB-9C07-26B6EC10863D",
+            "startDate": "2019-08-15 09:34:34 +0000",
+            "syncIdentifier": "\"85E1FC6B-030A-4754-83D7-5AC07A91163B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 111.4,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BFF350B6-EB58-4A3A-85F1-C025C91100BB",
+            "startDate": "2019-08-15 09:39:34 +0000",
+            "syncIdentifier": "\"9DFDCAB8-5640-4B88-A0AC-9A01810C65A0\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 108.013,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B0625726-BBF6-469F-81A1-2F998EC6CB4D",
+            "startDate": "2019-08-15 09:44:34 +0000",
+            "syncIdentifier": "\"F7E02528-B015-4287-9B92-2CA5778FB74E\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 104.554,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "46676DB5-B1E4-4F57-914E-07D9F67F329C",
+            "startDate": "2019-08-15 09:49:34 +0000",
+            "syncIdentifier": "\"7D21856F-5943-4B15-9A78-4894818A4F9C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 100.357,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BCFE6273-6F6A-4D5B-8051-AEC33FE21ADC",
+            "startDate": "2019-08-15 09:54:34 +0000",
+            "syncIdentifier": "\"B239B3EC-4AE4-4B13-AB16-E475C0989836\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 101.408,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F7075822-DDDE-4CFA-88BA-9FC7221F5BBF",
+            "startDate": "2019-08-15 09:59:34 +0000",
+            "syncIdentifier": "\"43AFC545-1C7C-4E5D-BDF8-B0A52F87C1DC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 96.9136,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "75869847-07CA-4FB0-90A4-1036AF714FB9",
+            "startDate": "2019-08-15 10:04:34 +0000",
+            "syncIdentifier": "\"7BEF9C28-EA04-4F63-8447-0AB8BEE7D2CE\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 96.486,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "1393779E-D028-436F-9DEF-53EE7D2055A4",
+            "startDate": "2019-08-15 10:09:34 +0000",
+            "syncIdentifier": "\"E52858A7-4AB6-4126-B19D-DFEA5F0A2E92\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 92.2181,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C1D67DBB-6C42-42CE-81D2-8070292CAD41",
+            "startDate": "2019-08-15 10:14:34 +0000",
+            "syncIdentifier": "\"FA3200A8-2671-411E-B6EB-660268CECEF9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.1047,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "6ADC01CD-C3B1-4D09-96D5-1C60CA3B9B53",
+            "startDate": "2019-08-15 10:19:34 +0000",
+            "syncIdentifier": "\"6048E575-11D9-469E-8C2A-F89CB34C0546\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 89.8017,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "1F66B8C4-A779-4259-B022-C17CBF5388AC",
+            "startDate": "2019-08-15 10:24:34 +0000",
+            "syncIdentifier": "\"5E167A02-4369-4861-B995-BAC7EA6E3F31\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 89.1681,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "95FF446B-E5C7-458A-8CD5-2781BC9BDF17",
+            "startDate": "2019-08-15 10:29:34 +0000",
+            "syncIdentifier": "\"A3EF9DCB-CD54-48D7-8D86-CBB84C80D72F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 86.5785,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "33E0DBF7-659B-4587-A302-06043FA569F4",
+            "startDate": "2019-08-15 10:34:34 +0000",
+            "syncIdentifier": "\"F756AD8B-3355-4796-A5B9-0516D211365C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 83.4567,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "21ADD6FC-C617-4045-9537-3FE6B33357E2",
+            "startDate": "2019-08-15 10:39:34 +0000",
+            "syncIdentifier": "\"1C4AB8A8-DF6A-48E6-A098-8DF210480BA2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 80.7432,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D83873D1-96BD-4402-8CDF-93E8FEB8A56D",
+            "startDate": "2019-08-15 10:44:34 +0000",
+            "syncIdentifier": "\"F6C9E434-4497-4FBB-AE6F-E1D534BB1774\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.6869,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "98BE64DF-A428-4A0B-A2F7-EF96B4A860CF",
+            "startDate": "2019-08-15 10:54:34 +0000",
+            "syncIdentifier": "\"EE836073-9599-442C-9F3C-0DF367131C3D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.1415,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "07517981-B235-48ED-87EA-C7BA47A5BE0F",
+            "startDate": "2019-08-15 10:59:34 +0000",
+            "syncIdentifier": "\"3B59B873-E9F4-43C6-9CEF-60F0A034B1FD\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.0935,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FF0980B3-906F-413F-B927-BD02EFFB60EC",
+            "startDate": "2019-08-15 11:04:34 +0000",
+            "syncIdentifier": "\"79DD2A6A-8ECB-4EF2-9E52-562F6A4702F2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.7406,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "E71949C9-41A0-482D-A516-2FC25D83A8F5",
+            "startDate": "2019-08-15 11:09:34 +0000",
+            "syncIdentifier": "\"3F97F59E-0892-4C9D-B606-2C3DD51F03CF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.025,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "6BC335D4-3513-4CA9-92F5-C7A3A6057E88",
+            "startDate": "2019-08-15 11:14:34 +0000",
+            "syncIdentifier": "\"357C7D9D-6904-45B5-B6EB-E970ED86BAC2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.6618,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "82D6787F-1560-4486-8FFD-4A44283114B4",
+            "startDate": "2019-08-15 11:19:34 +0000",
+            "syncIdentifier": "\"7D5878ED-10AE-40C2-91B2-FFD839D56AD9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.5476,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7BDD258E-CCBB-408D-8D0C-F66C604D1470",
+            "startDate": "2019-08-15 11:24:34 +0000",
+            "syncIdentifier": "\"569B8459-1A60-4009-95FF-3D45D1C65376\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.2275,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "90E94F1A-B690-4B24-BF81-359C04FACDAE",
+            "startDate": "2019-08-15 11:29:34 +0000",
+            "syncIdentifier": "\"C8572240-0B0B-41BA-AF2F-E142160F5589\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.2536,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5D4BE258-88D5-4D20-A76C-0459DD8AEC90",
+            "startDate": "2019-08-15 11:34:34 +0000",
+            "syncIdentifier": "\"8EFA7B6E-C7CC-4F2C-B6EC-924E6906C0E6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.4142,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "7F5157EC-D601-493D-B779-9E9D284E8476",
+            "startDate": "2019-08-15 11:39:34 +0000",
+            "syncIdentifier": "\"A5588471-FE87-41A7-810C-99B94609DCE9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.6245,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "12C26E57-8506-43DD-A343-95970967C989",
+            "startDate": "2019-08-15 11:44:34 +0000",
+            "syncIdentifier": "\"27FC66D2-8CC5-40B8-8CBF-DC82EEA2FDB6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.6969,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "EA5BC2A8-B0C1-4045-82D8-32DEABF28D0E",
+            "startDate": "2019-08-15 11:49:34 +0000",
+            "syncIdentifier": "\"197E3A6C-32BD-4DA4-823B-B9C0547559E9\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 78.7665,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "721CDDD9-9133-44DD-B769-BB13FB554E93",
+            "startDate": "2019-08-15 11:54:34 +0000",
+            "syncIdentifier": "\"69F732A7-6359-40B2-800E-FB63095937C1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.868,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "219011CC-1828-4FA6-BE1F-3F605C09E164",
+            "startDate": "2019-08-15 11:59:34 +0000",
+            "syncIdentifier": "\"D698DDC6-7158-44DD-AD55-1CA281862524\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 78.5595,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4636C828-16CE-436F-A682-168DCC00ABFA",
+            "startDate": "2019-08-15 12:04:34 +0000",
+            "syncIdentifier": "\"8BCCE8F0-CB17-4D03-89A9-CFB8F0625847\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 82.1978,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "67BDD24D-B1FE-4838-9153-C9785E545E57",
+            "startDate": "2019-08-15 12:14:34 +0000",
+            "syncIdentifier": "\"859DAA66-F47D-420F-9E70-6CE91DFD6B38\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 83.4184,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "0A7569C9-5083-4E5C-8336-A09F59AD097D",
+            "startDate": "2019-08-15 12:19:34 +0000",
+            "syncIdentifier": "\"457D9252-E330-435C-BD9E-53F08AA9FE23\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 86.9034,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D086E2DE-A3AF-469A-A8AB-FD2DFD2A2358",
+            "startDate": "2019-08-15 12:24:34 +0000",
+            "syncIdentifier": "\"A2846CA7-9B60-4CED-AD6C-4F42275BCF5D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 87.5243,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A36D39F6-6D02-49FD-81F8-671266A93FC2",
+            "startDate": "2019-08-15 12:29:34 +0000",
+            "syncIdentifier": "\"5E345312-6F00-42F4-9DD8-58B88966DA94\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 90.0957,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "81864147-D5AB-498C-9B3E-54619A8A1164",
+            "startDate": "2019-08-15 12:34:34 +0000",
+            "syncIdentifier": "\"5F11AD9B-635D-4901-B053-49B14EDB5CF6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.6499,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D3AD8A0E-1178-4D9B-A43E-22E544701058",
+            "startDate": "2019-08-15 12:39:34 +0000",
+            "syncIdentifier": "\"B3C86719-3B44-426F-B2AE-B24E9ABA8BF2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 95.0419,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4D11B5F7-6CEC-4172-B97D-89C92C16E277",
+            "startDate": "2019-08-15 12:44:34 +0000",
+            "syncIdentifier": "\"8632B496-F4CC-4F80-9BBA-AA997AB923F8\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 95.2091,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "176A94A8-D052-466A-B690-B6609ED1C50C",
+            "startDate": "2019-08-15 12:49:34 +0000",
+            "syncIdentifier": "\"1B698EB6-5AD0-4BDC-ACBF-C20266A74F52\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 96.5843,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4B0F2026-618F-44CF-95DA-204D024FD092",
+            "startDate": "2019-08-15 12:54:34 +0000",
+            "syncIdentifier": "\"67E99CC5-9460-4F4C-951B-AAB1ADE5DB25\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 101.986,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "AA0C076C-1298-45C9-9F34-4A5D3260CBBC",
+            "startDate": "2019-08-15 12:59:34 +0000",
+            "syncIdentifier": "\"B841FB6C-C8DD-4073-A22D-47653A21EE00\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 101.045,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DF4E26DD-EF92-4FCB-A623-0B20964DE545",
+            "startDate": "2019-08-15 13:04:34 +0000",
+            "syncIdentifier": "\"D033132A-926A-4C33-9D66-A6875331AB01\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 102.766,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2FBDF698-639D-4DA6-90E2-5C21B5B090E6",
+            "startDate": "2019-08-15 13:09:34 +0000",
+            "syncIdentifier": "\"455D2D7E-B218-4515-8B12-98843FBD2914\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 107.477,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "8A829F8D-51C6-4335-B905-4BD1A131560B",
+            "startDate": "2019-08-15 13:14:34 +0000",
+            "syncIdentifier": "\"D6C0F2DF-2A12-4137-B8F9-53709A636512\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 108.071,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "42CCF379-850E-400C-AB1A-55CB8F07234E",
+            "startDate": "2019-08-15 13:19:34 +0000",
+            "syncIdentifier": "\"83BDE479-984D-489C-AEB9-25FD49D06A35\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 110.465,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C6EF8B57-DCF3-4027-AAB8-93163799D1FF",
+            "startDate": "2019-08-15 13:24:34 +0000",
+            "syncIdentifier": "\"BD67563E-7B09-4CB0-9AB3-A9ABB78CD149\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 114.103,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "53ED3616-C8D8-485E-937A-C6BAB16F910D",
+            "startDate": "2019-08-15 13:29:34 +0000",
+            "syncIdentifier": "\"82D2F26E-F80A-4B40-A7BD-0666E27DFB2C\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 116.457,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "E2ABC13F-6152-4D82-A15D-CC74F7B1FA17",
+            "startDate": "2019-08-15 13:34:34 +0000",
+            "syncIdentifier": "\"7540E97A-A0E3-4614-BD65-AD761B4900A3\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 117.244,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "175090C1-19C5-426A-AA03-20F6D4FE3CC0",
+            "startDate": "2019-08-15 13:39:34 +0000",
+            "syncIdentifier": "\"2FB5DF0D-ADE0-416C-8537-1EEA5F33925F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 119.508,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F4E8EA7F-1895-4C58-8EC0-845299FCCE59",
+            "startDate": "2019-08-15 13:44:34 +0000",
+            "syncIdentifier": "\"23D6522E-D26F-45FE-9FF3-14B6A959A9CF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 118.518,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5F20C08C-F9CE-4A8F-9FF1-E681D0D6E6A6",
+            "startDate": "2019-08-15 13:49:34 +0000",
+            "syncIdentifier": "\"B73F9884-E78A-43D9-BA61-62D891327BDE\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 119.349,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "CE18E613-7FC2-42F5-933D-45CECAF44D3E",
+            "startDate": "2019-08-15 13:54:34 +0000",
+            "syncIdentifier": "\"6287401B-C1E3-4EB1-A2B5-8283F6A59B58\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.101,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "88E87E44-B6CC-46EB-B9E4-3A5EDAFD515D",
+            "startDate": "2019-08-15 13:59:34 +0000",
+            "syncIdentifier": "\"D8044F06-ABFD-4BD6-B65F-128719FCB62A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.509,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "55266AF3-BB60-4CF1-89D2-2BADA174B3FD",
+            "startDate": "2019-08-15 14:04:34 +0000",
+            "syncIdentifier": "\"1B26B51C-D4C4-4BAF-8E27-66F814509E40\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.785,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5E28E48C-4831-4B62-9804-177F9A0CF0D4",
+            "startDate": "2019-08-15 14:09:34 +0000",
+            "syncIdentifier": "\"410944B9-4F13-4D87-926D-D2138D9FE2FD\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 126.153,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "0C3D5E31-DBCA-4679-AC2D-8558F7F78796",
+            "startDate": "2019-08-15 14:14:34 +0000",
+            "syncIdentifier": "\"FBC2A7FC-3C2D-402C-AEAA-60B52CB482B3\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.569,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "9B008D6C-BDF8-421E-AC35-EA7F1E0AB3D7",
+            "startDate": "2019-08-15 14:19:34 +0000",
+            "syncIdentifier": "\"3EBC6977-8915-4EFD-8148-7F06036DF237\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.336,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "554FF53C-EFC4-40E6-BBF1-0794B135462C",
+            "startDate": "2019-08-15 14:24:34 +0000",
+            "syncIdentifier": "\"F4BA8A61-5D01-4947-BA79-23B534C75D2D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.132,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "530AA394-B989-4461-9991-D466E6DCDD7F",
+            "startDate": "2019-08-15 14:29:34 +0000",
+            "syncIdentifier": "\"6DCEB75D-9C64-4984-961B-54C7657E5C10\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.737,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F32EB015-4976-458A-90BF-A23676790E29",
+            "startDate": "2019-08-15 14:34:34 +0000",
+            "syncIdentifier": "\"681C3CA7-6B61-472D-83C1-FA2EDB0614EB\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 125.49,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DB0E1A4E-1900-4689-B208-19D5E73D39A7",
+            "startDate": "2019-08-15 14:39:34 +0000",
+            "syncIdentifier": "\"AA3D60A5-C629-4860-8DB7-0BA195544F20\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 124.272,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "1A71F03F-88F7-4DE4-A690-FC56C42444D8",
+            "startDate": "2019-08-15 14:44:34 +0000",
+            "syncIdentifier": "\"F131A99B-4CF9-4C60-A2C5-8D706C8FE2D3\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 126.277,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "3D763617-2A8A-40E7-8072-8D8756FE351C",
+            "startDate": "2019-08-15 14:49:34 +0000",
+            "syncIdentifier": "\"A4EF298F-C57F-4630-9E6F-9DD1DAA7F30E\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.299,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DDDDF373-7AF0-49B4-AA96-FE88317619D4",
+            "startDate": "2019-08-15 14:54:34 +0000",
+            "syncIdentifier": "\"5F0E7E4D-C72C-416B-9F4D-8278BFAD488A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.104,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FC7426F4-AF37-4A56-BBBC-F8AE9B70801D",
+            "startDate": "2019-08-15 14:59:34 +0000",
+            "syncIdentifier": "\"188431D9-A7F9-44CA-932A-61DB02158EAB\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 122.267,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2E885095-760A-4E73-8359-3B5046D218E2",
+            "startDate": "2019-08-15 15:04:34 +0000",
+            "syncIdentifier": "\"0A8E9798-20B2-4D75-A7A5-788CE9ED2AA6\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 118.216,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4E6C2337-B3B0-4A6B-8A2A-9B47EF2DE7F7",
+            "startDate": "2019-08-15 15:09:34 +0000",
+            "syncIdentifier": "\"7B8BEA21-09C0-48A7-B151-D77470A283AF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 117.492,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "510CBAA8-E8F3-4101-A675-77CCC1780FEB",
+            "startDate": "2019-08-15 15:14:34 +0000",
+            "syncIdentifier": "\"559E824B-2119-4EF6-AEF8-924F363A333F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 117.147,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C6B68163-D09E-4284-8C0F-CE5B4C43AFBC",
+            "startDate": "2019-08-15 15:19:34 +0000",
+            "syncIdentifier": "\"B70EAC1A-FFF2-4D64-B57F-337A61A8EF51\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 113.577,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5934FD96-AEF3-40DD-AABF-B7763BC988DD",
+            "startDate": "2019-08-15 15:24:34 +0000",
+            "syncIdentifier": "\"43EC7E6A-B2D6-4149-81C0-4A1BC5F987F1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 113.347,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B1020A96-13AF-4B15-822C-40EB3E1AA210",
+            "startDate": "2019-08-15 15:29:34 +0000",
+            "syncIdentifier": "\"F80B0CF6-9406-438A-B39A-7AA836E2CCFC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 111.508,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "6E1A7419-42A4-4AA9-8D1C-75FC3C8FB718",
+            "startDate": "2019-08-15 15:34:34 +0000",
+            "syncIdentifier": "\"9BBDAC4C-46CB-4087-9365-AC24C6239165\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 109.672,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "3D4E43E6-680A-4672-BBD2-03B87C7FCE4D",
+            "startDate": "2019-08-15 15:39:34 +0000",
+            "syncIdentifier": "\"37BF2E8E-178F-4A05-83D4-69383CB11BB1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 106.626,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "AFFDCB8A-5290-4134-A02D-66CFB0A52D12",
+            "startDate": "2019-08-15 15:44:34 +0000",
+            "syncIdentifier": "\"1009DA23-D717-4832-AB05-7316749A951B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 108.043,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "2B573114-06C4-4928-96DB-4A2A603B1CF2",
+            "startDate": "2019-08-15 15:49:34 +0000",
+            "syncIdentifier": "\"C1776AA6-9E1E-4DD9-ACAE-41BE4C12452B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 98.6274,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "47F87F54-FBD4-44C8-8986-9DC92EF27EEE",
+            "startDate": "2019-08-15 15:59:34 +0000",
+            "syncIdentifier": "\"B312A0C0-21B4-422F-BA80-02C46C9759E1\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 99.1374,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "D22CA303-6EE4-4C41-8728-14E8EF4B5DCC",
+            "startDate": "2019-08-15 16:04:34 +0000",
+            "syncIdentifier": "\"CE9C28BA-5AD1-4925-A777-6FCF352003BA\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 94.1759,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "05419487-1742-4D3C-A635-C4E086C4752A",
+            "startDate": "2019-08-15 16:09:34 +0000",
+            "syncIdentifier": "\"1E172C55-C3F6-4303-83F4-F52D77969629\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 94.0125,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "074B5103-AF72-4977-BFB8-FB881DAC939E",
+            "startDate": "2019-08-15 16:14:34 +0000",
+            "syncIdentifier": "\"F7D09A39-E17C-4582-A606-FC2DF7977868\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 90.457,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "0723BB57-060C-4432-86EF-AFEC12E01D29",
+            "startDate": "2019-08-15 16:19:34 +0000",
+            "syncIdentifier": "\"46135058-1089-43DF-B81C-08EE17CC52FC\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.2137,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A0B82323-C949-42DC-B59C-4857DD1225FC",
+            "startDate": "2019-08-15 16:24:34 +0000",
+            "syncIdentifier": "\"6597BB51-7EDB-4B5A-B922-F9CAFC75842F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 88.4876,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "6D04146C-6D56-40F6-95EF-83D7EBD076F4",
+            "startDate": "2019-08-15 16:29:34 +0000",
+            "syncIdentifier": "\"2DA8FD51-F8EB-40EA-8F2B-6A71C4CDB920\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 86.8427,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B043B638-341F-4807-847F-6C7BC9518093",
+            "startDate": "2019-08-15 16:34:34 +0000",
+            "syncIdentifier": "\"570683A5-711C-49C6-841C-BFC403C2A447\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 83.5002,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "6D1D7B33-B8C0-4688-B36B-4C126A6F491D",
+            "startDate": "2019-08-15 16:39:34 +0000",
+            "syncIdentifier": "\"5FAAA637-08B3-4B98-9342-C611DFC3B11A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 81.9709,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FB22631F-06A3-41EB-B30D-E7FDCE14B8FE",
+            "startDate": "2019-08-15 16:44:34 +0000",
+            "syncIdentifier": "\"6CC0A115-CC9B-4D4F-8C71-2299111CD614\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 79.6651,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FB9177D7-DB6D-4D2D-A880-91519B6E4765",
+            "startDate": "2019-08-15 16:49:34 +0000",
+            "syncIdentifier": "\"87890768-28A8-4BA4-B553-2F79E09392EF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 81.214,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4CA8DD6A-0883-44A3-B70A-84D42CDB86F6",
+            "startDate": "2019-08-15 16:54:34 +0000",
+            "syncIdentifier": "\"5C90DD33-D211-484B-A801-1024184727C3\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.9306,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "70778E63-B677-48A1-A74D-C442DE9B6431",
+            "startDate": "2019-08-15 16:59:34 +0000",
+            "syncIdentifier": "\"F1BB24E8-853F-4FD1-A00A-0489BD6F9D22\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.1428,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "F8B9F45B-0713-49F6-86A3-318DBC06C485",
+            "startDate": "2019-08-15 17:04:34 +0000",
+            "syncIdentifier": "\"3F1BC452-F694-49C0-9778-3147E9481FFF\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 78.3553,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "8849AA0F-1EAA-43EB-8419-0BB22B917DF5",
+            "startDate": "2019-08-15 17:09:34 +0000",
+            "syncIdentifier": "\"A624E7E7-3659-4318-8661-622F2E06448F\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 73.941,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4210274D-A782-4895-B29A-B89A23D30E93",
+            "startDate": "2019-08-15 17:14:34 +0000",
+            "syncIdentifier": "\"138FF3F1-F694-4102-A278-D2DB93641B6B\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.3824,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "8EC8A0C1-3503-4BCC-80B0-A3C2402AF304",
+            "startDate": "2019-08-15 17:19:34 +0000",
+            "syncIdentifier": "\"02C2E192-B48C-4F5A-99C2-80B60E113E34\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 76.9276,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "DFFF188C-A3CB-4C1B-9A7B-D40FB72A6D14",
+            "startDate": "2019-08-15 17:24:34 +0000",
+            "syncIdentifier": "\"4D6FB69A-D7A1-40D1-9A3B-EF158E9B437D\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.223,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "BD7543B1-B579-4179-830F-C96668D2F578",
+            "startDate": "2019-08-15 17:29:34 +0000",
+            "syncIdentifier": "\"C131CC2D-710E-442B-B059-3F8719675059\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.3457,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "5D39B26B-3A6B-44AB-890B-0F511599D32F",
+            "startDate": "2019-08-15 17:34:34 +0000",
+            "syncIdentifier": "\"4B5E1CD7-E846-4D83-8F6F-C6F5A907E524\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 74.5073,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A84E66C0-49F2-44A8-9D5F-ADB83D22A74C",
+            "startDate": "2019-08-15 17:39:34 +0000",
+            "syncIdentifier": "\"312868B5-3D24-4894-AAAA-9853802BE276\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 77.6573,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "A1B50CAF-9301-4FCE-90F0-C11A896C5411",
+            "startDate": "2019-08-15 17:44:34 +0000",
+            "syncIdentifier": "\"8E7C7303-2A1F-4F45-A097-8B18DFB0926A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.7749,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "98CB2E22-345C-4A95-9B6F-C0E2D8715E3D",
+            "startDate": "2019-08-15 17:49:34 +0000",
+            "syncIdentifier": "\"2A1FCEBD-F87F-407A-B891-2C1BCF838DA2\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 75.9766,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "86562E87-C231-4827-AC1C-C756507BF2ED",
+            "startDate": "2019-08-15 17:54:34 +0000",
+            "syncIdentifier": "\"622B490C-CA15-445F-81B3-E7CC5DEBBD66\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 80.2442,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B6AA860F-8A91-4DAF-9FF6-6DE500DD8D72",
+            "startDate": "2019-08-15 17:59:34 +0000",
+            "syncIdentifier": "\"25DDB4A0-4B74-448A-94B5-4ACB17289D22\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 80.9427,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "CD8A9746-3D9C-4DF2-A140-958E70084C22",
+            "startDate": "2019-08-15 18:04:34 +0000",
+            "syncIdentifier": "\"F11EF91D-C38D-40A1-9906-AF80A0EE3516\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 80.5092,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "B11D4281-4513-4D46-AF6C-DD8A1163AE31",
+            "startDate": "2019-08-15 18:09:34 +0000",
+            "syncIdentifier": "\"A31B4CF5-AC20-46AC-B667-22BC579EF4E0\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 81.6895,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C52EBA08-D707-4A41-8EEB-EA6ED889744B",
+            "startDate": "2019-08-15 18:14:34 +0000",
+            "syncIdentifier": "\"C7637B55-A6D4-4AFD-B54B-C124EEBC37FE\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 85.4774,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "457A3DDE-BBD1-4D49-9318-49C777D8D5B7",
+            "startDate": "2019-08-15 18:19:34 +0000",
+            "syncIdentifier": "\"AC24B101-7B88-4197-95F1-6C052F7A4533\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 85.1116,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "427F103C-B97D-4EA0-9D27-4659FEAEF48F",
+            "startDate": "2019-08-15 18:24:34 +0000",
+            "syncIdentifier": "\"79ECFEFF-9E22-4E79-BC44-529EDA80D59A\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 87.2988,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "20B4417C-0F90-43A7-889D-B1CAD2E0E634",
+            "startDate": "2019-08-15 18:29:34 +0000",
+            "syncIdentifier": "\"207FF74F-4C56-4127-BA5E-7E04DC301BA7\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 90.3004,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "00F1DFF4-4D66-4426-AE1C-4D4FB5283C8D",
+            "startDate": "2019-08-15 18:34:34 +0000",
+            "syncIdentifier": "\"1D768642-BAC1-466B-BB95-2170D21A1CA4\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 91.8455,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "C16DE04A-3E91-4A26-8C53-550204966C6E",
+            "startDate": "2019-08-15 18:39:34 +0000",
+            "syncIdentifier": "\"92B38777-B29B-4793-BB87-CDF79AAA8533\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 92.713,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "FF270EED-A9D7-4A32-A55C-479D5F226574",
+            "startDate": "2019-08-15 18:44:34 +0000",
+            "syncIdentifier": "\"C4C413DD-0806-4036-ABC9-CB2ABE3D7177\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 94.8871,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "9A499D4C-E779-4E4B-9F30-168CD7C29006",
+            "startDate": "2019-08-15 18:49:34 +0000",
+            "syncIdentifier": "\"9A9E23B0-CF2D-4603-8C66-520C3F66F820\"",
+            "syncVersion": "1"
+        },
+        {
+            "isDisplayOnly": "false",
+            "provenanceIdentifier": "\"\"",
+            "quantity": 100.287,
+            "quantity_units": "mg/dL",
+            "sampleUUID": "4B6B9CA4-65FD-4323-9EE0-2FA5F10FEE53",
+            "startDate": "2019-08-15 18:59:34 +0000",
+            "syncIdentifier": "\"54110A08-163C-41E6-A4C7-07715F489A3A\"",
+            "syncVersion": "1"
+        }
+    ],
+    "carb_default_absorption_times_fast": 7200.0,
+    "carb_default_absorption_times_medium": 10800.0,
+    "carb_default_absorption_times_slow": 14400.0,
+    "carb_effect": [
+        {
+            "start_time": "2019-08-15 18:25:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 18:30:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 18:35:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 18:40:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 18:45:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 18:50:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 18:55:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 19:00:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 19:05:00 +0000",
+            "units": "mg/dL",
+            "value": 1.178077717020054
+        },
+        {
+            "start_time": "2019-08-15 19:10:00 +0000",
+            "units": "mg/dL",
+            "value": 2.693229232171569
+        },
+        {
+            "start_time": "2019-08-15 19:15:00 +0000",
+            "units": "mg/dL",
+            "value": 4.208380747323084
+        },
+        {
+            "start_time": "2019-08-15 19:20:00 +0000",
+            "units": "mg/dL",
+            "value": 5.723532262474599
+        },
+        {
+            "start_time": "2019-08-15 19:25:00 +0000",
+            "units": "mg/dL",
+            "value": 7.238683777626115
+        },
+        {
+            "start_time": "2019-08-15 19:30:00 +0000",
+            "units": "mg/dL",
+            "value": 8.753835292777628
+        },
+        {
+            "start_time": "2019-08-15 19:35:00 +0000",
+            "units": "mg/dL",
+            "value": 10.268986807929146
+        },
+        {
+            "start_time": "2019-08-15 19:40:00 +0000",
+            "units": "mg/dL",
+            "value": 11.78413832308066
+        },
+        {
+            "start_time": "2019-08-15 19:45:00 +0000",
+            "units": "mg/dL",
+            "value": 13.299289838232175
+        },
+        {
+            "start_time": "2019-08-15 19:50:00 +0000",
+            "units": "mg/dL",
+            "value": 14.81444135338369
+        },
+        {
+            "start_time": "2019-08-15 19:55:00 +0000",
+            "units": "mg/dL",
+            "value": 16.329592868535205
+        },
+        {
+            "start_time": "2019-08-15 20:00:00 +0000",
+            "units": "mg/dL",
+            "value": 17.84474438368672
+        },
+        {
+            "start_time": "2019-08-15 20:05:00 +0000",
+            "units": "mg/dL",
+            "value": 19.359895898838236
+        },
+        {
+            "start_time": "2019-08-15 20:10:00 +0000",
+            "units": "mg/dL",
+            "value": 20.87504741398975
+        },
+        {
+            "start_time": "2019-08-15 20:15:00 +0000",
+            "units": "mg/dL",
+            "value": 22.390198929141267
+        },
+        {
+            "start_time": "2019-08-15 20:20:00 +0000",
+            "units": "mg/dL",
+            "value": 23.90535044429278
+        },
+        {
+            "start_time": "2019-08-15 20:25:00 +0000",
+            "units": "mg/dL",
+            "value": 25.420501959444294
+        },
+        {
+            "start_time": "2019-08-15 20:30:00 +0000",
+            "units": "mg/dL",
+            "value": 26.93565347459581
+        },
+        {
+            "start_time": "2019-08-15 20:35:00 +0000",
+            "units": "mg/dL",
+            "value": 28.450804989747322
+        },
+        {
+            "start_time": "2019-08-15 20:40:00 +0000",
+            "units": "mg/dL",
+            "value": 29.965956504898838
+        },
+        {
+            "start_time": "2019-08-15 20:45:00 +0000",
+            "units": "mg/dL",
+            "value": 31.481108020050357
+        },
+        {
+            "start_time": "2019-08-15 20:50:00 +0000",
+            "units": "mg/dL",
+            "value": 32.996259535201865
+        },
+        {
+            "start_time": "2019-08-15 20:55:00 +0000",
+            "units": "mg/dL",
+            "value": 34.51141105035339
+        },
+        {
+            "start_time": "2019-08-15 21:00:00 +0000",
+            "units": "mg/dL",
+            "value": 36.0265625655049
+        },
+        {
+            "start_time": "2019-08-15 21:05:00 +0000",
+            "units": "mg/dL",
+            "value": 37.54171408065642
+        },
+        {
+            "start_time": "2019-08-15 21:10:00 +0000",
+            "units": "mg/dL",
+            "value": 39.056865595807935
+        },
+        {
+            "start_time": "2019-08-15 21:15:00 +0000",
+            "units": "mg/dL",
+            "value": 40.57201711095944
+        },
+        {
+            "start_time": "2019-08-15 21:20:00 +0000",
+            "units": "mg/dL",
+            "value": 42.08716862611096
+        },
+        {
+            "start_time": "2019-08-15 21:25:00 +0000",
+            "units": "mg/dL",
+            "value": 43.602320141262474
+        },
+        {
+            "start_time": "2019-08-15 21:30:00 +0000",
+            "units": "mg/dL",
+            "value": 45.11747165641399
+        },
+        {
+            "start_time": "2019-08-15 21:35:00 +0000",
+            "units": "mg/dL",
+            "value": 46.632623171565506
+        },
+        {
+            "start_time": "2019-08-15 21:40:00 +0000",
+            "units": "mg/dL",
+            "value": 48.14777468671702
+        },
+        {
+            "start_time": "2019-08-15 21:45:00 +0000",
+            "units": "mg/dL",
+            "value": 49.66292620186854
+        },
+        {
+            "start_time": "2019-08-15 21:50:00 +0000",
+            "units": "mg/dL",
+            "value": 51.17807771702006
+        },
+        {
+            "start_time": "2019-08-15 21:55:00 +0000",
+            "units": "mg/dL",
+            "value": 52.69322923217157
+        },
+        {
+            "start_time": "2019-08-15 22:00:00 +0000",
+            "units": "mg/dL",
+            "value": 54.20838074732308
+        },
+        {
+            "start_time": "2019-08-15 22:05:00 +0000",
+            "units": "mg/dL",
+            "value": 54.54545454545455
+        },
+        {
+            "start_time": "2019-08-15 22:10:00 +0000",
+            "units": "mg/dL",
+            "value": 54.54545454545455
+        },
+        {
+            "start_time": "2019-08-15 22:15:00 +0000",
+            "units": "mg/dL",
+            "value": 54.54545454545455
+        }
+    ],
+    "carb_ratio_schedule": [
+        {
+            "startTime": 0.0,
+            "value": 5.0
+        },
+        {
+            "startTime": 30600.0,
+            "value": 7.0
+        },
+        {
+            "startTime": 43200.0,
+            "value": 11.0
+        }
+    ],
+    "carb_ratio_timeZone": -25200,
+    "carb_ratio_unit": "g",
+    "carbs_on_board": {
+        " endDate": "2019-08-15 19:00:00 +0000",
+        " quantity": 15.0,
+        " startDate": "2019-08-15 19:00:00 +0000",
+        "units": "g"
+    },
+    "correction_range_schedule": [
+        {
+            "startTime": "0.0",
+            "value": [
+                90.0,
+                95.0
+            ]
+        }
+    ],
+    "file_name": "example.md",
+    "get_normalized_dose_entries": [
+        {
+            "description": "nil",
+            "endDate": "2019-08-15 19:02:28 +0000",
+            "scheduledBasalRate": "nil",
+            "startDate": "2019-08-15 19:01:16 +0000",
+            "syncIdentifier": "\"\"",
+            "type": "LoopKit.DoseType.bolus",
+            "unit": "LoopKit.DoseUnit.units",
+            "value": "1.8"
+        }
+    ],
+    "get_normalized_pump_event_dose": [],
+    "get_pump_event_values": [],
+    "glucose_momentum_effect": [],
+    "glucose_store": {
+        "authorizationRequired": " false",
+        "cacheLength": " 86400.0",
+        "latestGlucoseValue": {
+            "isDisplayOnly": " false",
+            "provenanceIdentifier": " ",
+            "quantity": 100.287,
+            "quantity_units": "mg/dL",
+            "sampleUUID": " 4B6B9CA4-65FD-4323-9EE0-2FA5F10FEE53",
+            "startDate": " 2019-08-15 18:59:34 +0000",
+            "syncIdentifier": " \"54110A08-163C-41E6-A4C7-07715F489A3A",
+            "syncVersion": " 1"
+        },
+        "managedDataInterval": " 0.0",
+        "momentumDataInterval": " 900.0",
+        "observationEnabled": " true",
+        "observationStart": " 2019-08-14 18:58:24 +0000",
+        "observerQuery": " Optional(<HKObserverQuery:0x280a2f180 active>)"
+    },
+    "insulin_action_duration": 21600.0,
+    "insulin_counteraction_effects": [
+        {
+            "end_time": " 2019-08-14 23:04:34 +0000",
+            "start_time": "2019-08-14 22:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.1548756427921205
+        },
+        {
+            "end_time": " 2019-08-14 23:09:34 +0000",
+            "start_time": "2019-08-14 23:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.7815134701857742
+        },
+        {
+            "end_time": " 2019-08-14 23:14:34 +0000",
+            "start_time": "2019-08-14 23:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.17887336412525465
+        },
+        {
+            "end_time": " 2019-08-14 23:19:34 +0000",
+            "start_time": "2019-08-14 23:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4393439774913455
+        },
+        {
+            "end_time": " 2019-08-14 23:24:34 +0000",
+            "start_time": "2019-08-14 23:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.15414822362502814
+        },
+        {
+            "end_time": " 2019-08-14 23:29:34 +0000",
+            "start_time": "2019-08-14 23:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.14566004979645972
+        },
+        {
+            "end_time": " 2019-08-14 23:34:34 +0000",
+            "start_time": "2019-08-14 23:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.743682281404051
+        },
+        {
+            "end_time": " 2019-08-14 23:39:34 +0000",
+            "start_time": "2019-08-14 23:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.0371648136395473
+        },
+        {
+            "end_time": " 2019-08-14 23:44:34 +0000",
+            "start_time": "2019-08-14 23:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.766669667425434
+        },
+        {
+            "end_time": " 2019-08-14 23:49:34 +0000",
+            "start_time": "2019-08-14 23:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6884008013613224
+        },
+        {
+            "end_time": " 2019-08-14 23:54:34 +0000",
+            "start_time": "2019-08-14 23:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.20866477096259037
+        },
+        {
+            "end_time": " 2019-08-14 23:59:34 +0000",
+            "start_time": "2019-08-14 23:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0410664591352918
+        },
+        {
+            "end_time": " 2019-08-15 00:04:34 +0000",
+            "start_time": "2019-08-14 23:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5600710923511417
+        },
+        {
+            "end_time": " 2019-08-15 00:09:34 +0000",
+            "start_time": "2019-08-15 00:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4419147766081763
+        },
+        {
+            "end_time": " 2019-08-15 00:14:34 +0000",
+            "start_time": "2019-08-15 00:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7098344162443119
+        },
+        {
+            "end_time": " 2019-08-15 00:19:34 +0000",
+            "start_time": "2019-08-15 00:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.2827433097426286
+        },
+        {
+            "end_time": " 2019-08-15 00:24:34 +0000",
+            "start_time": "2019-08-15 00:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0270519507955198
+        },
+        {
+            "end_time": " 2019-08-15 00:29:34 +0000",
+            "start_time": "2019-08-15 00:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3650900096485706
+        },
+        {
+            "end_time": " 2019-08-15 00:34:34 +0000",
+            "start_time": "2019-08-15 00:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7282541779055727
+        },
+        {
+            "end_time": " 2019-08-15 00:39:34 +0000",
+            "start_time": "2019-08-15 00:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9880579539443338
+        },
+        {
+            "end_time": " 2019-08-15 00:44:34 +0000",
+            "start_time": "2019-08-15 00:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0342313810842676
+        },
+        {
+            "end_time": " 2019-08-15 00:49:34 +0000",
+            "start_time": "2019-08-15 00:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8675810264890997
+        },
+        {
+            "end_time": " 2019-08-15 00:54:34 +0000",
+            "start_time": "2019-08-15 00:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6929397916326038
+        },
+        {
+            "end_time": " 2019-08-15 00:59:34 +0000",
+            "start_time": "2019-08-15 00:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0930375497025138
+        },
+        {
+            "end_time": " 2019-08-15 01:04:34 +0000",
+            "start_time": "2019-08-15 00:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7228320919345677
+        },
+        {
+            "end_time": " 2019-08-15 01:09:34 +0000",
+            "start_time": "2019-08-15 01:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4100085858269025
+        },
+        {
+            "end_time": " 2019-08-15 01:14:34 +0000",
+            "start_time": "2019-08-15 01:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5472886605085308
+        },
+        {
+            "end_time": " 2019-08-15 01:19:34 +0000",
+            "start_time": "2019-08-15 01:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.3122698175252776
+        },
+        {
+            "end_time": " 2019-08-15 01:24:34 +0000",
+            "start_time": "2019-08-15 01:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6617918344260459
+        },
+        {
+            "end_time": " 2019-08-15 01:29:34 +0000",
+            "start_time": "2019-08-15 01:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5925401132988796
+        },
+        {
+            "end_time": " 2019-08-15 01:34:34 +0000",
+            "start_time": "2019-08-15 01:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3815958939910757
+        },
+        {
+            "end_time": " 2019-08-15 01:39:34 +0000",
+            "start_time": "2019-08-15 01:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.129929582764116
+        },
+        {
+            "end_time": " 2019-08-15 01:44:34 +0000",
+            "start_time": "2019-08-15 01:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5455752832306145
+        },
+        {
+            "end_time": " 2019-08-15 01:49:34 +0000",
+            "start_time": "2019-08-15 01:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.0357363252154883
+        },
+        {
+            "end_time": " 2019-08-15 01:54:34 +0000",
+            "start_time": "2019-08-15 01:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6692873455694837
+        },
+        {
+            "end_time": " 2019-08-15 01:59:34 +0000",
+            "start_time": "2019-08-15 01:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.1584003558224765
+        },
+        {
+            "end_time": " 2019-08-15 02:04:34 +0000",
+            "start_time": "2019-08-15 01:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8963499381647052
+        },
+        {
+            "end_time": " 2019-08-15 02:14:34 +0000",
+            "start_time": "2019-08-15 02:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.1814523009506921
+        },
+        {
+            "end_time": " 2019-08-15 02:19:34 +0000",
+            "start_time": "2019-08-15 02:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5615578525924234
+        },
+        {
+            "end_time": " 2019-08-15 02:24:34 +0000",
+            "start_time": "2019-08-15 02:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.28210862961013417
+        },
+        {
+            "end_time": " 2019-08-15 02:29:34 +0000",
+            "start_time": "2019-08-15 02:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7823636820292762
+        },
+        {
+            "end_time": " 2019-08-15 02:34:34 +0000",
+            "start_time": "2019-08-15 02:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.18024009405303756
+        },
+        {
+            "end_time": " 2019-08-15 02:39:34 +0000",
+            "start_time": "2019-08-15 02:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.07996248650361365
+        },
+        {
+            "end_time": " 2019-08-15 02:44:34 +0000",
+            "start_time": "2019-08-15 02:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.10241322309790632
+        },
+        {
+            "end_time": " 2019-08-15 02:49:34 +0000",
+            "start_time": "2019-08-15 02:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.10010888358841895
+        },
+        {
+            "end_time": " 2019-08-15 02:54:34 +0000",
+            "start_time": "2019-08-15 02:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.06032115126635347
+        },
+        {
+            "end_time": " 2019-08-15 02:59:34 +0000",
+            "start_time": "2019-08-15 02:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.7279342628473784
+        },
+        {
+            "end_time": " 2019-08-15 03:04:34 +0000",
+            "start_time": "2019-08-15 02:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5639086788307821
+        },
+        {
+            "end_time": " 2019-08-15 03:09:34 +0000",
+            "start_time": "2019-08-15 03:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.40234172954448294
+        },
+        {
+            "end_time": " 2019-08-15 03:14:34 +0000",
+            "start_time": "2019-08-15 03:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.014030379654738565
+        },
+        {
+            "end_time": " 2019-08-15 03:19:34 +0000",
+            "start_time": "2019-08-15 03:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5007591601695309
+        },
+        {
+            "end_time": " 2019-08-15 03:24:34 +0000",
+            "start_time": "2019-08-15 03:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.013558184100520518
+        },
+        {
+            "end_time": " 2019-08-15 03:34:34 +0000",
+            "start_time": "2019-08-15 03:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.42562534280538095
+        },
+        {
+            "end_time": " 2019-08-15 03:39:34 +0000",
+            "start_time": "2019-08-15 03:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.35395108650655516
+        },
+        {
+            "end_time": " 2019-08-15 03:44:34 +0000",
+            "start_time": "2019-08-15 03:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.28172497797902163
+        },
+        {
+            "end_time": " 2019-08-15 03:49:34 +0000",
+            "start_time": "2019-08-15 03:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.45115530768475476
+        },
+        {
+            "end_time": " 2019-08-15 03:54:34 +0000",
+            "start_time": "2019-08-15 03:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.17557839523512084
+        },
+        {
+            "end_time": " 2019-08-15 03:59:34 +0000",
+            "start_time": "2019-08-15 03:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.1894984829735506
+        },
+        {
+            "end_time": " 2019-08-15 04:04:34 +0000",
+            "start_time": "2019-08-15 03:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.9716713837823759
+        },
+        {
+            "end_time": " 2019-08-15 04:09:34 +0000",
+            "start_time": "2019-08-15 04:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.18023968928826262
+        },
+        {
+            "end_time": " 2019-08-15 04:14:34 +0000",
+            "start_time": "2019-08-15 04:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.8004758849517486
+        },
+        {
+            "end_time": " 2019-08-15 04:19:34 +0000",
+            "start_time": "2019-08-15 04:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.2501267067783658
+        },
+        {
+            "end_time": " 2019-08-15 04:24:34 +0000",
+            "start_time": "2019-08-15 04:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5233364814456563
+        },
+        {
+            "end_time": " 2019-08-15 04:29:34 +0000",
+            "start_time": "2019-08-15 04:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.3474771992478395
+        },
+        {
+            "end_time": " 2019-08-15 04:34:34 +0000",
+            "start_time": "2019-08-15 04:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.009954762357008916
+        },
+        {
+            "end_time": " 2019-08-15 04:39:34 +0000",
+            "start_time": "2019-08-15 04:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5184921642675021
+        },
+        {
+            "end_time": " 2019-08-15 04:44:34 +0000",
+            "start_time": "2019-08-15 04:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.010503010182921456
+        },
+        {
+            "end_time": " 2019-08-15 04:49:34 +0000",
+            "start_time": "2019-08-15 04:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.7535501198886834
+        },
+        {
+            "end_time": " 2019-08-15 04:54:34 +0000",
+            "start_time": "2019-08-15 04:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.8139331506535683
+        },
+        {
+            "end_time": " 2019-08-15 04:59:34 +0000",
+            "start_time": "2019-08-15 04:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.24961853215519622
+        },
+        {
+            "end_time": " 2019-08-15 05:04:34 +0000",
+            "start_time": "2019-08-15 04:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.1583292358553393
+        },
+        {
+            "end_time": " 2019-08-15 05:09:34 +0000",
+            "start_time": "2019-08-15 05:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.17614591463924678
+        },
+        {
+            "end_time": " 2019-08-15 05:14:34 +0000",
+            "start_time": "2019-08-15 05:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5311487137198184
+        },
+        {
+            "end_time": " 2019-08-15 05:19:34 +0000",
+            "start_time": "2019-08-15 05:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.1564176518206693
+        },
+        {
+            "end_time": " 2019-08-15 05:24:34 +0000",
+            "start_time": "2019-08-15 05:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6219555661889159
+        },
+        {
+            "end_time": " 2019-08-15 05:29:34 +0000",
+            "start_time": "2019-08-15 05:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.6772032470753601
+        },
+        {
+            "end_time": " 2019-08-15 05:34:34 +0000",
+            "start_time": "2019-08-15 05:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6675407054870504
+        },
+        {
+            "end_time": " 2019-08-15 05:39:34 +0000",
+            "start_time": "2019-08-15 05:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.527651061561937
+        },
+        {
+            "end_time": " 2019-08-15 05:44:34 +0000",
+            "start_time": "2019-08-15 05:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.679507822413141
+        },
+        {
+            "end_time": " 2019-08-15 05:49:34 +0000",
+            "start_time": "2019-08-15 05:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3009876143008831
+        },
+        {
+            "end_time": " 2019-08-15 05:54:34 +0000",
+            "start_time": "2019-08-15 05:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.19980117854202709
+        },
+        {
+            "end_time": " 2019-08-15 05:59:34 +0000",
+            "start_time": "2019-08-15 05:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.47065234736828643
+        },
+        {
+            "end_time": " 2019-08-15 06:04:34 +0000",
+            "start_time": "2019-08-15 05:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7029213103034029
+        },
+        {
+            "end_time": " 2019-08-15 06:09:34 +0000",
+            "start_time": "2019-08-15 06:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6892382079160443
+        },
+        {
+            "end_time": " 2019-08-15 06:14:34 +0000",
+            "start_time": "2019-08-15 06:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8679176739421477
+        },
+        {
+            "end_time": " 2019-08-15 06:19:34 +0000",
+            "start_time": "2019-08-15 06:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7165374207728742
+        },
+        {
+            "end_time": " 2019-08-15 06:24:34 +0000",
+            "start_time": "2019-08-15 06:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.39599685404261387
+        },
+        {
+            "end_time": " 2019-08-15 06:29:34 +0000",
+            "start_time": "2019-08-15 06:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9161714591383902
+        },
+        {
+            "end_time": " 2019-08-15 06:34:34 +0000",
+            "start_time": "2019-08-15 06:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.179973519370675
+        },
+        {
+            "end_time": " 2019-08-15 06:39:34 +0000",
+            "start_time": "2019-08-15 06:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.840268315121353
+        },
+        {
+            "end_time": " 2019-08-15 06:44:34 +0000",
+            "start_time": "2019-08-15 06:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9239879767257697
+        },
+        {
+            "end_time": " 2019-08-15 06:49:34 +0000",
+            "start_time": "2019-08-15 06:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7294224077455467
+        },
+        {
+            "end_time": " 2019-08-15 06:54:34 +0000",
+            "start_time": "2019-08-15 06:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9735797741285941
+        },
+        {
+            "end_time": " 2019-08-15 06:59:34 +0000",
+            "start_time": "2019-08-15 06:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8772248072242723
+        },
+        {
+            "end_time": " 2019-08-15 07:04:34 +0000",
+            "start_time": "2019-08-15 06:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.25754444267619403
+        },
+        {
+            "end_time": " 2019-08-15 07:09:34 +0000",
+            "start_time": "2019-08-15 07:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.237543727912966
+        },
+        {
+            "end_time": " 2019-08-15 07:19:34 +0000",
+            "start_time": "2019-08-15 07:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6222786386723868
+        },
+        {
+            "end_time": " 2019-08-15 07:24:34 +0000",
+            "start_time": "2019-08-15 07:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9338315527519128
+        },
+        {
+            "end_time": " 2019-08-15 07:29:34 +0000",
+            "start_time": "2019-08-15 07:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3110914736910857
+        },
+        {
+            "end_time": " 2019-08-15 07:34:34 +0000",
+            "start_time": "2019-08-15 07:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0419179937823102
+        },
+        {
+            "end_time": " 2019-08-15 07:39:34 +0000",
+            "start_time": "2019-08-15 07:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.37244030120175886
+        },
+        {
+            "end_time": " 2019-08-15 07:49:34 +0000",
+            "start_time": "2019-08-15 07:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5379825139447062
+        },
+        {
+            "end_time": " 2019-08-15 07:54:34 +0000",
+            "start_time": "2019-08-15 07:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7199695278533326
+        },
+        {
+            "end_time": " 2019-08-15 07:59:34 +0000",
+            "start_time": "2019-08-15 07:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5846072803937828
+        },
+        {
+            "end_time": " 2019-08-15 08:04:34 +0000",
+            "start_time": "2019-08-15 07:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4086974178260319
+        },
+        {
+            "end_time": " 2019-08-15 08:09:34 +0000",
+            "start_time": "2019-08-15 08:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4964024582148254
+        },
+        {
+            "end_time": " 2019-08-15 08:14:34 +0000",
+            "start_time": "2019-08-15 08:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8737639417284285
+        },
+        {
+            "end_time": " 2019-08-15 08:19:34 +0000",
+            "start_time": "2019-08-15 08:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.35746765043578393
+        },
+        {
+            "end_time": " 2019-08-15 08:24:34 +0000",
+            "start_time": "2019-08-15 08:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4934716292610161
+        },
+        {
+            "end_time": " 2019-08-15 08:29:34 +0000",
+            "start_time": "2019-08-15 08:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7572304465053007
+        },
+        {
+            "end_time": " 2019-08-15 08:34:34 +0000",
+            "start_time": "2019-08-15 08:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.04313928606590025
+        },
+        {
+            "end_time": " 2019-08-15 08:44:34 +0000",
+            "start_time": "2019-08-15 08:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.16566179929774946
+        },
+        {
+            "end_time": " 2019-08-15 08:49:34 +0000",
+            "start_time": "2019-08-15 08:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.17619597374802393
+        },
+        {
+            "end_time": " 2019-08-15 08:54:34 +0000",
+            "start_time": "2019-08-15 08:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.04269976047245336
+        },
+        {
+            "end_time": " 2019-08-15 08:59:34 +0000",
+            "start_time": "2019-08-15 08:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.002570967514309075
+        },
+        {
+            "end_time": " 2019-08-15 09:04:34 +0000",
+            "start_time": "2019-08-15 08:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.3909726253618799
+        },
+        {
+            "end_time": " 2019-08-15 09:09:34 +0000",
+            "start_time": "2019-08-15 09:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6614709241495106
+        },
+        {
+            "end_time": " 2019-08-15 09:14:34 +0000",
+            "start_time": "2019-08-15 09:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.723516973461629
+        },
+        {
+            "end_time": " 2019-08-15 09:19:34 +0000",
+            "start_time": "2019-08-15 09:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.0041173182933818
+        },
+        {
+            "end_time": " 2019-08-15 09:24:34 +0000",
+            "start_time": "2019-08-15 09:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.01743297810903357
+        },
+        {
+            "end_time": " 2019-08-15 09:29:34 +0000",
+            "start_time": "2019-08-15 09:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.22913189579435592
+        },
+        {
+            "end_time": " 2019-08-15 09:34:34 +0000",
+            "start_time": "2019-08-15 09:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.15898737796268278
+        },
+        {
+            "end_time": " 2019-08-15 09:39:34 +0000",
+            "start_time": "2019-08-15 09:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.038430946401015825
+        },
+        {
+            "end_time": " 2019-08-15 09:44:34 +0000",
+            "start_time": "2019-08-15 09:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5812277399809516
+        },
+        {
+            "end_time": " 2019-08-15 09:49:34 +0000",
+            "start_time": "2019-08-15 09:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.6028689338551941
+        },
+        {
+            "end_time": " 2019-08-15 09:54:34 +0000",
+            "start_time": "2019-08-15 09:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.7571851941479166
+        },
+        {
+            "end_time": " 2019-08-15 09:59:34 +0000",
+            "start_time": "2019-08-15 09:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2856119073200432
+        },
+        {
+            "end_time": " 2019-08-15 10:04:34 +0000",
+            "start_time": "2019-08-15 09:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.829328802910976
+        },
+        {
+            "end_time": " 2019-08-15 10:09:34 +0000",
+            "start_time": "2019-08-15 10:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.02188585450810194
+        },
+        {
+            "end_time": " 2019-08-15 10:14:34 +0000",
+            "start_time": "2019-08-15 10:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.7954170762271189
+        },
+        {
+            "end_time": " 2019-08-15 10:19:34 +0000",
+            "start_time": "2019-08-15 10:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.16966037400804904
+        },
+        {
+            "end_time": " 2019-08-15 10:24:34 +0000",
+            "start_time": "2019-08-15 10:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.2124589464587842
+        },
+        {
+            "end_time": " 2019-08-15 10:29:34 +0000",
+            "start_time": "2019-08-15 10:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.08315209754770761
+        },
+        {
+            "end_time": " 2019-08-15 10:34:34 +0000",
+            "start_time": "2019-08-15 10:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.4786205476356911
+        },
+        {
+            "end_time": " 2019-08-15 10:39:34 +0000",
+            "start_time": "2019-08-15 10:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5890997520016981
+        },
+        {
+            "end_time": " 2019-08-15 10:44:34 +0000",
+            "start_time": "2019-08-15 10:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.51119550413691
+        },
+        {
+            "end_time": " 2019-08-15 10:54:34 +0000",
+            "start_time": "2019-08-15 10:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.09163532595483302
+        },
+        {
+            "end_time": " 2019-08-15 10:59:34 +0000",
+            "start_time": "2019-08-15 10:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.4843707085973193
+        },
+        {
+            "end_time": " 2019-08-15 11:04:34 +0000",
+            "start_time": "2019-08-15 10:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4120363329442682
+        },
+        {
+            "end_time": " 2019-08-15 11:09:34 +0000",
+            "start_time": "2019-08-15 11:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.6517894601741858
+        },
+        {
+            "end_time": " 2019-08-15 11:14:34 +0000",
+            "start_time": "2019-08-15 11:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2730274188582825
+        },
+        {
+            "end_time": " 2019-08-15 11:19:34 +0000",
+            "start_time": "2019-08-15 11:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.4589667439626566
+        },
+        {
+            "end_time": " 2019-08-15 11:24:34 +0000",
+            "start_time": "2019-08-15 11:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.011435261699344322
+        },
+        {
+            "end_time": " 2019-08-15 11:29:34 +0000",
+            "start_time": "2019-08-15 11:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.14526334776736577
+        },
+        {
+            "end_time": " 2019-08-15 11:34:34 +0000",
+            "start_time": "2019-08-15 11:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.012540257671665242
+        },
+        {
+            "end_time": " 2019-08-15 11:39:34 +0000",
+            "start_time": "2019-08-15 11:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.037666424649526666
+        },
+        {
+            "end_time": " 2019-08-15 11:44:34 +0000",
+            "start_time": "2019-08-15 11:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2459436578011889
+        },
+        {
+            "end_time": " 2019-08-15 11:49:34 +0000",
+            "start_time": "2019-08-15 11:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.21683328703647928
+        },
+        {
+            "end_time": " 2019-08-15 11:54:34 +0000",
+            "start_time": "2019-08-15 11:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.21490405511247557
+        },
+        {
+            "end_time": " 2019-08-15 11:59:34 +0000",
+            "start_time": "2019-08-15 11:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.379651600455108
+        },
+        {
+            "end_time": " 2019-08-15 12:04:34 +0000",
+            "start_time": "2019-08-15 11:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3382826304472047
+        },
+        {
+            "end_time": " 2019-08-15 12:14:34 +0000",
+            "start_time": "2019-08-15 12:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3638305080373541
+        },
+        {
+            "end_time": " 2019-08-15 12:19:34 +0000",
+            "start_time": "2019-08-15 12:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2690206664843119
+        },
+        {
+            "end_time": " 2019-08-15 12:24:34 +0000",
+            "start_time": "2019-08-15 12:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8021864211385442
+        },
+        {
+            "end_time": " 2019-08-15 12:29:34 +0000",
+            "start_time": "2019-08-15 12:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.300688115221849
+        },
+        {
+            "end_time": " 2019-08-15 12:34:34 +0000",
+            "start_time": "2019-08-15 12:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7513350271138658
+        },
+        {
+            "end_time": " 2019-08-15 12:39:34 +0000",
+            "start_time": "2019-08-15 12:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5987928889637998
+        },
+        {
+            "end_time": " 2019-08-15 12:44:34 +0000",
+            "start_time": "2019-08-15 12:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0086232942731148
+        },
+        {
+            "end_time": " 2019-08-15 12:49:34 +0000",
+            "start_time": "2019-08-15 12:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.39824057076651387
+        },
+        {
+            "end_time": " 2019-08-15 12:54:34 +0000",
+            "start_time": "2019-08-15 12:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6676473261088574
+        },
+        {
+            "end_time": " 2019-08-15 12:59:34 +0000",
+            "start_time": "2019-08-15 12:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.494684190397458
+        },
+        {
+            "end_time": " 2019-08-15 13:04:34 +0000",
+            "start_time": "2019-08-15 12:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.24242174175343292
+        },
+        {
+            "end_time": " 2019-08-15 13:09:34 +0000",
+            "start_time": "2019-08-15 13:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7866531450259304
+        },
+        {
+            "end_time": " 2019-08-15 13:14:34 +0000",
+            "start_time": "2019-08-15 13:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.392070091644156
+        },
+        {
+            "end_time": " 2019-08-15 13:19:34 +0000",
+            "start_time": "2019-08-15 13:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5726761760461934
+        },
+        {
+            "end_time": " 2019-08-15 13:24:34 +0000",
+            "start_time": "2019-08-15 13:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9334264345443165
+        },
+        {
+            "end_time": " 2019-08-15 13:29:34 +0000",
+            "start_time": "2019-08-15 13:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.1801792772997812
+        },
+        {
+            "end_time": " 2019-08-15 13:34:34 +0000",
+            "start_time": "2019-08-15 13:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9191289320193554
+        },
+        {
+            "end_time": " 2019-08-15 13:39:34 +0000",
+            "start_time": "2019-08-15 13:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5992955814057929
+        },
+        {
+            "end_time": " 2019-08-15 13:44:34 +0000",
+            "start_time": "2019-08-15 13:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8868876306050728
+        },
+        {
+            "end_time": " 2019-08-15 13:49:34 +0000",
+            "start_time": "2019-08-15 13:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.22649905727524738
+        },
+        {
+            "end_time": " 2019-08-15 13:54:34 +0000",
+            "start_time": "2019-08-15 13:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.5801842108977723
+        },
+        {
+            "end_time": " 2019-08-15 13:59:34 +0000",
+            "start_time": "2019-08-15 13:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.9527508964652682
+        },
+        {
+            "end_time": " 2019-08-15 14:04:34 +0000",
+            "start_time": "2019-08-15 13:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.47139573322700556
+        },
+        {
+            "end_time": " 2019-08-15 14:09:34 +0000",
+            "start_time": "2019-08-15 14:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.4321803694218814
+        },
+        {
+            "end_time": " 2019-08-15 14:14:34 +0000",
+            "start_time": "2019-08-15 14:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 1.0371571585699584
+        },
+        {
+            "end_time": " 2019-08-15 14:19:34 +0000",
+            "start_time": "2019-08-15 14:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2329908564660712
+        },
+        {
+            "end_time": " 2019-08-15 14:24:34 +0000",
+            "start_time": "2019-08-15 14:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2890573270383882
+        },
+        {
+            "end_time": " 2019-08-15 14:29:34 +0000",
+            "start_time": "2019-08-15 14:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.28101514741404965
+        },
+        {
+            "end_time": " 2019-08-15 14:34:34 +0000",
+            "start_time": "2019-08-15 14:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.42875101392657056
+        },
+        {
+            "end_time": " 2019-08-15 14:39:34 +0000",
+            "start_time": "2019-08-15 14:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.24426219113031206
+        },
+        {
+            "end_time": " 2019-08-15 14:44:34 +0000",
+            "start_time": "2019-08-15 14:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.03620961028003222
+        },
+        {
+            "end_time": " 2019-08-15 14:49:34 +0000",
+            "start_time": "2019-08-15 14:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6672901817863176
+        },
+        {
+            "end_time": " 2019-08-15 14:54:34 +0000",
+            "start_time": "2019-08-15 14:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5428945358601097
+        },
+        {
+            "end_time": " 2019-08-15 14:59:34 +0000",
+            "start_time": "2019-08-15 14:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.20076778060831937
+        },
+        {
+            "end_time": " 2019-08-15 15:04:34 +0000",
+            "start_time": "2019-08-15 14:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2595340936134789
+        },
+        {
+            "end_time": " 2019-08-15 15:09:34 +0000",
+            "start_time": "2019-08-15 15:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5958184598503933
+        },
+        {
+            "end_time": " 2019-08-15 15:14:34 +0000",
+            "start_time": "2019-08-15 15:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.05743391248118854
+        },
+        {
+            "end_time": " 2019-08-15 15:19:34 +0000",
+            "start_time": "2019-08-15 15:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.12174269100417802
+        },
+        {
+            "end_time": " 2019-08-15 15:24:34 +0000",
+            "start_time": "2019-08-15 15:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5345789837927568
+        },
+        {
+            "end_time": " 2019-08-15 15:29:34 +0000",
+            "start_time": "2019-08-15 15:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.12242409316463636
+        },
+        {
+            "end_time": " 2019-08-15 15:34:34 +0000",
+            "start_time": "2019-08-15 15:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.21001824358947516
+        },
+        {
+            "end_time": " 2019-08-15 15:39:34 +0000",
+            "start_time": "2019-08-15 15:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.219283698562505
+        },
+        {
+            "end_time": " 2019-08-15 15:44:34 +0000",
+            "start_time": "2019-08-15 15:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.4709037196601201
+        },
+        {
+            "end_time": " 2019-08-15 15:49:34 +0000",
+            "start_time": "2019-08-15 15:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.41239254433191375
+        },
+        {
+            "end_time": " 2019-08-15 15:59:34 +0000",
+            "start_time": "2019-08-15 15:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.8814057992485117
+        },
+        {
+            "end_time": " 2019-08-15 16:04:34 +0000",
+            "start_time": "2019-08-15 15:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.21379404711036892
+        },
+        {
+            "end_time": " 2019-08-15 16:09:34 +0000",
+            "start_time": "2019-08-15 16:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.8884937568783242
+        },
+        {
+            "end_time": " 2019-08-15 16:14:34 +0000",
+            "start_time": "2019-08-15 16:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.06350465750364263
+        },
+        {
+            "end_time": " 2019-08-15 16:19:34 +0000",
+            "start_time": "2019-08-15 16:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.6221454693749763
+        },
+        {
+            "end_time": " 2019-08-15 16:24:34 +0000",
+            "start_time": "2019-08-15 16:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.23343459049097812
+        },
+        {
+            "end_time": " 2019-08-15 16:29:34 +0000",
+            "start_time": "2019-08-15 16:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.46960944077072203
+        },
+        {
+            "end_time": " 2019-08-15 16:34:34 +0000",
+            "start_time": "2019-08-15 16:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.2595418694808927
+        },
+        {
+            "end_time": " 2019-08-15 16:39:34 +0000",
+            "start_time": "2019-08-15 16:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.6048617338828676
+        },
+        {
+            "end_time": " 2019-08-15 16:44:34 +0000",
+            "start_time": "2019-08-15 16:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.2476937147427833
+        },
+        {
+            "end_time": " 2019-08-15 16:49:34 +0000",
+            "start_time": "2019-08-15 16:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.4081482192164713
+        },
+        {
+            "end_time": " 2019-08-15 16:54:34 +0000",
+            "start_time": "2019-08-15 16:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3579153877793459
+        },
+        {
+            "end_time": " 2019-08-15 16:59:34 +0000",
+            "start_time": "2019-08-15 16:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.8131062749700049
+        },
+        {
+            "end_time": " 2019-08-15 17:04:34 +0000",
+            "start_time": "2019-08-15 16:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.08173641482876519
+        },
+        {
+            "end_time": " 2019-08-15 17:09:34 +0000",
+            "start_time": "2019-08-15 17:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.27777301371336016
+        },
+        {
+            "end_time": " 2019-08-15 17:14:34 +0000",
+            "start_time": "2019-08-15 17:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.8513570912975296
+        },
+        {
+            "end_time": " 2019-08-15 17:19:34 +0000",
+            "start_time": "2019-08-15 17:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.51626842459857
+        },
+        {
+            "end_time": " 2019-08-15 17:24:34 +0000",
+            "start_time": "2019-08-15 17:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.13375445874467
+        },
+        {
+            "end_time": " 2019-08-15 17:29:34 +0000",
+            "start_time": "2019-08-15 17:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.5192766435974306
+        },
+        {
+            "end_time": " 2019-08-15 17:34:34 +0000",
+            "start_time": "2019-08-15 17:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.0433226431167327
+        },
+        {
+            "end_time": " 2019-08-15 17:39:34 +0000",
+            "start_time": "2019-08-15 17:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.048453608737563054
+        },
+        {
+            "end_time": " 2019-08-15 17:44:34 +0000",
+            "start_time": "2019-08-15 17:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6436752081818298
+        },
+        {
+            "end_time": " 2019-08-15 17:49:34 +0000",
+            "start_time": "2019-08-15 17:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.36507147032434656
+        },
+        {
+            "end_time": " 2019-08-15 17:54:34 +0000",
+            "start_time": "2019-08-15 17:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.049619849940282276
+        },
+        {
+            "end_time": " 2019-08-15 17:59:34 +0000",
+            "start_time": "2019-08-15 17:54:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.8608422592881565
+        },
+        {
+            "end_time": " 2019-08-15 18:04:34 +0000",
+            "start_time": "2019-08-15 17:59:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.1452388361525692
+        },
+        {
+            "end_time": " 2019-08-15 18:09:34 +0000",
+            "start_time": "2019-08-15 18:04:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.0828004476327834
+        },
+        {
+            "end_time": " 2019-08-15 18:14:34 +0000",
+            "start_time": "2019-08-15 18:09:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.23842412577068325
+        },
+        {
+            "end_time": " 2019-08-15 18:19:34 +0000",
+            "start_time": "2019-08-15 18:14:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.7585384399330136
+        },
+        {
+            "end_time": " 2019-08-15 18:24:34 +0000",
+            "start_time": "2019-08-15 18:19:34 +0000",
+            "units": "mg/dL/min",
+            "value": -0.07311038449181807
+        },
+        {
+            "end_time": " 2019-08-15 18:29:34 +0000",
+            "start_time": "2019-08-15 18:24:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.43743091981979204
+        },
+        {
+            "end_time": " 2019-08-15 18:34:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6003383821777049
+        },
+        {
+            "end_time": " 2019-08-15 18:39:34 +0000",
+            "start_time": "2019-08-15 18:34:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.3339047782853272
+        },
+        {
+            "end_time": " 2019-08-15 18:44:34 +0000",
+            "start_time": "2019-08-15 18:39:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.2786757435023085
+        },
+        {
+            "end_time": " 2019-08-15 18:49:34 +0000",
+            "start_time": "2019-08-15 18:44:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6113349709588654
+        },
+        {
+            "end_time": " 2019-08-15 18:59:34 +0000",
+            "start_time": "2019-08-15 18:49:34 +0000",
+            "units": "mg/dL/min",
+            "value": 0.6585508773654656
+        }
+    ],
+    "insulin_delivery_store": {
+        "authorizationRequired": " false",
+        "cacheLength": " 86400.0",
+        "lastBasalEndDate": " Optional(0001-01-01 00:00:00 +0000)",
+        "observationEnabled": " true",
+        "observationStart": " 2019-08-15 13:00:14 +0000",
+        "observerQuery": " Optional(<HKObserverQuery:0x280a5c900 active>)"
+    },
+    "insulin_effect": [
+        {
+            "start_time": "2019-08-15 19:00:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 19:05:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 19:10:00 +0000",
+            "units": "mg/dL",
+            "value": 0.0
+        },
+        {
+            "start_time": "2019-08-15 19:15:00 +0000",
+            "units": "mg/dL",
+            "value": -0.12443768227012786
+        },
+        {
+            "start_time": "2019-08-15 19:20:00 +0000",
+            "units": "mg/dL",
+            "value": -0.6503694934117927
+        },
+        {
+            "start_time": "2019-08-15 19:25:00 +0000",
+            "units": "mg/dL",
+            "value": -1.532953615431433
+        },
+        {
+            "start_time": "2019-08-15 19:30:00 +0000",
+            "units": "mg/dL",
+            "value": -2.718240135511536
+        },
+        {
+            "start_time": "2019-08-15 19:35:00 +0000",
+            "units": "mg/dL",
+            "value": -4.157971262418371
+        },
+        {
+            "start_time": "2019-08-15 19:40:00 +0000",
+            "units": "mg/dL",
+            "value": -5.809065376191195
+        },
+        {
+            "start_time": "2019-08-15 19:45:00 +0000",
+            "units": "mg/dL",
+            "value": -7.63314395773509
+        },
+        {
+            "start_time": "2019-08-15 19:50:00 +0000",
+            "units": "mg/dL",
+            "value": -9.59609803223049
+        },
+        {
+            "start_time": "2019-08-15 19:55:00 +0000",
+            "units": "mg/dL",
+            "value": -11.667691013974279
+        },
+        {
+            "start_time": "2019-08-15 20:00:00 +0000",
+            "units": "mg/dL",
+            "value": -13.821195075425342
+        },
+        {
+            "start_time": "2019-08-15 20:05:00 +0000",
+            "units": "mg/dL",
+            "value": -16.033058381163784
+        },
+        {
+            "start_time": "2019-08-15 20:10:00 +0000",
+            "units": "mg/dL",
+            "value": -18.282600729419066
+        },
+        {
+            "start_time": "2019-08-15 20:15:00 +0000",
+            "units": "mg/dL",
+            "value": -20.551735330922693
+        },
+        {
+            "start_time": "2019-08-15 20:20:00 +0000",
+            "units": "mg/dL",
+            "value": -22.8247146281593
+        },
+        {
+            "start_time": "2019-08-15 20:25:00 +0000",
+            "units": "mg/dL",
+            "value": -25.08789821861648
+        },
+        {
+            "start_time": "2019-08-15 20:30:00 +0000",
+            "units": "mg/dL",
+            "value": -27.32954109428778
+        },
+        {
+            "start_time": "2019-08-15 20:35:00 +0000",
+            "units": "mg/dL",
+            "value": -29.53960054731987
+        },
+        {
+            "start_time": "2019-08-15 20:40:00 +0000",
+            "units": "mg/dL",
+            "value": -31.709560219109168
+        },
+        {
+            "start_time": "2019-08-15 20:45:00 +0000",
+            "units": "mg/dL",
+            "value": -33.83226988808397
+        },
+        {
+            "start_time": "2019-08-15 20:50:00 +0000",
+            "units": "mg/dL",
+            "value": -35.90179970054069
+        },
+        {
+            "start_time": "2019-08-15 20:55:00 +0000",
+            "units": "mg/dL",
+            "value": -37.91330764987686
+        },
+        {
+            "start_time": "2019-08-15 21:00:00 +0000",
+            "units": "mg/dL",
+            "value": -39.86291920296971
+        },
+        {
+            "start_time": "2019-08-15 21:05:00 +0000",
+            "units": "mg/dL",
+            "value": -41.74761805883971
+        },
+        {
+            "start_time": "2019-08-15 21:10:00 +0000",
+            "units": "mg/dL",
+            "value": -43.56514710462339
+        },
+        {
+            "start_time": "2019-08-15 21:15:00 +0000",
+            "units": "mg/dL",
+            "value": -45.31391870773513
+        },
+        {
+            "start_time": "2019-08-15 21:20:00 +0000",
+            "units": "mg/dL",
+            "value": -46.99293355136411
+        },
+        {
+            "start_time": "2019-08-15 21:25:00 +0000",
+            "units": "mg/dL",
+            "value": -48.60170728353956
+        },
+        {
+            "start_time": "2019-08-15 21:30:00 +0000",
+            "units": "mg/dL",
+            "value": -50.14020430828596
+        },
+        {
+            "start_time": "2019-08-15 21:35:00 +0000",
+            "units": "mg/dL",
+            "value": -51.6087781012325
+        },
+        {
+            "start_time": "2019-08-15 21:40:00 +0000",
+            "units": "mg/dL",
+            "value": -53.0081174817655
+        },
+        {
+            "start_time": "2019-08-15 21:45:00 +0000",
+            "units": "mg/dL",
+            "value": -54.339198319723636
+        },
+        {
+            "start_time": "2019-08-15 21:50:00 +0000",
+            "units": "mg/dL",
+            "value": -55.60324019701532
+        },
+        {
+            "start_time": "2019-08-15 21:55:00 +0000",
+            "units": "mg/dL",
+            "value": -56.80166758364759
+        },
+        {
+            "start_time": "2019-08-15 22:00:00 +0000",
+            "units": "mg/dL",
+            "value": -57.93607512374022
+        },
+        {
+            "start_time": "2019-08-15 22:05:00 +0000",
+            "units": "mg/dL",
+            "value": -59.00819666038112
+        },
+        {
+            "start_time": "2019-08-15 22:10:00 +0000",
+            "units": "mg/dL",
+            "value": -60.01987765887177
+        },
+        {
+            "start_time": "2019-08-15 22:15:00 +0000",
+            "units": "mg/dL",
+            "value": -60.973050716204305
+        },
+        {
+            "start_time": "2019-08-15 22:20:00 +0000",
+            "units": "mg/dL",
+            "value": -61.869713870689054
+        },
+        {
+            "start_time": "2019-08-15 22:25:00 +0000",
+            "units": "mg/dL",
+            "value": -62.71191144967635
+        },
+        {
+            "start_time": "2019-08-15 22:30:00 +0000",
+            "units": "mg/dL",
+            "value": -63.5017172154459
+        },
+        {
+            "start_time": "2019-08-15 22:35:00 +0000",
+            "units": "mg/dL",
+            "value": -64.24121958971332
+        },
+        {
+            "start_time": "2019-08-15 22:40:00 +0000",
+            "units": "mg/dL",
+            "value": -64.93250875595963
+        },
+        {
+            "start_time": "2019-08-15 22:45:00 +0000",
+            "units": "mg/dL",
+            "value": -65.57766545604944
+        },
+        {
+            "start_time": "2019-08-15 22:50:00 +0000",
+            "units": "mg/dL",
+            "value": -66.17875131347928
+        },
+        {
+            "start_time": "2019-08-15 22:55:00 +0000",
+            "units": "mg/dL",
+            "value": -66.73780053019748
+        },
+        {
+            "start_time": "2019-08-15 23:00:00 +0000",
+            "units": "mg/dL",
+            "value": -67.25681281735686
+        },
+        {
+            "start_time": "2019-08-15 23:05:00 +0000",
+            "units": "mg/dL",
+            "value": -67.73774743269212
+        },
+        {
+            "start_time": "2019-08-15 23:10:00 +0000",
+            "units": "mg/dL",
+            "value": -68.18251820854087
+        },
+        {
+            "start_time": "2019-08-15 23:15:00 +0000",
+            "units": "mg/dL",
+            "value": -68.59298946492572
+        },
+        {
+            "start_time": "2019-08-15 23:20:00 +0000",
+            "units": "mg/dL",
+            "value": -68.97097271165914
+        },
+        {
+            "start_time": "2019-08-15 23:25:00 +0000",
+            "units": "mg/dL",
+            "value": -69.31822405218752
+        },
+        {
+            "start_time": "2019-08-15 23:30:00 +0000",
+            "units": "mg/dL",
+            "value": -69.636442209919
+        },
+        {
+            "start_time": "2019-08-15 23:35:00 +0000",
+            "units": "mg/dL",
+            "value": -69.92726710513696
+        },
+        {
+            "start_time": "2019-08-15 23:40:00 +0000",
+            "units": "mg/dL",
+            "value": -70.19227891734121
+        },
+        {
+            "start_time": "2019-08-15 23:45:00 +0000",
+            "units": "mg/dL",
+            "value": -70.43299757402968
+        },
+        {
+            "start_time": "2019-08-15 23:50:00 +0000",
+            "units": "mg/dL",
+            "value": -70.65088261258094
+        },
+        {
+            "start_time": "2019-08-15 23:55:00 +0000",
+            "units": "mg/dL",
+            "value": -70.84733336706257
+        },
+        {
+            "start_time": "2019-08-16 00:00:00 +0000",
+            "units": "mg/dL",
+            "value": -71.023689436511
+        },
+        {
+            "start_time": "2019-08-16 00:05:00 +0000",
+            "units": "mg/dL",
+            "value": -71.1812313955418
+        },
+        {
+            "start_time": "2019-08-16 00:10:00 +0000",
+            "units": "mg/dL",
+            "value": -71.32118171208633
+        },
+        {
+            "start_time": "2019-08-16 00:15:00 +0000",
+            "units": "mg/dL",
+            "value": -71.44470584064226
+        },
+        {
+            "start_time": "2019-08-16 00:20:00 +0000",
+            "units": "mg/dL",
+            "value": -71.55291346270111
+        },
+        {
+            "start_time": "2019-08-16 00:25:00 +0000",
+            "units": "mg/dL",
+            "value": -71.6468598489986
+        },
+        {
+            "start_time": "2019-08-16 00:30:00 +0000",
+            "units": "mg/dL",
+            "value": -71.7275473209497
+        },
+        {
+            "start_time": "2019-08-16 00:35:00 +0000",
+            "units": "mg/dL",
+            "value": -71.79592679110085
+        },
+        {
+            "start_time": "2019-08-16 00:40:00 +0000",
+            "units": "mg/dL",
+            "value": -71.8528993646764
+        },
+        {
+            "start_time": "2019-08-16 00:45:00 +0000",
+            "units": "mg/dL",
+            "value": -71.89931798633484
+        },
+        {
+            "start_time": "2019-08-16 00:50:00 +0000",
+            "units": "mg/dL",
+            "value": -71.9359891180994
+        },
+        {
+            "start_time": "2019-08-16 00:55:00 +0000",
+            "units": "mg/dL",
+            "value": -71.96367443610346
+        },
+        {
+            "start_time": "2019-08-16 01:00:00 +0000",
+            "units": "mg/dL",
+            "value": -71.98309253530742
+        },
+        {
+            "start_time": "2019-08-16 01:05:00 +0000",
+            "units": "mg/dL",
+            "value": -71.99492063271514
+        },
+        {
+            "start_time": "2019-08-16 01:10:00 +0000",
+            "units": "mg/dL",
+            "value": -71.99979626085693
+        },
+        {
+            "start_time": "2019-08-16 01:15:00 +0000",
+            "units": "mg/dL",
+            "value": -72.0
+        }
+    ],
+    "insulin_model": "humalogNovologChild",
+    "insulin_sensitivity_factor_schedule": [
+        {
+            "startTime": 0.0,
+            "value": 50.0
+        },
+        {
+            "startTime": 1800.0,
+            "value": 60.0
+        },
+        {
+            "startTime": 32400.0,
+            "value": 40.0
+        },
+        {
+            "startTime": 59400.0,
+            "value": 45.0
+        }
+    ],
+    "insulin_sensitivity_factor_timeZone": -25200,
+    "insulin_sensitivity_factor_unit": "mg/dL",
+    "is_watch_app_installed": "false",
+    "last_temp_basal": {
+        " description": "nil",
+        " endDate": "2019-08-15 19:31:24 +0000",
+        " scheduledBasalRate": "nil",
+        " startDate": "2019-08-15 19:01:24 +0000",
+        " syncIdentifier": "Optional(\"30373445443145452d463436362d343039332d393537332d394231343238353239353446\"",
+        " type": "LoopKit.DoseType.basal",
+        " unit": "LoopKit.DoseUnit.unitsPerHour",
+        " value": 0.0
+    },
+    "loop_version": "Loop v1.10.0dev",
+    "maximum_basal_rate": 15.0,
+    "maximum_bolus": 15.0,
+    "override_units": "mg/dL",
+    "persistence_controller": {
+        "directoryURL": " file:///private/var/mobile/Containers/Shared/AppGroup/FF8A06B6-54EE-44C6-96E0-33742D8AB387/com.loopkit.LoopKit/",
+        "isReadOnly": " false",
+        "persistenceStoreCoordinator": " Optional(<NSPersistentStoreCoordinator: 0x2831623c0>)"
+    },
+    "predicted_glucose": [
+        {
+            "start_time": "2019-08-15 18:59:34 +0000",
+            "units": "mg/dL",
+            "value": 100.28728803658692
+        },
+        {
+            "start_time": "2019-08-15 19:00:00 +0000",
+            "units": "mg/dL",
+            "value": 100.28728803658692
+        },
+        {
+            "start_time": "2019-08-15 19:05:00 +0000",
+            "units": "mg/dL",
+            "value": 101.46536575360697
+        },
+        {
+            "start_time": "2019-08-15 19:10:00 +0000",
+            "units": "mg/dL",
+            "value": 102.98051726875849
+        },
+        {
+            "start_time": "2019-08-15 19:15:00 +0000",
+            "units": "mg/dL",
+            "value": 104.37123110163988
+        },
+        {
+            "start_time": "2019-08-15 19:20:00 +0000",
+            "units": "mg/dL",
+            "value": 105.36045080564973
+        },
+        {
+            "start_time": "2019-08-15 19:25:00 +0000",
+            "units": "mg/dL",
+            "value": 105.99301819878161
+        },
+        {
+            "start_time": "2019-08-15 19:30:00 +0000",
+            "units": "mg/dL",
+            "value": 106.32288319385302
+        },
+        {
+            "start_time": "2019-08-15 19:35:00 +0000",
+            "units": "mg/dL",
+            "value": 106.3983035820977
+        },
+        {
+            "start_time": "2019-08-15 19:40:00 +0000",
+            "units": "mg/dL",
+            "value": 106.26236098347638
+        },
+        {
+            "start_time": "2019-08-15 19:45:00 +0000",
+            "units": "mg/dL",
+            "value": 105.953433917084
+        },
+        {
+            "start_time": "2019-08-15 19:50:00 +0000",
+            "units": "mg/dL",
+            "value": 105.50563135774011
+        },
+        {
+            "start_time": "2019-08-15 19:55:00 +0000",
+            "units": "mg/dL",
+            "value": 104.94918989114784
+        },
+        {
+            "start_time": "2019-08-15 20:00:00 +0000",
+            "units": "mg/dL",
+            "value": 104.3108373448483
+        },
+        {
+            "start_time": "2019-08-15 20:05:00 +0000",
+            "units": "mg/dL",
+            "value": 103.61412555426136
+        },
+        {
+            "start_time": "2019-08-15 20:10:00 +0000",
+            "units": "mg/dL",
+            "value": 102.8797347211576
+        },
+        {
+            "start_time": "2019-08-15 20:15:00 +0000",
+            "units": "mg/dL",
+            "value": 102.1257516348055
+        },
+        {
+            "start_time": "2019-08-15 20:20:00 +0000",
+            "units": "mg/dL",
+            "value": 101.3679238527204
+        },
+        {
+            "start_time": "2019-08-15 20:25:00 +0000",
+            "units": "mg/dL",
+            "value": 100.61989177741472
+        },
+        {
+            "start_time": "2019-08-15 20:30:00 +0000",
+            "units": "mg/dL",
+            "value": 99.89340041689493
+        },
+        {
+            "start_time": "2019-08-15 20:35:00 +0000",
+            "units": "mg/dL",
+            "value": 99.19849247901436
+        },
+        {
+            "start_time": "2019-08-15 20:40:00 +0000",
+            "units": "mg/dL",
+            "value": 98.54368432237658
+        },
+        {
+            "start_time": "2019-08-15 20:45:00 +0000",
+            "units": "mg/dL",
+            "value": 97.93612616855329
+        },
+        {
+            "start_time": "2019-08-15 20:50:00 +0000",
+            "units": "mg/dL",
+            "value": 97.38174787124808
+        },
+        {
+            "start_time": "2019-08-15 20:55:00 +0000",
+            "units": "mg/dL",
+            "value": 96.88539143706343
+        },
+        {
+            "start_time": "2019-08-15 21:00:00 +0000",
+            "units": "mg/dL",
+            "value": 96.45093139912211
+        },
+        {
+            "start_time": "2019-08-15 21:05:00 +0000",
+            "units": "mg/dL",
+            "value": 96.08138405840361
+        },
+        {
+            "start_time": "2019-08-15 21:10:00 +0000",
+            "units": "mg/dL",
+            "value": 95.77900652777146
+        },
+        {
+            "start_time": "2019-08-15 21:15:00 +0000",
+            "units": "mg/dL",
+            "value": 95.54538643981124
+        },
+        {
+            "start_time": "2019-08-15 21:20:00 +0000",
+            "units": "mg/dL",
+            "value": 95.38152311133376
+        },
+        {
+            "start_time": "2019-08-15 21:25:00 +0000",
+            "units": "mg/dL",
+            "value": 95.28790089430983
+        },
+        {
+            "start_time": "2019-08-15 21:30:00 +0000",
+            "units": "mg/dL",
+            "value": 95.26455538471495
+        },
+        {
+            "start_time": "2019-08-15 21:35:00 +0000",
+            "units": "mg/dL",
+            "value": 95.31113310691993
+        },
+        {
+            "start_time": "2019-08-15 21:40:00 +0000",
+            "units": "mg/dL",
+            "value": 95.42694524153845
+        },
+        {
+            "start_time": "2019-08-15 21:45:00 +0000",
+            "units": "mg/dL",
+            "value": 95.61101591873182
+        },
+        {
+            "start_time": "2019-08-15 21:50:00 +0000",
+            "units": "mg/dL",
+            "value": 95.86212555659166
+        },
+        {
+            "start_time": "2019-08-15 21:55:00 +0000",
+            "units": "mg/dL",
+            "value": 96.17884968511089
+        },
+        {
+            "start_time": "2019-08-15 22:00:00 +0000",
+            "units": "mg/dL",
+            "value": 96.55959366016978
+        },
+        {
+            "start_time": "2019-08-15 22:05:00 +0000",
+            "units": "mg/dL",
+            "value": 95.82454592166035
+        },
+        {
+            "start_time": "2019-08-15 22:10:00 +0000",
+            "units": "mg/dL",
+            "value": 94.81286492316968
+        },
+        {
+            "start_time": "2019-08-15 22:15:00 +0000",
+            "units": "mg/dL",
+            "value": 93.85969186583715
+        },
+        {
+            "start_time": "2019-08-15 22:20:00 +0000",
+            "units": "mg/dL",
+            "value": 92.9630287113524
+        },
+        {
+            "start_time": "2019-08-15 22:25:00 +0000",
+            "units": "mg/dL",
+            "value": 92.1208311323651
+        },
+        {
+            "start_time": "2019-08-15 22:30:00 +0000",
+            "units": "mg/dL",
+            "value": 91.33102536659555
+        },
+        {
+            "start_time": "2019-08-15 22:35:00 +0000",
+            "units": "mg/dL",
+            "value": 90.59152299232812
+        },
+        {
+            "start_time": "2019-08-15 22:40:00 +0000",
+            "units": "mg/dL",
+            "value": 89.90023382608182
+        },
+        {
+            "start_time": "2019-08-15 22:45:00 +0000",
+            "units": "mg/dL",
+            "value": 89.255077125992
+        },
+        {
+            "start_time": "2019-08-15 22:50:00 +0000",
+            "units": "mg/dL",
+            "value": 88.65399126856217
+        },
+        {
+            "start_time": "2019-08-15 22:55:00 +0000",
+            "units": "mg/dL",
+            "value": 88.09494205184397
+        },
+        {
+            "start_time": "2019-08-15 23:00:00 +0000",
+            "units": "mg/dL",
+            "value": 87.57592976468459
+        },
+        {
+            "start_time": "2019-08-15 23:05:00 +0000",
+            "units": "mg/dL",
+            "value": 87.09499514934933
+        },
+        {
+            "start_time": "2019-08-15 23:10:00 +0000",
+            "units": "mg/dL",
+            "value": 86.65022437350058
+        },
+        {
+            "start_time": "2019-08-15 23:15:00 +0000",
+            "units": "mg/dL",
+            "value": 86.23975311711573
+        },
+        {
+            "start_time": "2019-08-15 23:20:00 +0000",
+            "units": "mg/dL",
+            "value": 85.8617698703823
+        },
+        {
+            "start_time": "2019-08-15 23:25:00 +0000",
+            "units": "mg/dL",
+            "value": 85.51451852985393
+        },
+        {
+            "start_time": "2019-08-15 23:30:00 +0000",
+            "units": "mg/dL",
+            "value": 85.19630037212245
+        },
+        {
+            "start_time": "2019-08-15 23:35:00 +0000",
+            "units": "mg/dL",
+            "value": 84.90547547690448
+        },
+        {
+            "start_time": "2019-08-15 23:40:00 +0000",
+            "units": "mg/dL",
+            "value": 84.64046366470023
+        },
+        {
+            "start_time": "2019-08-15 23:45:00 +0000",
+            "units": "mg/dL",
+            "value": 84.39974500801176
+        },
+        {
+            "start_time": "2019-08-15 23:50:00 +0000",
+            "units": "mg/dL",
+            "value": 84.1818599694605
+        },
+        {
+            "start_time": "2019-08-15 23:55:00 +0000",
+            "units": "mg/dL",
+            "value": 83.98540921497887
+        },
+        {
+            "start_time": "2019-08-16 00:00:00 +0000",
+            "units": "mg/dL",
+            "value": 83.80905314553044
+        },
+        {
+            "start_time": "2019-08-16 00:05:00 +0000",
+            "units": "mg/dL",
+            "value": 83.65151118649965
+        },
+        {
+            "start_time": "2019-08-16 00:10:00 +0000",
+            "units": "mg/dL",
+            "value": 83.51156086995512
+        },
+        {
+            "start_time": "2019-08-16 00:15:00 +0000",
+            "units": "mg/dL",
+            "value": 83.38803674139919
+        },
+        {
+            "start_time": "2019-08-16 00:20:00 +0000",
+            "units": "mg/dL",
+            "value": 83.27982911934033
+        },
+        {
+            "start_time": "2019-08-16 00:25:00 +0000",
+            "units": "mg/dL",
+            "value": 83.18588273304285
+        },
+        {
+            "start_time": "2019-08-16 00:30:00 +0000",
+            "units": "mg/dL",
+            "value": 83.10519526109175
+        },
+        {
+            "start_time": "2019-08-16 00:35:00 +0000",
+            "units": "mg/dL",
+            "value": 83.0368157909406
+        },
+        {
+            "start_time": "2019-08-16 00:40:00 +0000",
+            "units": "mg/dL",
+            "value": 82.97984321736504
+        },
+        {
+            "start_time": "2019-08-16 00:45:00 +0000",
+            "units": "mg/dL",
+            "value": 82.93342459570661
+        },
+        {
+            "start_time": "2019-08-16 00:50:00 +0000",
+            "units": "mg/dL",
+            "value": 82.89675346394205
+        },
+        {
+            "start_time": "2019-08-16 00:55:00 +0000",
+            "units": "mg/dL",
+            "value": 82.86906814593799
+        },
+        {
+            "start_time": "2019-08-16 01:00:00 +0000",
+            "units": "mg/dL",
+            "value": 82.84965004673403
+        },
+        {
+            "start_time": "2019-08-16 01:05:00 +0000",
+            "units": "mg/dL",
+            "value": 82.83782194932631
+        },
+        {
+            "start_time": "2019-08-16 01:10:00 +0000",
+            "units": "mg/dL",
+            "value": 82.83294632118452
+        },
+        {
+            "start_time": "2019-08-16 01:15:00 +0000",
+            "units": "mg/dL",
+            "value": 82.83274258204145
+        }
+    ],
+    "recommended_bolus": {
+        " amount": 0.0,
+        " date": "2019-08-15 19:01:24 +0000",
+        " notice": "Optional(Loop.BolusRecommendationNotice.glucoseBelowSuspendThreshold(minGlucose",
+        " pendingInsulin": 0.0,
+        " quantity": "99.8934 mg/dL"
+    },
+    "recommended_temp_basal": {
+        " date": "2019-08-15 19:01:24 +0000",
+        " duration": 1800.0,
+        " unitsPerHour": 0.0
+    },
+    "retrospective_correction_enabled": "false",
+    "retrospective_glucose_discrepancies": [
+        {
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 2.1871545990989603
+        },
+        {
+            "start_time": "2019-08-15 18:34:34 +0000",
+            "units": "mg/dL",
+            "value": 3.0016919108885247
+        },
+        {
+            "start_time": "2019-08-15 18:39:34 +0000",
+            "units": "mg/dL",
+            "value": 1.6695238914266364
+        },
+        {
+            "start_time": "2019-08-15 18:44:34 +0000",
+            "units": "mg/dL",
+            "value": 1.3933787175115429
+        },
+        {
+            "start_time": "2019-08-15 18:49:34 +0000",
+            "units": "mg/dL",
+            "value": 3.056674854794327
+        },
+        {
+            "start_time": "2019-08-15 18:59:34 +0000",
+            "units": "mg/dL",
+            "value": 3.292754386827329
+        }
+    ],
+    "retrospective_glucose_discrepancies_summed": [
+        {
+            "end_time": " 2019-08-15 18:29:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 2.1871545990989603
+        },
+        {
+            "end_time": " 2019-08-15 18:34:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 5.188846509987485
+        },
+        {
+            "end_time": " 2019-08-15 18:39:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 6.858370401414121
+        },
+        {
+            "end_time": " 2019-08-15 18:44:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 8.251749118925664
+        },
+        {
+            "end_time": " 2019-08-15 18:49:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 11.308423973719991
+        },
+        {
+            "end_time": " 2019-08-15 18:59:34 +0000",
+            "start_time": "2019-08-15 18:29:34 +0000",
+            "units": "mg/dL",
+            "value": 14.601178360547319
+        }
+    ],
+    "retrospective_glucose_effect": [
+        {
+            "quantity": 100.287,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 18:55:00 +0000"
+        },
+        {
+            "quantity": 102.721,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:00:00 +0000"
+        },
+        {
+            "quantity": 104.933,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:05:00 +0000"
+        },
+        {
+            "quantity": 106.924,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:10:00 +0000"
+        },
+        {
+            "quantity": 108.694,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:15:00 +0000"
+        },
+        {
+            "quantity": 110.243,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:20:00 +0000"
+        },
+        {
+            "quantity": 111.57,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:25:00 +0000"
+        },
+        {
+            "quantity": 112.676,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:30:00 +0000"
+        },
+        {
+            "quantity": 113.561,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:35:00 +0000"
+        },
+        {
+            "quantity": 114.225,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:40:00 +0000"
+        },
+        {
+            "quantity": 114.667,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:45:00 +0000"
+        },
+        {
+            "quantity": 114.888,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:50:00 +0000"
+        },
+        {
+            "quantity": 114.888,
+            "quantity_units": "mg/dL",
+            "startDate": "2019-08-15 19:55:00 +0000"
+        }
+    ]
+}

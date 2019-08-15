@@ -15,6 +15,7 @@ from datetime import time, datetime, timedelta
 import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
 from dose_math import recommended_temp_basal, recommended_bolus
+from dose import DoseType
 
 
 class TestDoseMathFunctions(unittest.TestCase):
@@ -126,7 +127,7 @@ class TestDoseMathFunctions(unittest.TestCase):
 
         # "Cancel" basal
         last_temp_basal = [
-            "TempBasal",
+            DoseType.tempbasal,
             glucose[0][0] + timedelta(minutes=-11),
             glucose[0][0] + timedelta(minutes=19),
             0.125
@@ -165,7 +166,7 @@ class TestDoseMathFunctions(unittest.TestCase):
         self.assertIsNone(dose)
 
         last_temp_basal = [
-            "TempBasal",
+            DoseType.tempbasal,
             glucose[0][0] + timedelta(minutes=-11),
             glucose[0][0] + timedelta(minutes=19),
             1.225
@@ -191,7 +192,7 @@ class TestDoseMathFunctions(unittest.TestCase):
         )
 
         last_temp_basal = [
-            "TempBasal",
+            DoseType.tempbasal,
             glucose[0][0] + timedelta(minutes=-21),
             glucose[0][0] + timedelta(minutes=9),
             0.125
@@ -264,7 +265,7 @@ class TestDoseMathFunctions(unittest.TestCase):
 
         # "Cancel" basal
         last_temp_basal = [
-            "TempBasal",
+            DoseType.tempbasal,
             glucose[0][0] + timedelta(minutes=-11),
             glucose[0][0] + timedelta(minutes=19),
             1.225

@@ -10,6 +10,7 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 """
 # pylint: disable=R0913, R0914, C0200, R1705, R0912
 from datetime import timedelta
+from enum import Enum
 import sys
 
 from insulin_math import is_time_between, find_ratio_at_time
@@ -17,6 +18,14 @@ from date import time_interval_since
 from dose import DoseType
 from walsh_insulin_model import walsh_percent_effect_remaining
 from exponential_insulin_model import percent_effect_remaining
+
+
+class Correction(Enum):
+    suspend = 0
+    in_range = 1
+    above_range = 2
+    entirely_below_range = 3
+    cancel = 4
 
 
 def filter_date_range_for_doses(
@@ -161,7 +170,7 @@ def if_necessary(
 
     Output:
     None (if the scheduled temp basal or basal rate should be allowed to
-    continue to run), "cancel" (if the temp basal should be cancelled),
+    continue to run), cancel (if the temp basal should be cancelled),
     or the recommended temp basal (if it should be set)
     """
     # Adjust behavior for the currently active temp basal
@@ -180,7 +189,7 @@ def if_necessary(
 
         # If our new temp matches the scheduled rate, cancel the current temp
         elif matches_rate(temp_basal[0], scheduled_basal_rate):
-            return "cancel"
+            return Correction.cancel
 
     # If we recommend the in-progress scheduled basal rate, do nothing
     elif matches_rate(temp_basal[0], scheduled_basal_rate):
@@ -219,14 +228,14 @@ def insulin_correction(
     first index, and may include additional information based on the type.
 
         Types:
-        -1 -- entirely_below_range
+        - entirely_below_range
             Structure: [type, glucose value to be corrected, minimum target,
                         units of correction insulin]
-        0 -- suspend
+        - suspend
             Structure: [type, min glucose value]
-        1 -- in_range
+        - in_range
             Structure: [type]
-        2 -- above_range
+        - above_range
             Structure: [type, minimum predicted glucose value,
                         glucose value to be corrected, minimum target,
                         units of correction insulin]
@@ -278,7 +287,7 @@ def insulin_correction(
         # If any predicted value is below the suspend threshold,
         # return immediately
         if prediction_values[i] < suspend_threshold_value:
-            return [0, prediction_values[i]]
+            return [Correction.suspend, prediction_values[i]]
 
         # Update range statistics
         if not min_glucose or prediction_values[i] < min_glucose[1]:
@@ -413,7 +422,7 @@ def insulin_correction(
 
         # we're way below target
         return [
-            -1,
+            Correction.entirely_below_range,
             min_glucose[1],
             min_glucose_targets[0],
             units
@@ -425,7 +434,7 @@ def insulin_correction(
           and correcting_glucose
          ):
         return [
-            2,
+            Correction.above_range,
             min_glucose[1],
             correcting_glucose[1],
             eventual_glucose_targets[0],
@@ -433,7 +442,7 @@ def insulin_correction(
             ]
     # we're in range
     else:
-        return [1]
+        return [Correction.in_range]
 
 
 def as_temp_basal(
@@ -458,10 +467,12 @@ def as_temp_basal(
     """
     rate = (
         correction[len(correction) - 1] / (duration / 60)
-        if correction[0] in [-1, 2] else 0
+        if correction[0] in [
+            Correction.entirely_below_range, Correction.above_range
+        ] else 0
     )
     # if it's not a suspend, add in the scheduled basal rate
-    if correction[0] in [-1, 1, 2]:
+    if not correction[0] == Correction.suspend:
         rate += scheduled_basal_rate
 
     rate = min(max_basal_rate, max(0, rate))
@@ -476,13 +487,13 @@ def as_temp_basal(
 
 def bolus_recommendation_notice(correction):
     """ Make a bolus recommendation based on an insulin correction """
-    if correction[0] == 0:
+    if correction[0] == Correction.suspend:
         return ["glucoseBelowSuspendThreshold", correction[1]]
 
-    if correction[0] in [-1, 1]:
+    if correction[0] in [Correction.entirely_below_range, Correction.in_range]:
         return None
 
-    if correction[0] == 2:
+    if correction[0] == Correction.above_range:
         # if we're recommending units but the minimum glucose is below target
         if correction[4] > 0 and correction[1] < correction[3]:
             return ["predictedGlucoseBelowTarget", correction[1]]
@@ -513,7 +524,9 @@ def as_bolus(
     """
     correction_units = (
         correction[len(correction) - 1]
-        if correction[0] in [-1, 2] else 0
+        if correction[0] in [
+            Correction.above_range, Correction.entirely_below_range
+        ] else 0
     )
     units = correction_units - pending_insulin
     units = min(max_bolus, max(0, units))
@@ -622,7 +635,8 @@ def recommended_temp_basal(
         at_date
         )
 
-    if correction[0] == 2 and correction[1] < correction[3]:
+    if (correction[0] == Correction.above_range
+            and correction[1] < correction[3]):
         max_basal_rate = scheduled_basal_rate
 
     temp_basal = as_temp_basal(
@@ -642,7 +656,7 @@ def recommended_temp_basal(
         )
 
     # convert a "cancel" into zero-temp, zero-duration basal
-    if recommendation == "cancel":
+    if recommendation == Correction.cancel:
         return [0, 0]
 
     return recommendation

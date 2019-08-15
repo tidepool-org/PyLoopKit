@@ -20,7 +20,7 @@ class DoseType(Enum):
     def from_str(label):
         if label.lower() in ["suspend", "pumpsuspend"]:
             return DoseType.suspend
-        elif label.lower() == "resume":
+        elif label.lower() in ["resume", "pumpresume"]:
             return DoseType.resume
         elif label.lower() in ["basal", "basalprofilestart"]:
             return DoseType.basal
@@ -31,4 +31,4 @@ class DoseType(Enum):
         elif label.lower() == "meal":
             return DoseType.meal
         else:
-            raise NotImplementedError
+            raise NotImplementedError(label, "not recognized")

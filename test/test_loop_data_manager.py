@@ -10,6 +10,7 @@ from datetime import datetime
 import unittest
 
 import path_grabber  # pylint: disable=unused-import
+from dose import DoseType
 from loop_data_manager import (get_pending_insulin,
                                update_retrospective_glucose_effect)
 from loop_kit_tests import load_fixture, find_root_path
@@ -283,7 +284,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         basal_schedule = self.load_report_basal_schedule("loop_issue_report")
 
         last_temporary_basal = [
-            "tempBasal",
+            DoseType.tempbasal,
             datetime.fromisoformat("2019-08-01T12:00:00"),
             datetime.fromisoformat("2019-08-01T12:30:00"),
             0.1
@@ -302,7 +303,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         basal_schedule = self.load_report_basal_schedule("loop_issue_report")
 
         last_temporary_basal = [
-            "tempBasal",
+            DoseType.tempbasal,
             datetime.fromisoformat("2019-08-01T12:00:00"),
             datetime.fromisoformat("2019-08-01T12:16:00"),
             1.3
@@ -340,7 +341,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
         # when the temp basal has already expired
         last_temporary_basal = [
-            "tempBasal",
+            DoseType.tempbasal,
             datetime.fromisoformat("2019-08-01T11:00:00"),
             datetime.fromisoformat("2019-08-01T11:16:00"),
             0.8
@@ -369,7 +370,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
         # when the start and end times are reversed
         last_temporary_basal = [
-            "tempBasal",
+            DoseType.tempbasal,
             datetime.fromisoformat("2019-08-01T12:55:00"),
             datetime.fromisoformat("2019-08-01T12:40:00"),
             0.95

@@ -12,6 +12,7 @@ import unittest
 import path_grabber  # pylint: disable=unused-import
 from carb_store import get_carb_glucose_effects, get_carbs_on_board
 from dose_store import get_glucose_effects
+from dose import DoseType
 from glucose_store import (
     get_recent_momentum_effects, get_counteraction_effects
 )
@@ -69,7 +70,9 @@ class TestDataStoreFunctions(unittest.TestCase):
         data = load_fixture(resource_name, ".json")
 
         dose_types = [
-            dict_.get("type") or "!" for dict_ in data
+            DoseType.from_str(
+                dict_.get("type")
+            ) or "!" for dict_ in data
         ]
         start_dates = [
             datetime.fromisoformat(dict_.get("start_at"))

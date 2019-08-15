@@ -8,6 +8,7 @@ from datetime import datetime, time
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 
+import get_path
 from date import time_interval_since
 from dose import DoseType
 from generate_graphs import plot_relative_graph

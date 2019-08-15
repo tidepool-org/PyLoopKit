@@ -209,7 +209,7 @@ def are_correction_ranges_valid(
             or any(value < 60 or value > 180 for value in maximum_values)):
         warnings.warn(
             "Warning: correction ranges are typically between 60 and"
-            + "180 mg/dL; continuing anyway")
+            + " 180 mg/dL; continuing anyway")
 
     if any(
             start > end for (start, end) in

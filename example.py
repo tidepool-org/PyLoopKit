@@ -16,17 +16,24 @@ from plotly.offline import plot, iplot
 from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
 from loop_kit_tests import find_root_path
 from loop_math import predict_glucose
-from pyloop_parser import parse_report_and_run
+from pyloop_parser import (parse_report_and_run,
+                           parse_dictionary_from_previous_run)
 
-# find the path to the file in the repo
+# %% find the path to the file in the repo
 # uncomment the name of the file you'd like to run
 name = "example_issue_report.json"
 # name = "example_issue_report_2.json"
 # name = "example_issue_report_3.json"
+# name = "example_from_previous_run.json"
+
 path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 
 # run the Loop algorithm with the issue report data
+
+# uncomment parse_report_and_run if using an issue report; uncomment
+# parse_dictionary_from_previous_run if using data from a previous run
 recommendations = parse_report_and_run(path, name)
+# recommendations = parse_dictionary_from_previous_run(path, name)
 
 # %% generate separate glucose predictions using each effect individually
 starting_date = recommendations.get("input_data").get("glucose_dates")[-1]

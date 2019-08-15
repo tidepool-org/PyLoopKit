@@ -830,3 +830,62 @@ def parse_report_and_run(path, name):
         )
 
     return recommendations
+
+
+def parse_dictionary_from_previous_run(path, name):
+    """ Get a dictionary output from a previous run of PyLoopKit
+        and convert the ISO strings to datetime or time objects, and
+        dose types to enums
+    """
+    data_path_and_name = os.path.join(path, name)
+
+    with open(data_path_and_name, "r") as file:
+        dictionary = json.load(file)
+
+    keys_with_times = [
+        "basal_rate_start_times",
+        "carb_ratio_start_times",
+        "sensitivity_ratio_start_times",
+        "sensitivity_ratio_end_times",
+        "target_range_start_times",
+        "target_range_end_times"
+        ]
+
+    for key in keys_with_times:
+        new_list = []
+        for string in dictionary.get(key):
+            new_list.append(time.fromisoformat(string))
+        dictionary[key] = new_list
+
+    keys_with_datetimes = [
+        "dose_start_times",
+        "dose_end_times",
+        "glucose_dates",
+        "carb_dates"
+        ]
+
+    for key in keys_with_datetimes:
+        new_list = []
+        for string in dictionary.get(key):
+            new_list.append(datetime.fromisoformat(string))
+        dictionary[key] = new_list
+
+    dictionary["time_to_calculate_at"] = datetime.fromisoformat(
+        dictionary["time_to_calculate_at"]
+    )
+
+    last_temp = dictionary.get("last_temporary_basal")
+    dictionary["last_temporary_basal"] = [
+        DoseType.from_str(last_temp[0]),
+        datetime.fromisoformat(last_temp[1]),
+        datetime.fromisoformat(last_temp[2]),
+        last_temp[3]
+    ]
+
+    dictionary["dose_types"] = [
+        DoseType.from_str(value) for value in dictionary.get("dose_types")
+    ]
+
+    output = update(dictionary)
+    
+    return output

@@ -17,8 +17,27 @@ from insulin_math import schedule_offset
 def plot_graph(
         dates, values,
         x_label=None, y_label=None, title=None,
-        line_color=None, fill_color=None, file_name=None, grid=False,
+        line_color=None, fill_color=None,
+        file_name=None, grid=False,
         line_style="-", scatter=False):
+    """ Plot an Loop-style effects graph, with the x-axis ticks
+        being absolute hour of the day (ex: 13:00)
+
+    dates -- datetimes of dates to plot at
+    values -- integer values to plot
+    Optional parameters:
+        x_label -- the x-axis label
+        y_label -- the y-axis label
+        title -- the title of the graph
+        line_color -- color of the line that is graphed
+        fill_color -- the color of the fill under the graph (defaults to
+                      no fill)
+        file_name -- name to save the plot as (if no name is specified, the
+                     graph is not saved)
+        grid -- set to True to enable a grid on the graph
+        line_style -- see pyplot documentation for the line style options
+        scatter -- plot points as a scatter plot instead of a line
+    """
     relative_dates = []
 
     # convert from exact dates to relative dates
@@ -98,7 +117,25 @@ def plot_relative_graph(
         x_label=None, y_label=None, title=None,
         line_color=None, fill_color=None, file_name=None, grid=False,
         line_style="-", scatter=False):
+    """ Plot an Loop-style effects graph, with the x-axis ticks
+        being the relative time since the first value (ex: 4 hours)
 
+    dates -- datetimes of dates to plot at
+    values -- integer values to plot
+
+    Optional parameters:
+        x_label -- the x-axis label
+        y_label -- the y-axis label
+        title -- the title of the graph
+        line_color -- color of the line that is graphed
+        fill_color -- the color of the fill under the graph (defaults to
+                      no fill)
+        file_name -- name to save the plot as (if no name is specified, the
+                     graph is not saved)
+        grid -- set to True to enable a grid on the graph
+        line_style -- see pyplot documentation for the line style options
+        scatter -- plot points as a scatter plot instead of a line
+    """
     relative_dates = []
 
     # convert from exact dates to relative dates
@@ -164,9 +201,35 @@ def plot_relative_graph(
 def plot_multiple_relative_graphs(
         dates, values,
         x_label=None, y_label=None, title=None,
-        line_color=None, fill_color=None, file_name=None, grid=False,
-        ls_list=None):
+        line_color=None, fill_color=None, file_name=None, grid=False):
+    """ Plot an Loop-style effects graph, with the x-axis ticks
+        being the relative time since the first value (ex: 4 hours) AND there
+        being multiple lines on the same graph
 
+    dates -- lists of dates to plot at (datetime)
+        ex: [
+                [1:00, 2:00],
+                [1:00, 2:00]
+            ]
+    values -- lists of integer values to plot
+        ex: ex: [
+                [2, 4],
+                [0, -20]
+            ]
+
+    Optional parameters:
+        x_label -- the x-axis label
+        y_label -- the y-axis label
+        title -- the title of the graph
+        line_color -- color of the line that is graphed
+        fill_color -- the color of the fill under the graph (defaults to
+                      no fill)
+        file_name -- name to save the plot as (if no name is specified, the
+                     graph is not saved)
+        grid -- set to True to enable a grid on the graph
+        line_style -- see pyplot documentation for the line style options
+        scatter -- plot points as a scatter plot instead of a line
+    """
     assert len(dates) == len(values)
 
     font = {
@@ -234,14 +297,49 @@ def plot_loop_inspired_glucose_graph(
         insulin_dates=None, insulin_values=None,
         carb_dates=None, carb_values=None,
         retrospective_dates=None, retrospective_values=None,
-        x_label=None, y_label=None, title=None,
         previous_glucose_dates=None, previous_glucose_values=None,
+        x_label=None, y_label=None, title=None,
         line_color=None, file_name=None, grid=False,
         line_style="-", target_min=None, target_max=None,
         correction_range_starts=None, correction_range_ends=None,
         correction_range_mins=None, correction_range_maxes=None):
-    """ Create a Loop-inspired graph.
+    """ Create a Loop-inspired prediction line graph.
+
+    overall_dates -- dates of overall prediction
+    overall_values -- BG values of overall prediction
+
+    momentum_dates, insulin_dates, carb_dates, retrospective_dates - dates
+        of BG prediction that includes only the named effect
+    momentum_values, insulin_values, carb_values, retrospective_values - values
+        of BG prediction that includes only the named effect
+
+    previous_glucose_dates -- dates of previous CGM points
+    previous_glucose_values -- values of previous CGM points
+
+    Optional parameters:
+        x_label -- the x-axis label
+        y_label -- the y-axis label
+        title -- the title of the graph
+        line_color -- color of the line that is graphed
+        fill_color -- the color of the fill under the graph (defaults to
+                      no fill)
+        file_name -- name to save the plot as (if no name is specified, the
+                     graph is not saved)
+        grid -- set to True to enable a grid on the graph
+        line_style -- see pyplot documentation for the line style options
+
+        target_min -- the minimum correction range target for the whole
+                      duration of the prediction
+        target_max -- the maximum correction range target for the whole
+                      duration of the prediction
+
+        * passing these will override the target_min and target_max *
+        correction_range_starts -- start times for target ranges (datetime)
+        correction_range_ends -- stop times for given target ranges (datetime)
+        correction_range_mins -- the lower bounds of target ranges (mg/dL)
+        correction_range_maxes -- the upper bounds of target ranges (mg/dL)
     """
+
     def plot_line(
             absolute_dates, values,
             line_color="#5ac6fa",

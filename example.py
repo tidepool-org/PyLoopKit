@@ -5,14 +5,15 @@ Created on Sun Aug 11 13:03:07 2019
 
 @author: annaquinlan
 """
+# pylint: disable=C0103
 import json
 import datetime
-from dose import DoseType
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 from plotly.offline import plot, iplot
 
+from dose import DoseType
 from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
 from loop_kit_tests import find_root_path
 from loop_math import predict_glucose
@@ -70,10 +71,10 @@ if recommendations.get("retrospective_effect_dates"):
          starting_date, starting_glucose,
          correction_effect_dates=recommendations.get(
              "retrospective_effect_dates"
-            ),
+         ),
          correction_effect_values=recommendations.get(
-            "retrospective_effect_values"
-            )
+             "retrospective_effect_values"
+         )
          )
 else:
     (retrospective_predicted_glucose_dates,
@@ -83,6 +84,7 @@ else:
 
 # save dictionary as json file
 def convert_times_and_types(obj):
+    """ Convert dates and dose types into strings when saving as a json """
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
     if isinstance(obj, datetime.time):
@@ -276,7 +278,7 @@ basal["sbr"].fillna(method='ffill', inplace=True)
 basal.dropna(subset=['sbr'], inplace=True)
 
 # temp basal data
-if (("basal" in unique_dose_types) | ("suspend" in unique_dose_types)):
+if ("basal" in unique_dose_types) | ("suspend" in unique_dose_types):
     temp_basal = (
         dose[((dose["type"] == "basal") | (dose["type"] == "suspend"))]
     )

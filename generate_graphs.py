@@ -451,7 +451,7 @@ def plot_loop_inspired_glucose_graph(
     if momentum_dates:
         plot_line(
             momentum_dates, momentum_values,
-            line_color="#eb5905", thickness=3,
+            line_color="#eb5905", thickness=5,
             label="Predicted Glucose (Momentum Only)"
         )
     if insulin_dates:

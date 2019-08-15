@@ -2,25 +2,23 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Aug 11 15:56:36 2019
-
 @author: annaquinlan
 """
 from datetime import datetime, time
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 
-import get_path
 from date import time_interval_since
-from generate_graphs import plot_relative_graph, plot_loop_inspired_glucose_graph
-from insulin_math import glucose_effects, insulin_on_board, between
-from loop_math import predict_glucose, decay_effect
+from dose import DoseType
+from generate_graphs import plot_relative_graph
+from insulin_math import glucose_effects, insulin_on_board
 
 
 def cumulative_insulin_effect_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -45,7 +43,7 @@ def insulin_on_board_percentage_graph(save=False):
     (iob_dates,
      iob_values
      ) = insulin_on_board(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -72,7 +70,7 @@ def insulin_on_board_graph(save=False):
     (iob_dates,
      iob_values
      ) = insulin_on_board(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -95,7 +93,7 @@ def insulin_absorption_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -127,7 +125,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (adult_effect_dates,
      adult_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -154,7 +152,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (child_effect_dates,
      child_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -181,7 +179,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (fiasp_effect_dates,
      fiasp_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -208,7 +206,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (walsh_effect_dates,
      walsh_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -294,7 +292,7 @@ def insulin_effect_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -327,7 +325,7 @@ def suspend_effect_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["suspend"],
+         [DoseType.suspend],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T01:00:00")],
          [0],
@@ -346,32 +344,3 @@ def suspend_effect_graph(save=False):
         x_label="Time Since Delivery (Hours)",
         grid=True
         )
-
-
-def retrospective_effect_graph(save=False):
-    (retrospective_dates,
-     retrospective_values
-     ) = decay_effect(
-        datetime.fromisoformat("2019-08-08T00:00:00"), 0,
-        rate=-10,
-        duration=30
-        )
-
-    (retrospective_predicted_glucose_dates,
-     retrospective_predicted_glucose_values
-     ) = predict_glucose(
-         retrospective_dates[0], 165,
-         correction_effect_dates=retrospective_dates,
-         correction_effect_values=retrospective_values
-         )
-
-    plot_loop_inspired_glucose_graph(
-        retrospective_predicted_glucose_dates,
-        retrospective_predicted_glucose_values,
-        title="Glucose (mg/dL)",
-        file_name="suspend_effect_for_alg_doc" if save else None,
-        x_label="Time",
-        grid=True
-        )
-
-retrospective_effect_graph()

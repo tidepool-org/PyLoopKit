@@ -14,6 +14,7 @@ from datetime import timedelta, datetime
 import sys
 
 from date import time_interval_since, time_interval_since_reference_date
+from dose import DoseType
 from loop_math import simulation_date_range_for_samples
 from dose_entry import net_basal_units, total_units_given
 from exponential_insulin_model import percent_effect_remaining
@@ -97,7 +98,7 @@ def dose_entries(reservoir_dates, unit_volumes):
 
         if (duration > 0 and 0 <= volume_drop <=
                 MAXIMUM_RESERVOIR_DROP_PER_MINUTE * duration / 60):
-            dose_types.append("tempBasal")
+            dose_types.append(DoseType.tempbasal)
             start_dates.append(previous_date)
             end_dates.append(reservoir_dates[i])
             insulin_values.append(volume_drop)
@@ -217,13 +218,13 @@ def reconciled(dose_types, start_dates, end_dates, values):
         "expected input shapes to match"
 
     for (i, type_) in enumerate(dose_types):
-        if type_.lower() == "bolus":
+        if type_ == DoseType.bolus:
             output_types.append(type_)
             output_starts.append(start_dates[i])
             output_ends.append(end_dates[i])
             output_values.append(values[i])
 
-        elif type_.lower() in ["tempbasal", "basalprofilestart", "basal"]:
+        elif type_ in [DoseType.tempbasal, DoseType.basal]:
             if last_basal and not last_suspend_index:
                 last = last_basal
                 end_date = min(last[2], start_dates[i])
@@ -237,7 +238,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
             last_basal = [type_, start_dates[i], end_dates[i],
                           values[i]]
 
-        elif type_.lower() in ["resume", "pumpresume"]:
+        elif type_ == DoseType.resume:
             if last_suspend_index:
                 suspend = last_suspend_index
 
@@ -256,7 +257,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
                     else:
                         last_basal = []
 
-        elif type_.lower() in ["suspend", "pumpsuspend"]:
+        elif type_ == DoseType.suspend:
             if last_basal:
                 last = last_basal
 
@@ -278,7 +279,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
                 output_ends.append(end_dates[i])
                 output_values.append(values[i])
 
-        elif type_.lower() == "meal":
+        elif type_ == DoseType.meal:
             output_types.append(type_)
             output_starts.append(start_dates[i])
             output_ends.append(end_dates[i])
@@ -403,8 +404,8 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     Output:
     Tuple with properties of doses, annotated with the current basal rates
     """
-    if dose_type.lower() not in ["basalprofilestart", "tempbasal", "basal",
-                                 "pumpsuspend", "suspend"]:
+    if dose_type not in [DoseType.basal, DoseType.tempbasal,
+                                 DoseType.suspend]:
         return ([dose_type], [dose_start_date], [dose_end_date], [value],
                 [0])
 
@@ -444,7 +445,7 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
 
         if convert_to_units_hr:
             output_values.append(
-                0 if dose_type.lower() in ["pumpsuspend", "suspend"] else value
+                0 if dose_type == DoseType.suspend else value
                 / (time_interval_since(dose_end_date, dose_start_date)/60/60))
         else:
             output_values.append(value)
@@ -1256,15 +1257,14 @@ def overlay_basal_schedule(
 
     last_basal = []
     if inserting_basal_entries:
-        last_basal = ["tempbasal",
+        last_basal = [DoseType.tempbasal,
                       starting_at,
                       starting_at,
                       0
                       ]
 
     for (i, type_) in enumerate(dose_types):
-        if type_.lower() in ["tempbasal", "pumpsuspend", "basalprofilestart",
-                             "basal", "suspend"]:
+        if type_ in [DoseType.tempbasal, DoseType.basal, DoseType.suspend]:
             if ending_at and ends[i] > ending_at:
                 continue
 
@@ -1292,7 +1292,7 @@ def overlay_basal_schedule(
                                 < sys.float_info.epsilon:
                             continue
 
-                        out_dose_types.append("BasalProfileStart")
+                        out_dose_types.append(DoseType.basal)
                         out_starts.append(start)
                         out_ends.append(end)
                         out_values.append(sched_basal_rates[j])
@@ -1305,10 +1305,10 @@ def overlay_basal_schedule(
                 out_ends.append(last_basal[2])
                 out_values.append(last_basal[3])
 
-        elif type_.lower() == "resume":
+        elif type_ == DoseType.resume:
             assert "No resume events should be present in reconciled doses"
 
-        elif type_.lower() == "bolus":
+        elif type_ == DoseType.bolus:
             out_dose_types.append(dose_types[i])
             out_starts.append(starts[i])
             out_ends.append(ends[i])

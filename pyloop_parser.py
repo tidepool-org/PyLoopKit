@@ -9,13 +9,16 @@ Created on Fri Jul 12 13:35:43 2019
 import json
 import os
 import warnings
+
 from datetime import datetime, time, timedelta
 import numpy
 
+from dose import DoseType
 from loop_data_manager import update
 from loop_math import sort_dose_lists
 
 
+# %% Functions to get various data from an issue report
 def get_glucose_data(glucose_dict, offset=0):
     """ Load glucose values from an issue report cached_glucose dictionary
 
@@ -46,7 +49,7 @@ def convert_to_correct_units(type_, start, end, value):
     """ Take a dose and convert it into the appropriate unit
         (either U or U/hr)
     """
-    if type_.lower() == "bolus":
+    if type_ == DoseType.bolus:
         return value
 
     return value / ((end - start).total_seconds()/60/60)
@@ -71,13 +74,17 @@ def get_insulin_data(
     now_time -- the time to run the loop at ("datetime.now")
 
     Output:
-    4 lists in (dose_type (basal/bolus/suspend), start_dates, end_dates,
+    4 lists in (dose_type (DoseType enum), start_dates, end_dates,
                 values (in units/insulin)) format
     """
     dose_types = [
-        dict_.get("type")[17:]
+        DoseType.from_str(
+            dict_.get("type")[17:]
+        )
         if dict_.get("type").startswith("LoopKit.DoseType.")
-        else dict_.get("type") for dict_ in data
+        else DoseType.from_str(
+            dict_.get("type")
+        ) for dict_ in data
     ]
     start_dates = [
         datetime.strptime(
@@ -118,9 +125,13 @@ def get_insulin_data(
         # and add to the output
         if not start == start_dates[-1] and not dose_end == end_dates[-1]:
             dose_types.append(
-                entry_to_add.get("type")[17:]
+                DoseType.from_str(
+                    entry_to_add.get("type")[17:]
+                )
                 if entry_to_add.get("type").startswith("LoopKit.DoseType.")
-                else entry_to_add.get("type")
+                else DoseType.from_str(
+                    entry_to_add.get("type")
+                )
             )
             start_dates.append(start)
             end_dates.append(
@@ -425,10 +436,10 @@ def get_last_temp_basal(data, offset=0):
     """
     if (data.get(" type") == "LoopKit.DoseType.tempBasal"
             or data.get("type") == "LoopKit.DoseType.tempBasal"):
-        type_ = "tempBasal"
+        type_ = DoseType.tempbasal
     elif (data.get(" type") == "LoopKit.DoseType.basal"
           or data.get("type") == "LoopKit.DoseType.basal"):
-        type_ = "basal"
+        type_ = DoseType.basal
     else:
         raise RuntimeError("The last temporary basal is not a basal")
 
@@ -449,6 +460,7 @@ def get_last_temp_basal(data, offset=0):
     ]
 
 
+# %% List management tools
 def sort_by_first_list(list_1, list_2, list_3=None, list_4=None, list_5=None):
     """ Sort lists that are matched index-wise, using the first list as the
         property to sort by
@@ -529,6 +541,7 @@ def remove_too_new_values(
     return (l1, l2, l3, l4, l5)
 
 
+# %% Take an issue report and run it through the Loop algorithm
 def parse_report_and_run(path, name):
     """ Get relevent information from a Loop issue report and use it to
         run PyLoopKit

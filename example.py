@@ -7,6 +7,7 @@ Created on Sun Aug 11 13:03:07 2019
 """
 import json
 import datetime
+from dose import DoseType
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
@@ -71,11 +72,13 @@ else:
 
 
 # save dictionary as json file
-def convert_times(obj):
+def convert_times_and_types(obj):
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
     if isinstance(obj, datetime.time):
         return obj.isoformat()
+    if isinstance(obj, DoseType):
+        return str(obj.name)
 
 
 with open(name.split(".")[0] + "-output.json", "w") as f:
@@ -84,7 +87,7 @@ with open(name.split(".")[0] + "-output.json", "w") as f:
         f,
         sort_keys=True,
         indent=4,
-        default=convert_times
+        default=convert_times_and_types
     )
 
 # %% Visualize output effect data
@@ -171,7 +174,7 @@ plot_loop_inspired_glucose_graph(
     correction_range_maxes=inputs.get("target_range_maximum_values")
     )
 
-# %% visualize inputs as a Tidepool daily view
+'''# %% visualize inputs as a Tidepool daily view
 current_time = inputs.get("time_to_calculate_at")
 
 # blood glucose data
@@ -423,4 +426,4 @@ layout = go.Layout(
 )
 
 fig = go.Figure(data=data, layout=layout)
-plot(fig, filename=name.split(".")[0] + '.html')
+plot(fig, filename=name.split(".")[0] + '.html')'''

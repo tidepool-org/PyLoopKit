@@ -106,7 +106,7 @@ def are_carb_readings_valid(dates, carb_values, absorption_times):
             for absorption in absorption_times):
         warnings.warn(
             "Error: expected carbohydrate absorption times to be between"
-            + "0 & 1440 minutes (0 & 24 hours); stopping run"
+            + " 0 & 1440 minutes (0 & 24 hours); stopping run"
         )
         return False
 

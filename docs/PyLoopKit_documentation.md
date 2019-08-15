@@ -2,6 +2,7 @@
 
 Welcome to the documentation for PyLoopKit. This document contains instructions to help get you oriented to the project, and includes details on running the Loop Algorithm in Python. The project was started by Anna Quinlan in the summer of 2019; if you have any questions please reach out to [Ed Nykaza](mailto:ed@tidepool.org).
 
+<a href="/docs/prediction.png"><img src="/docs/prediction.png?raw=true" alt="Sample Prediction Figure from PyLoopKit"></a>
 
 # Important Notes
 

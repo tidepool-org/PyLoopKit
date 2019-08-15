@@ -106,7 +106,7 @@ def are_carb_readings_valid(dates, carb_values, absorption_times):
             for absorption in absorption_times):
         warnings.warn(
             "Error: expected carbohydrate absorption times to be between"
-            + "0 & 1440 minutes (0 & 24 hours); stopping run"
+            + " 0 & 1440 minutes (0 & 24 hours); stopping run"
         )
         return False
 
@@ -209,7 +209,7 @@ def are_correction_ranges_valid(
             or any(value < 60 or value > 180 for value in maximum_values)):
         warnings.warn(
             "Warning: correction ranges are typically between 60 and"
-            + "180 mg/dL; continuing anyway")
+            + " 180 mg/dL; continuing anyway")
 
     if any(
             start > end for (start, end) in

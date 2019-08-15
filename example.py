@@ -24,7 +24,7 @@ path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 # run the Loop algorithm with the issue report data
 recommendations = parse_report_and_run(path, name)
 
-# generate separate glucose predictions using each effect individually
+# %% generate separate glucose predictions using each effect individually
 starting_date = recommendations.get("input_data").get("glucose_dates")[-1]
 starting_glucose = recommendations.get("input_data").get("glucose_values")[-1]
 
@@ -87,7 +87,7 @@ with open(name.split(".")[0] + "-output.json", "w") as f:
         default=convert_times
     )
 
-# visualize some of that data
+# %% Visualize output effect data
 
 # plot insulin effects
 plot_graph(
@@ -131,6 +131,7 @@ if recommendations.get("cob_timeline_values"):
         line_color="#5FCB49", fill_color="#63ed47"
         )
 
+# %% Visualize output data as a Loop-style plot
 inputs = recommendations.get("input_data")
 
 plot_loop_inspired_glucose_graph(
@@ -170,7 +171,7 @@ plot_loop_inspired_glucose_graph(
     correction_range_maxes=inputs.get("target_range_maximum_values")
     )
 
-# %% visualize inputs
+# %% visualize inputs as a Tidepool daily view
 current_time = inputs.get("time_to_calculate_at")
 
 # blood glucose data

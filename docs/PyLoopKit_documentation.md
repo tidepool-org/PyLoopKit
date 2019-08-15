@@ -18,6 +18,7 @@ Welcome to the documentation for PyLoopKit. This document contains instructions 
     *   To correctly calculate counteraction effects at a point in time, the past duration of insulin action (DIA)-worth of insulin is required; Loop uses 24 hours of counteraction effects to calculate carbohydrate effects and retrospective correction effects.
     *   However, there are only 24 hours of dose history in a report, meaning that the first DIA-worth of counteraction effects will be incorrect because not all insulin active at that time was accounted for. This will affect three of the four effects that are output by the issue report (insulin, carb and retrospective correction effects). The insulin effects will still have the same momentary effects, but since some initial IOB was unaccounted for, the value of the overall effect will differ.
 *   If, having read the caution above, you still would like to use an issue report with PyLoopKit, the issue report must _first_ be run through [the issue report parser](https://github.com/tidepool-org/data-analytics/tree/master/projects/parsers) in the [Tidepool data analytics repository](https://github.com/tidepool-org/data-analytics) to convert it from Markdown to json
+*   As you read through this doc <strong><code>bold()</code></strong> is used for functions.
 
 
 # 
@@ -29,7 +30,7 @@ _Functions to Run the Loop Algorithm_
 
 
 
-*   If you are passing in data from an issue report, you can use the function <code>parse_report_and_run()</code></strong> in <code>pyloop_parser.py</code>. This function expects the input file to have been generated through [the issue report parser](https://github.com/tidepool-org/data-analytics/tree/master/projects/parsers) in the [Tidepool data analytics repository](https://github.com/tidepool-org/data-analytics).
+*   If you are passing in data from an issue report, you can use the function <strong><code>parse_report_and_run()</code></strong> in <code>pyloop_parser.py</code>. This function expects the input file to have been generated through [the issue report parser](https://github.com/tidepool-org/data-analytics/tree/master/projects/parsers) in the [Tidepool data analytics repository](https://github.com/tidepool-org/data-analytics).
 *   If passing data from a previous run, or data that you have prepared to be in the format specified in “Input Data Requirements”, pass it into <strong><code>update()</code></strong> in <code>loop_data_manager.py</code>
 
 <em>Tests</em>
@@ -48,13 +49,13 @@ _How Effects Used for Glucose Predictions Are Calculated_
 
 
 1. Momentum effects: 
-<code>get_recent_momentum_effects()</code></strong> in <code>glucose_store.py</code>
+<strong><code>get_recent_momentum_effects()</code></strong> in <code>glucose_store.py</code>
     1. Filters the glucose data so that it is within <code>momentum_data_interval</code> minutes
     2. Calls <strong><code>linear_momentum_effect() </code></strong>in <code>glucose_math.py</code> to calculate the glucose momentum effect
         1. Checks that the glucose values are valid, with only one provenance (<strong><code>has_single_provenance()</code></strong>), no CGM calibration values (<strong><code>is_calibrated()</code></strong>), and BG values that are continuous  (<strong><code>is_continuous()</code></strong>)
         2. Does a linear regression on the BG values with <strong><code>linear_regression()</code></strong>, then uses the slope to project momentum effect for each value, proportional to the time since the starting date
             1. Momentum effect <strong><em>cannot</em></strong> be negative
-2. Insulin effects: <strong><code>get_glucose_effects() </code></strong>in <code>dose_store.py</code>
+2. Insulin effects: <strong><code>get_glucose_effects()</code></strong> in <code>dose_store.py</code>
     3. Filters dose data so that the data starts at start time minus DIA
     4. Reconciles the data, trimming overlapping temporary basal rates (temp basals) and adding resumes for suspends (if necessary) using <strong><code>reconciled()</code></strong> in <code>insulin_math.py</code>
     5. Sorts the data, since <strong><code>reconciled()</code></strong> often makes the doses slightly out of order
@@ -298,7 +299,7 @@ _Using the Virtual Environment_
 
 
 
-*   In Terminal run` source activate py-loop`, or in the Anaconda Prompt run `conda activate py-loop` to start the environment.
+*   In Terminal run `source activate py-loop`, or in the Anaconda Prompt run `conda activate py-loop` to start the environment.
 *   Run `deactivate` to stop the environment.
 
 _Using the Examples_
@@ -317,7 +318,7 @@ _Using the Examples_
         *   `example_issue_report_4.json`
             *   Issue report with Walsh insulin model
         *   `example_from_previous_run.json` 
-            *   input dictionary that was saved from the output of a previous run of **<code>update()</code></strong>
+            *   input dictionary that was saved from the output of a previous run of <strong><code>update()</code></strong>
     *   There is code in <code>example.py</code> to run any of these files; uncomment the file you want to use
     *   An output json file will be generated and saved
 
@@ -326,7 +327,7 @@ _Using the Examples_
 
 
 *   The issue report must be have already been parsed into json format with the parser found in [Tidepool’s data-science repository](https://github.com/tidepool-org/data-analytics)
-*   **<code>parse_report_and_run()</code></strong> in <code>pyloop_parser.py</code> is the function that can automatically take this json issue report, extract the data into a usable format, then run it through the algorithm and give recommendations
+*   <strong><code>parse_report_and_run()</code></strong> in <code>pyloop_parser.py</code> is the function that can automatically take this json issue report, extract the data into a usable format, then run it through the algorithm and give recommendations
 *   The path and file name are required
     *   For Mac, an example would be 
 
@@ -350,7 +351,7 @@ _Using the Examples_
 
 
 
-*   **<code>update()</code></strong> in <code>loop_data_manager.py</code> can take the input dictionary, run it through the algorithm, and return an output dictionary
+*   <strong><code>update()</code></strong> in <code>loop_data_manager.py</code> can take the input dictionary, run it through the algorithm, and return an output dictionary
     *   <strong><code>update()</code></strong> takes one input dictionary and extracts all the necessary information, provided the keys are the same as are specified in “Input Data Requirements”
 
 <em>Input Validation in PyLoopKit</em>

@@ -57,30 +57,30 @@ _How Effects Used for Glucose Predictions Are Calculated_
         2. Does a linear regression on the BG values with <strong><code>linear_regression()</code></strong>, then uses the slope to project momentum effect for each value, proportional to the time since the starting date
             1. Momentum effect <strong><em>cannot</em></strong> be negative
 2. Insulin effects: <strong><code>get_glucose_effects()</code></strong> in <code>dose_store.py</code>
-    3. Filters dose data so that the data starts at start time minus DIA
-    4. Reconciles the data, trimming overlapping temporary basal rates (temp basals) and adding resumes for suspends (if necessary) using <strong><code>reconciled()</code></strong> in <code>insulin_math.py</code>
-    5. Sorts the data, since <strong><code>reconciled()</code></strong> often makes the doses slightly out of order
-    6. Annotates the data with the scheduled basal rate during the dose using <strong><code>annotated()</code></strong> in <code>insulin_math.py</code>; boluses have a scheduled basal rate of 0 U/hr.
-    7. Trims doses to the start of the interval (start time - DIA)
-    8. Gets insulin effects using <strong><code>glucose_effects() </code></strong>in <code>insulin_math.py</code>
-        3. Determines what the start and end times for the effects should be using <strong><code>simulation_date_range_for_samples()</code></strong>
-        4. Iterates from the start to the end in <code>delta</code>-long intervals (where delta is typically set to 5 minutes), finding the partial insulin effect for each dose at a given <code>date</code> using <strong><code>glucose_effect()</code></strong>
-            2. Determines the percentage of the dose that has been used up before <code>date</code> if the dose is shorter than 1.05 * <code>delta</code> (typically a bolus or very short temp basal) with the computation 1 - percent_effect_remaining
-            3. Determines the percentage of the dose that has been used up before <code>date</code> if the dose is shorter than 1.05 * <code>delta</code> (typically temp basal) with the computation 1 - <strong><code>continuous_delivery_glucose_effect()</code></strong>
-            4. Calculates the Units of insulin (net of any scheduled basal rates) in the dose with<code> <strong>net_basal_units</strong>()</code>, then multiplies by negative insulin <code>sensitivity</code> and the percentage of used dose to calculate the partial effect
-    9. Filters effects so they start at the start time
+    1. Filters dose data so that the data starts at start time minus DIA
+    2. Reconciles the data, trimming overlapping temporary basal rates (temp basals) and adding resumes for suspends (if necessary) using <strong><code>reconciled()</code></strong> in <code>insulin_math.py</code>
+    3. Sorts the data, since <strong><code>reconciled()</code></strong> often makes the doses slightly out of order
+    4. Annotates the data with the scheduled basal rate during the dose using <strong><code>annotated()</code></strong> in <code>insulin_math.py</code>; boluses have a scheduled basal rate of 0 U/hr.
+    5. Trims doses to the start of the interval (start time - DIA)
+    6. Gets insulin effects using <strong><code>glucose_effects() </code></strong>in <code>insulin_math.py</code>
+        1. Determines what the start and end times for the effects should be using <strong><code>simulation_date_range_for_samples()</code></strong>
+        2. Iterates from the start to the end in <code>delta</code>-long intervals (where delta is typically set to 5 minutes), finding the partial insulin effect for each dose at a given <code>date</code> using <strong><code>glucose_effect()</code></strong>
+            1. Determines the percentage of the dose that has been used up before <code>date</code> if the dose is shorter than 1.05 * <code>delta</code> (typically a bolus or very short temp basal) with the computation 1 - percent_effect_remaining
+            2. Determines the percentage of the dose that has been used up before <code>date</code> if the dose is shorter than 1.05 * <code>delta</code> (typically temp basal) with the computation 1 - <strong><code>continuous_delivery_glucose_effect()</code></strong>
+            3. Calculates the Units of insulin (net of any scheduled basal rates) in the dose with<code> <strong>net_basal_units</strong>()</code>, then multiplies by negative insulin <code>sensitivity</code> and the percentage of used dose to calculate the partial effect
+    7. Filters effects so they start at the start time
 3. Carb effects: <strong><code>get_carb_glucose_effects()</code></strong> in <code>carb_store.py</code>
-    10. Filters the carb data so it starts at start time minus <code>maximum_absorption_time_interval</code> (the slowest absorption time * 2)
-    11. If counteraction effects are provided, calculates the absorption dynamically using <strong><code>map_()</code></strong> and <strong><code>dynamic_glucose_effects()</code></strong>
-        5. <strong><code>map_()</code></strong> generates a timeline of absorption and absorption statistics. It calculates the carb absorption using positive counteraction effects, then if there are multiple active carb entries, splits the absorption proportionally based on the minimum expected absorption rates.
-        6. <strong><code>dynamic_glucose_effects() </code></strong>determines what the start and end times for the effects should be using <strong><code>simulation_date_range()</code></strong>, then iterates from start to the end in <code>delta</code>-long intervals, suming the partial carb effects at that <code>date</code> for each entry using <strong><code>dynamic_absorbed_carbs()</code></strong> in carb_status.py
-            5. If there is no absorption information for an entry, effects are calculated using<code> <strong>absorbed_carbs</strong>()</code> in <code>carb_math.py</code>, which is a parabolic model
-            6. If less than the minimum expected absorption is observed, the absorbed carbs are calculated linearly with <strong><code>linearly_absorbed_carbs()</code></strong> in <code>carb_math.py</code> to ensure they eventually absorb
-    12. If counteraction effects are not provided (which is <em>very</em> rare), it calculates the absorption using <strong><code>carb_glucose_effects</code></strong>(), which uses a parabolic model to generate the timeline.
+    1. Filters the carb data so it starts at start time minus <code>maximum_absorption_time_interval</code> (the slowest absorption time * 2)
+    2. If counteraction effects are provided, calculates the absorption dynamically using <strong><code>map_()</code></strong> and <strong><code>dynamic_glucose_effects()</code></strong>
+        1. <strong><code>map_()</code></strong> generates a timeline of absorption and absorption statistics. It calculates the carb absorption using positive counteraction effects, then if there are multiple active carb entries, splits the absorption proportionally based on the minimum expected absorption rates.
+        2. <strong><code>dynamic_glucose_effects() </code></strong>determines what the start and end times for the effects should be using <strong><code>simulation_date_range()</code></strong>, then iterates from start to the end in <code>delta</code>-long intervals, suming the partial carb effects at that <code>date</code> for each entry using <strong><code>dynamic_absorbed_carbs()</code></strong> in carb_status.py
+            1. If there is no absorption information for an entry, effects are calculated using<code> <strong>absorbed_carbs</strong>()</code> in <code>carb_math.py</code>, which is a parabolic model
+            2. If less than the minimum expected absorption is observed, the absorbed carbs are calculated linearly with <strong><code>linearly_absorbed_carbs()</code></strong> in <code>carb_math.py</code> to ensure they eventually absorb
+    3. If counteraction effects are not provided (which is <em>very</em> rare), it calculates the absorption using <strong><code>carb_glucose_effects</code></strong>(), which uses a parabolic model to generate the timeline.
 4. Retrospective correction (if enabled): <strong><code>update_retrospective_glucose_effect()</code></strong> in <code>loop_data_manager.py</code>
-    13. “Subtracts” the carb effects from the counteraction effects to determine discrepancies over <code>delta</code>-minute intervals using <strong><code>subtracting()</code></strong> in <code>loop_math.py</code>
-    14. Sums those discrepancies over time using <strong><code>combined_sums()</code></strong> in <code>loop_math.py</code>
-    15. Calculates the average velocity of the retrospective discrepancies, then decays that effect linearly with <strong><code>decay_effect()</code></strong> in <code>loop_math.py</code>, using the most recent glucose measurement as the starting point
+    1. “Subtracts” the carb effects from the counteraction effects to determine discrepancies over <code>delta</code>-minute intervals using <strong><code>subtracting()</code></strong> in <code>loop_math.py</code>
+    2. Sums those discrepancies over time using <strong><code>combined_sums()</code></strong> in <code>loop_math.py</code>
+    3. Calculates the average velocity of the retrospective discrepancies, then decays that effect linearly with <strong><code>decay_effect()</code></strong> in <code>loop_math.py</code>, using the most recent glucose measurement as the starting point
 
 
 # 

@@ -6,8 +6,12 @@ Created on Fri Jun 21 13:11:40 2019
 @author: annaquinlan, plot style from Ed Nykaza
 """
 from collections import OrderedDict
+from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
+from matplotlib import collections as mc
+
 from date import time_interval_since
+from insulin_math import schedule_offset
 
 
 def plot_graph(
@@ -233,9 +237,10 @@ def plot_loop_inspired_glucose_graph(
         x_label=None, y_label=None, title=None,
         previous_glucose_dates=None, previous_glucose_values=None,
         line_color=None, file_name=None, grid=False,
-        line_style="-", target_min=90, target_max=120):
-    """ Create a Loop-inspired graph. Limitation: can only do one correction
-        range.
+        line_style="-", target_min=None, target_max=None,
+        correction_range_starts=None, correction_range_ends=None,
+        correction_range_mins=None, correction_range_maxes=None):
+    """ Create a Loop-inspired graph.
     """
     def plot_line(
             absolute_dates, values,
@@ -300,34 +305,98 @@ def plot_loop_inspired_glucose_graph(
 
     plt.xticks(x_ticks, labels)
 
-    # find the correct length to fill the correction range
-    fill_length = [
-        x_ticks[0],
-        x_ticks[-1] if x_ticks[0] != x_ticks[-1] else x_ticks[0] + 1
-    ]
+    # if there is a specified target range, it's assumed it will be for the
+    # whole duration of the graph
+    if target_min and target_max:
+        # find the correct length to fill the correction range
+        fill_length = [
+            x_ticks[0],
+            x_ticks[-1] if x_ticks[0] != x_ticks[-1] else x_ticks[0] + 1
+        ]
 
-    # plot correction range
-    if abs(target_max - target_min) > 0:
-        ax.fill_between(
-            fill_length,
-            [target_min, target_min],
-            [target_max, target_max],
-            facecolor='#B5E7FF',
-            lw=0
+        # plot correction range
+        if abs(target_max - target_min) > 0:
+            ax.fill_between(
+                fill_length,
+                [target_min, target_min],
+                [target_max, target_max],
+                facecolor='#B5E7FF',
+                lw=0
+            )
+            plt.plot(
+                [], [],
+                color='#B5E7FF',
+                lw=10,
+                label="Target Range: %d-%d" % (target_min, target_max)
+            )
+        else:
+            plt.axhline(
+                y=target_min,
+                color='#B5E7FF',
+                lw=3,
+                label="Target Range: %d-%d" % (target_min, target_max)
+            )
+
+    elif correction_range_starts:
+        start = min(
+            previous_glucose_dates[0] or overall_dates[0],
+            overall_dates[0]
         )
-        plt.plot(
-            [], [],
-            color='#B5E7FF',
-            lw=10,
-            label="Target Range: %d-%d" % (target_min, target_max)
+        end = max(
+            start + timedelta(hours=1),
+            overall_dates[-1]
         )
-    else:
-        plt.axhline(
-            y=target_min,
-            color='#B5E7FF',
-            lw=3,
-            label="Target Range: %d-%d" % (target_min, target_max)
-        )
+        (range_starts,
+         range_ends,
+         range_mins,
+         range_maxes
+         ) = correction_ranges_between(
+             correction_range_starts,
+             correction_range_ends,
+             correction_range_mins,
+             correction_range_maxes,
+             start,
+             end
+             )
+
+        for i in range(0, len(range_starts)):
+            # find the fill length, adjusting if the dates cross midnight
+            fill_start = x_ticks[0] if i == 0 else (
+                range_starts[i].hour if range_starts[i].day == start.day
+                else range_starts[i].hour + 24
+            )
+            fill_end = x_ticks[-1] if i == len(range_starts) - 1 else (
+                range_ends[i].hour if range_ends[i].day == start.day
+                else range_ends[i].hour + 24
+            )
+            fill_length = (
+                fill_start,
+                fill_end
+            )
+            # plot the range
+            if abs(range_mins[i] - range_maxes[i]) > 0:
+                ax.fill_between(
+                    fill_length,
+                    [range_mins[i], range_mins[i]],
+                    [range_maxes[i], range_maxes[i]],
+                    facecolor='#B5E7FF',
+                    lw=0
+                )
+                plt.plot(
+                    [], [],
+                    color='#B5E7FF',
+                    lw=10,
+                    label="Target Range"
+                )
+            else:
+                line = [
+                    [
+                        (fill_length[0], range_mins[i]),
+                        (fill_length[1], range_mins[i])
+                    ]
+                ]
+                lc = mc.LineCollection(line, colors='#B5E7FF', linewidths=3)
+                ax.add_collection(lc)
 
     # set labels and title
     if x_label:
@@ -427,3 +496,141 @@ def plot_loop_inspired_glucose_graph(
     )
 
     plt.show()
+
+
+def correction_ranges_between(
+        correction_range_starts, correction_range_ends,
+        correction_range_mins, correction_range_maxes,
+        start_date, end_date,
+        repeat_interval=24
+    ):
+    """ Returns a slice of scheduled basal rates that occur between two dates
+
+    Arguments:
+    basal_start_times -- list of times the basal rates start at
+    basal_rates -- list of basal rates(U/hr)
+    basal_minutes -- list of basal lengths (in mins)
+    start_date -- start date of the range (datetime obj)
+    end_date -- end date of the range (datetime obj)
+    repeat_interval -- the duration over which the rates repeat themselves
+                       (24 hours by default)
+
+    Output:
+    Tuple in format (basal_start_times, basal_rates, basal_minutes) within
+    the range of dose_start_date and dose_end_date
+    """
+    timezone_info = start_date.tzinfo
+    if start_date > end_date:
+        return ([], [], [])
+
+    reference_time_interval = timedelta(
+        hours=correction_range_starts[0].hour,
+        minutes=correction_range_starts[0].minute,
+        seconds=correction_range_starts[0].second
+    )
+    max_time_interval = (
+        reference_time_interval
+        + timedelta(hours=repeat_interval)
+    )
+
+    start_offset = schedule_offset(start_date, correction_range_starts[0])
+
+    end_offset = (
+        start_offset
+        + timedelta(seconds=time_interval_since(end_date, start_date))
+    )
+
+    # if a dose is crosses days, split it into separate doses
+    if end_offset > max_time_interval:
+        boundary_date = start_date + (max_time_interval - start_offset)
+        (start_times_1,
+         end_times_1,
+         mins_1,
+         maxes_1,
+         ) = correction_ranges_between(
+             correction_range_starts,
+             correction_range_ends,
+             correction_range_mins,
+             correction_range_maxes,
+             start_date,
+             boundary_date,
+             repeat_interval=repeat_interval
+             )
+        (start_times_2,
+         end_times_2,
+         mins_2,
+         maxes_2,
+         ) = correction_ranges_between(
+             correction_range_starts,
+             correction_range_ends,
+             correction_range_mins,
+             correction_range_maxes,
+             boundary_date,
+             end_date,
+             repeat_interval=repeat_interval
+             )
+
+        return (start_times_1 + start_times_2,
+                end_times_1 + end_times_2,
+                mins_1 + mins_2,
+                maxes_1 + maxes_2
+                )
+
+    start_index = 0
+    end_index = len(correction_range_starts)
+
+    for (i, start_time) in enumerate(correction_range_starts):
+        start_time = timedelta(
+            hours=start_time.hour,
+            minutes=start_time.minute,
+            seconds=start_time.second
+        )
+        if start_offset >= start_time:
+            start_index = i
+        if end_offset < start_time:
+            end_index = i
+            break
+
+    reference_date = start_date - start_offset
+    reference_date = datetime(
+        year=reference_date.year,
+        month=reference_date.month,
+        day=reference_date.day,
+        hour=reference_date.hour,
+        minute=reference_date.minute,
+        second=reference_date.second,
+        tzinfo=timezone_info
+        )
+
+    if start_index > end_index:
+        return ([], [], [])
+
+    (output_start_times,
+     output_end_times,
+     output_mins,
+     output_maxes
+     ) = ([], [], [], [])
+
+    for i in range(start_index, end_index):
+        end_time = (timedelta(
+            hours=correction_range_starts[i+1].hour,
+            minutes=correction_range_starts[i+1].minute,
+            seconds=correction_range_starts[i+1].second) if i+1 <
+                    len(correction_range_starts) else max_time_interval)
+
+        output_start_times.append(
+            reference_date + timedelta(
+                hours=correction_range_starts[i].hour,
+                minutes=correction_range_starts[i].minute,
+                seconds=correction_range_starts[i].second
+            )
+        )
+        output_end_times.append(reference_date + end_time)
+        output_mins.append(correction_range_mins[i])
+        output_maxes.append(correction_range_maxes[i])
+
+    assert len(output_start_times) == len(output_end_times) ==\
+        len(output_mins) == len(output_maxes),\
+        "expected output shape to match"
+
+    return (output_start_times, output_end_times, output_mins, output_maxes)

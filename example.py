@@ -9,7 +9,6 @@ import json
 import datetime
 
 from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
-from insulin_math import find_ratio_at_time
 from loop_kit_tests import find_root_path
 from loop_math import predict_glucose
 from pyloop_parser import parse_report_and_run
@@ -138,18 +137,10 @@ plot_loop_inspired_glucose_graph(
     grid=True,
     previous_glucose_dates=inputs.get("glucose_dates")[-15:],
     previous_glucose_values=inputs.get("glucose_values")[-15:],
-    target_min=find_ratio_at_time(
-        inputs.get("target_range_start_times"),
-        inputs.get("target_range_end_times"),
-        inputs.get("target_range_minimum_values"),
-        inputs.get("time_to_calculate_at")
-        ),
-    target_max=find_ratio_at_time(
-        inputs.get("target_range_start_times"),
-        inputs.get("target_range_end_times"),
-        inputs.get("target_range_maximum_values"),
-        inputs.get("time_to_calculate_at")
-        )
+    correction_range_starts=inputs.get("target_range_start_times"),
+    correction_range_ends=inputs.get("target_range_end_times"),
+    correction_range_mins=inputs.get("target_range_minimum_values"),
+    correction_range_maxes=inputs.get("target_range_maximum_values")
     )
 
 
@@ -169,16 +160,8 @@ plot_loop_inspired_glucose_graph(
     grid=True,
     previous_glucose_dates=inputs.get("glucose_dates")[-15:],
     previous_glucose_values=inputs.get("glucose_values")[-15:],
-    target_min=find_ratio_at_time(
-        inputs.get("target_range_start_times"),
-        inputs.get("target_range_end_times"),
-        inputs.get("target_range_minimum_values"),
-        inputs.get("time_to_calculate_at")
-        ),
-    target_max=find_ratio_at_time(
-        inputs.get("target_range_start_times"),
-        inputs.get("target_range_end_times"),
-        inputs.get("target_range_maximum_values"),
-        inputs.get("time_to_calculate_at")
-        )
+    correction_range_starts=inputs.get("target_range_start_times"),
+    correction_range_ends=inputs.get("target_range_end_times"),
+    correction_range_mins=inputs.get("target_range_minimum_values"),
+    correction_range_maxes=inputs.get("target_range_maximum_values")
     )

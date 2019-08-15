@@ -19,7 +19,10 @@ from loop_math import predict_glucose
 from pyloop_parser import parse_report_and_run
 
 # find the path to the file in the repo
+# uncomment the name of the file you'd like to run
 name = "example_issue_report.json"
+# name = "example_issue_report_2.json"
+# name = "example_issue_report_3.json"
 path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 
 # run the Loop algorithm with the issue report data
@@ -174,7 +177,7 @@ plot_loop_inspired_glucose_graph(
     correction_range_maxes=inputs.get("target_range_maximum_values")
     )
 
-'''# %% visualize inputs as a Tidepool daily view
+# %% visualize inputs as a Tidepool daily view
 current_time = inputs.get("time_to_calculate_at")
 
 # blood glucose data
@@ -426,4 +429,4 @@ layout = go.Layout(
 )
 
 fig = go.Figure(data=data, layout=layout)
-plot(fig, filename=name.split(".")[0] + '.html')'''
+plot(fig, filename=name.split(".")[0] + '-output.html')

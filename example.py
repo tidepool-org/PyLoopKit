@@ -383,14 +383,48 @@ carb_trace = go.Scatter(
     textposition='middle center'
 )
 
-# combine the plots
+# %% visualize outputs
+# overall prediction
+predicted_glucose_dates = pd.DataFrame(
+    recommendations.get("predicted_glucose_dates"), columns=["time"]
+)
+predicted_glucose_values = pd.DataFrame(
+    recommendations.get("predicted_glucose_values"), columns=["mg_dL"]
+)
+
+bg_prediction = pd.concat(
+    [predicted_glucose_dates, predicted_glucose_values],
+    axis=1
+)
+
+bg_prediction_trace = go.Scattergl(
+    name="predicted bg",
+    x=bg_prediction["time"],
+    y=bg_prediction["mg_dL"],
+    hoverinfo="y+name",
+    mode='markers',
+    marker=dict(
+        size=6,
+        line=dict(width=0),
+        color="#5ac6fa"
+    )
+)
+
+
+# %% combine the plots
 basal_trace.yaxis = "y"
 sbr_trace.yaxis = "y"
 bolus_trace.yaxis = "y2"
 carb_trace.yaxis = "y2"
 bg_trace.yaxis = "y3"
+bg_prediction_trace.yaxis = "y3"
 
-data = [basal_trace, sbr_trace, bolus_trace, carb_trace, bg_trace]
+data = [
+    basal_trace, sbr_trace,
+    bolus_trace, carb_trace,
+    bg_trace, bg_prediction_trace
+]
+
 layout = go.Layout(
     yaxis=dict(
         domain=[0, 0.2],
@@ -432,7 +466,7 @@ layout = go.Layout(
     xaxis=dict(
         range=(
             current_time - datetime.timedelta(days=1),
-            current_time + datetime.timedelta(minutes=60)
+            current_time + datetime.timedelta(hours=7)
         )
     ),
     dragmode="pan",

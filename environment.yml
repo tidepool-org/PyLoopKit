@@ -9,6 +9,7 @@ dependencies:
   - pylint=2.3.1=py37_0
   - python=3.7.3=h359304d_0
   - spyder=3.3.4=py37_0
+  - ploty=4.0.0
   - pip:
     - tensorflow==2.0.0-beta1
 

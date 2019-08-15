@@ -127,7 +127,7 @@ def map_(
         for i in builder_entry_indexes
         ]
 
-    # unit: G/s
+    # unit: g/s
     builder_max_absorb_times = [
         (carb_entry_absorptions[i]
          or default_absorption_time)

@@ -49,7 +49,7 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
 
 def total_units_given(type_, value, start, end):
     """ Find total units given for a dose """
-    if type_.lower() in [DoseType.bolus, DoseType.suspend]:
+    if type_ in [DoseType.bolus, DoseType.suspend]:
         return value
 
     return value * hours(end, start)

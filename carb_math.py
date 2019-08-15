@@ -110,7 +110,7 @@ def map_(
 
     builder_entry_indexes = list(range(0, len(carb_entry_starts)))
 
-    # CSF is in mg/dL/G
+    # CSF is in mg/dL/g
     builder_carb_sensitivities = [
         find_ratio_at_time(
             sensitivity_starts,

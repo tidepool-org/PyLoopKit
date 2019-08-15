@@ -10,6 +10,7 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 from date import time_interval_since
+from dose import DoseType
 from generate_graphs import plot_relative_graph
 from insulin_math import glucose_effects, insulin_on_board
 
@@ -18,7 +19,7 @@ def cumulative_insulin_effect_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -43,7 +44,7 @@ def insulin_on_board_percentage_graph(save=False):
     (iob_dates,
      iob_values
      ) = insulin_on_board(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -70,7 +71,7 @@ def insulin_on_board_graph(save=False):
     (iob_dates,
      iob_values
      ) = insulin_on_board(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -93,7 +94,7 @@ def insulin_absorption_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -125,7 +126,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (adult_effect_dates,
      adult_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -152,7 +153,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (child_effect_dates,
      child_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -179,7 +180,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (fiasp_effect_dates,
      fiasp_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -206,7 +207,7 @@ def all_insulin_absorption_curves_graph(save=False):
     (walsh_effect_dates,
      walsh_effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -292,7 +293,7 @@ def insulin_effect_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["bolus"],
+         [DoseType.bolus],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [2],
@@ -325,7 +326,7 @@ def suspend_effect_graph(save=False):
     (effect_dates,
      effect_values
      ) = glucose_effects(
-         ["suspend"],
+         [DoseType.suspend],
          [datetime.fromisoformat("2019-08-08T00:00:00")],
          [datetime.fromisoformat("2019-08-08T01:00:00")],
          [0],

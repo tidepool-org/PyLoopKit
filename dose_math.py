@@ -14,6 +14,7 @@ import sys
 
 from insulin_math import is_time_between, find_ratio_at_time
 from date import time_interval_since
+from dose import DoseType
 from walsh_insulin_model import walsh_percent_effect_remaining
 from exponential_insulin_model import percent_effect_remaining
 
@@ -165,7 +166,7 @@ def if_necessary(
     """
     # Adjust behavior for the currently active temp basal
     if (last_temp_basal
-            and last_temp_basal[0].lower() in ["tempbasal", "basal"]
+            and last_temp_basal[0] in [DoseType.tempbasal, DoseType.basal]
             and last_temp_basal[2] > at_date
        ):
         # If the last temp basal has the same rate, and has more than

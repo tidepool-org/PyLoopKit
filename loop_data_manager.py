@@ -14,6 +14,7 @@ import warnings
 
 from carb_store import get_carb_glucose_effects, get_carbs_on_board
 from date import time_interval_since
+from dose import DoseType
 from dose_math import recommended_temp_basal, recommended_bolus
 from dose_store import get_glucose_effects
 from glucose_store import (get_recent_momentum_effects,
@@ -477,7 +478,7 @@ def get_pending_insulin(
     # if the end date for the temp basal is greater than current date,
     # find the pending insulin
     if (last_temp_basal[2] > at_date
-            and last_temp_basal[0].lower() in ["tempbasal", "basal"]):
+            and last_temp_basal[0] in [DoseType.tempbasal, DoseType.basal]):
         normal_basal_rate = find_ratio_at_time(
             basal_starts, [], basal_rates, at_date
         )

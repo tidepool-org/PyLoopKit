@@ -7,6 +7,7 @@ Created on Mon Jul 29 16:39:23 2019
 """
 # pylint: disable=R0911, W0613
 import warnings
+from dose import DoseType
 
 
 def are_settings_valid(settings):
@@ -115,9 +116,10 @@ def are_carb_readings_valid(dates, carb_values, absorption_times):
 
 def are_insulin_doses_valid(types, start_times, end_times, values):
     """ Checks that dose inputs are reasonable """
-    if any(type_.lower() not in
-           ["tempbasal", "basal", "basalprofilestart", "bolus",
-            "pumpsuspend", "suspend", "resume", "meal"] for type_ in types):
+    if any(type_ not in
+           [DoseType.tempbasal, DoseType.basal, DoseType.bolus,
+            DoseType.suspend, DoseType.resume, DoseType.meal
+            ] for type_ in types):
         warnings.warn(
             "Warning: there are types in the insulin doses that PyLoopKit" +
             " doesn't recognize; continuing anyway"

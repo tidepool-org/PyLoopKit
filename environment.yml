@@ -4,12 +4,11 @@ channels:
 dependencies:
   - matplotlib
   - pip
-  - numpy=1.16.4=py37hacdab7b_0
-  - pandas=0.24.2=py37h0a44026_0
-  - pylint=2.3.1=py37_0
-  - python=3.7.3=h359304d_0
   - spyder=3.3.4=py37_0
-  - ploty=4.0.0
+  - pylint=2.3.1=py37_0
+  - python==3.7.3
   - pip:
     - tensorflow==2.0.0-beta1
-
+    - numpy==1.16.4
+    - pandas==0.24.2
+    - plotly==4.1.0

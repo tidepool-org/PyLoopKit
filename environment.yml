@@ -10,5 +10,5 @@ dependencies:
     - tensorflow==2.0.0-beta1
     - numpy==1.16.4
     - pandas==0.24.2
-    - ploty==4.1.0
+    - plotly==4.1.0
     - python==3.7.3

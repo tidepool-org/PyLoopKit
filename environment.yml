@@ -6,9 +6,9 @@ dependencies:
   - pip
   - spyder=3.3.4=py37_0
   - pylint=2.3.1=py37_0
+  - python==3.7.3
   - pip:
     - tensorflow==2.0.0-beta1
     - numpy==1.16.4
     - pandas==0.24.2
     - plotly==4.1.0
-    - python==3.7.3

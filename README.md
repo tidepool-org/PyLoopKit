@@ -8,7 +8,7 @@ A set of Python tools for building closed-loop insulin delivery apps (Python por
 [Link of Tidepool LoopKit repository version used for algorithm](https://github.com/tidepool-org/LoopKit/tree/57a9f2ba65ae3765ef7baafe66b883e654e08391)
 
 # To use this project
-## Please review [the documentation](https://docs.google.com/document/d/1ZDICisaDrp_uBEYGMf2HOEJLW8LMxjHaYev2FpxDUm8/edit?usp=sharing) for usage instructions, input data requirements, and other important details.
+## Please review [the documentation](docs/pyloopkit_documentation.md) for usage instructions, input data requirements, and other important details.
 
 ### To recreate the Virtual Environment
 1. This environment was developed with Anaconda. You'll need to install [Miniconda](https://conda.io/miniconda.html) or [Anaconda](https://anaconda-installer.readthedocs.io/en/latest/) for your platform.

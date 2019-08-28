@@ -217,12 +217,6 @@ bg_trace = go.Scattergl(
     )
 )
 
-
-# insulin (bolus and basal)
-def get_name_from_enum(dose_type):
-    return dose_type.name
-
-
 # bolus data
 dose_start_times = (
     pd.DataFrame(inputs.get("dose_start_times"), columns=["startTime"])
@@ -237,7 +231,8 @@ dose_types = (
     pd.DataFrame(inputs.get("dose_types"), columns=["type"])
 )
 
-dose_types["type"] = dose_types["type"].apply(get_name_from_enum)
+dose_types["type"] = dose_types["type"].apply(convert_times_and_types)
+
 dose = pd.concat(
     [dose_start_times, dose_end_times, dose_values, dose_types],
     axis=1

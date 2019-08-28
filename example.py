@@ -23,9 +23,9 @@ from pyloop_parser import (parse_report_and_run,
 # %% find the path to the file in the repo
 # uncomment the name of the file you'd like to run
 name = "example_issue_report_1.json"
-# name = "example_issue_report_2.json"
-# name = "example_issue_report_3.json"
-# name = "example_from_previous_run.json"
+#name = "example_issue_report_2.json"
+#name = "example_issue_report_3.json"
+#name = "example_from_previous_run.json"
 
 path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
 
@@ -216,8 +216,13 @@ bg_trace = go.Scattergl(
     )
 )
 
+
 # insulin (bolus and basal)
+def get_name_from_enum(dose_type):
+    return dose_type.name
 # bolus data
+
+
 dose_start_times = (
     pd.DataFrame(inputs.get("dose_start_times"), columns=["startTime"])
 )
@@ -230,6 +235,8 @@ dose_values = (
 dose_types = (
     pd.DataFrame(inputs.get("dose_types"), columns=["type"])
 )
+
+dose_types["type"] = dose_types["type"].apply(get_name_from_enum)
 dose = pd.concat(
     [dose_start_times, dose_end_times, dose_values, dose_types],
     axis=1

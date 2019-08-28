@@ -4,3 +4,7 @@
 *.pyc
 
 *.png
+
+*output.html
+
+*-output.json

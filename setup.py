@@ -10,7 +10,7 @@ https://packaging.python.org/tutorials/packaging-projects/
 """
 
 # %% REQUIRED LIBRARIES
-import setuptools
+from setuptools import setup, find_packages
 import os
 import glob
 import shutil
@@ -26,7 +26,7 @@ with open("README.md", "r") as fh:
 
 version_string = "v0.0.1"
 
-setuptools.setup(
+setup(
     name="pyloopkit",
     version=version_string,
     author="Ed Nykaza",
@@ -35,7 +35,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/tidepool-org/PyLoopKit",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     include_package_data=True,
     download_url=(
         'https://github.com/tidepool-org/PyLoopKit/tarball/' + version_string

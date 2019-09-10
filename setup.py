@@ -37,7 +37,9 @@ setuptools.setup(
     url="https://github.com/tidepool-org/PyLoopKit",
     packages=setuptools.find_packages(),
     include_package_data=True,
-
+    download_url=(
+        'https://github.com/tidepool-org/PyLoopKit/tarball/' + version_string
+    ),
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

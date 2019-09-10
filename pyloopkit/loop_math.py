@@ -13,8 +13,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 from datetime import timedelta
 import numpy
 
-from date import (date_floored_to_time_interval,
-                  date_ceiled_to_time_interval, time_interval_since)
+from pyloopkit.date import (date_floored_to_time_interval,
+                            date_ceiled_to_time_interval, time_interval_since)
 
 
 def predict_glucose(

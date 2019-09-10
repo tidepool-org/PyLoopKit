@@ -11,11 +11,11 @@ https://github.com/tidepool-org/LoopKit/blob/
 import sys
 from datetime import timedelta
 
-from insulin_math import find_ratio_at_time
-from date import (time_interval_since,
-                  date_floored_to_time_interval,
-                  date_ceiled_to_time_interval)
-import carb_status
+from pyloopkit.insulin_math import find_ratio_at_time
+from pyloopkit.date import (time_interval_since,
+                            date_floored_to_time_interval,
+                            date_ceiled_to_time_interval)
+from pyloopkit import carb_status
 
 
 def map_(

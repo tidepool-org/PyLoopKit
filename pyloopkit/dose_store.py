@@ -11,9 +11,9 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # pylint: disable=R0913, R0914, C0200
 from datetime import timedelta
 
-from dose_math import filter_date_range_for_doses
-from insulin_math import (annotated, trim, glucose_effects, reconciled)
-from loop_math import filter_date_range, sort_dose_lists
+from pyloopkit.dose_math import filter_date_range_for_doses
+from pyloopkit.insulin_math import (annotated, trim, glucose_effects, reconciled)
+from pyloopkit.loop_math import filter_date_range, sort_dose_lists
 
 
 def get_glucose_effects(

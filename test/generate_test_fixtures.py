@@ -8,9 +8,8 @@ Created on Mon Jun 24 14:25:03 2019
 # pylint: disable=C0200, R0914
 from datetime import datetime, time
 import json
-import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from insulin_math import glucose_effects, insulin_on_board
+from pyloopkit.insulin_math import glucose_effects, insulin_on_board
 
 WITHIN = 30
 

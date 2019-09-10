@@ -11,9 +11,9 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # pylint: disable=R0913, R0914
 from datetime import timedelta
 
-from carb_math import (filter_date_range_for_carbs, map_, carb_glucose_effects,
-                       dynamic_glucose_effects, dynamic_carbs_on_board,
-                       carbs_on_board)
+from pyloopkit.carb_math import (filter_date_range_for_carbs, map_, carb_glucose_effects,
+                                 dynamic_glucose_effects, dynamic_carbs_on_board,
+                                 carbs_on_board)
 
 
 def get_carb_glucose_effects(

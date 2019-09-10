@@ -12,10 +12,9 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 import unittest
 from datetime import datetime
 
-import path_grabber  # pylint: disable=unused-import
 from loop_kit_tests import load_fixture
-from loop_math import predict_glucose, decay_effect, subtracting, combined_sums
-from date import time_interval_since
+from pyloopkit.loop_math import predict_glucose, decay_effect, subtracting, combined_sums
+from pyloopkit.date import time_interval_since
 
 
 class TestLoopMathFunctions(unittest.TestCase):

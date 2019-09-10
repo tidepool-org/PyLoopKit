@@ -9,15 +9,14 @@ Created on Wed Jul 24 09:48:51 2019
 from datetime import datetime, time, timedelta
 import unittest
 
-import path_grabber  # pylint: disable=unused-import
-from carb_store import get_carb_glucose_effects, get_carbs_on_board
-from dose_store import get_glucose_effects
-from dose import DoseType
-from glucose_store import (
+from pyloopkit.carb_store import get_carb_glucose_effects, get_carbs_on_board
+from pyloopkit.dose_store import get_glucose_effects
+from pyloopkit.dose import DoseType
+from pyloopkit.glucose_store import (
     get_recent_momentum_effects, get_counteraction_effects
 )
 from loop_kit_tests import load_fixture
-from pyloop_parser import (
+from pyloopkit.pyloop_parser import (
     load_momentum_effects, get_glucose_data
     )
 

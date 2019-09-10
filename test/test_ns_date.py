@@ -9,9 +9,8 @@ Created on Sun Jun 16 15:41:18 2019
 import unittest
 from datetime import datetime, timedelta
 
-import path_grabber  # pylint: disable=unused-import
-from date import (date_floored_to_time_interval, date_ceiled_to_time_interval,
-                  time_interval_since_reference_date, time_interval_since)
+from pyloopkit.date import (date_floored_to_time_interval, date_ceiled_to_time_interval,
+                            time_interval_since_reference_date, time_interval_since)
 
 REF_DATE = datetime(2001, 1, 1, 0, 0, 0)
 

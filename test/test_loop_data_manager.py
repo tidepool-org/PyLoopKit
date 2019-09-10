@@ -9,12 +9,11 @@ Created on Thu Jul 11 15:16:42 2019
 from datetime import datetime
 import unittest
 
-import path_grabber  # pylint: disable=unused-import
-from dose import DoseType
-from loop_data_manager import (get_pending_insulin,
-                               update_retrospective_glucose_effect)
+from pyloopkit.dose import DoseType
+from pyloopkit.loop_data_manager import (get_pending_insulin,
+                                         update_retrospective_glucose_effect)
 from loop_kit_tests import load_fixture, find_root_path
-from pyloop_parser import (
+from pyloopkit.pyloop_parser import (
     load_momentum_effects, get_glucose_data, load_insulin_effects,
     get_insulin_data, get_basal_schedule, get_carb_ratios,
     get_sensitivities, get_settings, get_counteractions, get_carb_data,

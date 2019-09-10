@@ -13,12 +13,12 @@ import numpy as np
 import plotly.graph_objs as go
 from plotly.offline import plot
 
-from dose import DoseType
-from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
+from pyloopkit.dose import DoseType
+from pyloopkit.generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
 from loop_kit_tests import find_root_path
-from loop_math import predict_glucose
-from pyloop_parser import (
-    parse_report_and_run, parse_dictionary_from_previous_run
+from pyloopkit.loop_math import predict_glucose
+from pyloopkit.pyloop_parser import (
+    parse_report_and_run
 )
 
 # %% find the path to the file in the repo

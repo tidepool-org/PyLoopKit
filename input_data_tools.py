@@ -141,6 +141,10 @@ def input_dict_to_one_dataframe(input_data):
     return combined_df
 
 
+def str2bool(string_):
+    return string_.lower() in ("yes", "true", "t", "1")
+
+
 def input_table_to_dict(input_df):
     dict_ = dict()
 
@@ -153,7 +157,8 @@ def input_table_to_dict(input_df):
             "dynamic_carb_absorption_enabled",
             "retrospective_correction_enabled"
         ]:
-            dict_["settings_dictionary"][k] = np.bool(
+
+            dict_["settings_dictionary"][k] = str2bool(
                 dict_["settings_dictionary"][k]
             )
         else:

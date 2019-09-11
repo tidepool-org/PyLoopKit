@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-description: setup script for the tidals package
-created: 2018-10-01
-author: Ed Nykaza
+description: setup script for the PyLoopKit package
+created: 20190-09-10
+author: Russ Wilson
 license: BSD-2-Clause
 Parts of this file were taken from
 https://packaging.python.org/tutorials/packaging-projects/
@@ -11,9 +11,6 @@ https://packaging.python.org/tutorials/packaging-projects/
 
 # %% REQUIRED LIBRARIES
 from setuptools import setup, find_packages
-import os
-import glob
-import shutil
 import sys
 
 

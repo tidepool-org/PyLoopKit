@@ -142,7 +142,6 @@ def input_dict_to_one_dataframe(input_data):
 
 
 def input_table_to_dict(input_df):
-
     dict_ = dict()
 
     # first parse and format the settings
@@ -150,9 +149,17 @@ def input_table_to_dict(input_df):
     dict_["settings_dictionary"] = all_settings.to_dict()
 
     for k in dict_["settings_dictionary"].keys():
-        dict_["settings_dictionary"][k] = np.safe_eval(
-            dict_["settings_dictionary"][k]
-        )
+        if k in [
+            "dynamic_carb_absorption_enabled",
+            "retrospective_correction_enabled"
+        ]:
+            dict_["settings_dictionary"][k] = np.bool(
+                dict_["settings_dictionary"][k]
+            )
+        else:
+            dict_["settings_dictionary"][k] = np.safe_eval(
+                dict_["settings_dictionary"][k]
+            )
     if "suspend_threshold" not in dict_["settings_dictionary"].keys():
         dict_["settings_dictionary"]["suspend_threshold"] = None
 
@@ -169,17 +176,29 @@ def input_table_to_dict(input_df):
             dict_[col] = int(np.safe_eval(input_df_T[col].dropna()[0]))
         elif "time_to_calculate" in col:
             dict_[col] = (
-                datetime.datetime.fromisoformat(input_df_T[col].dropna()[0])
+                datetime.datetime.fromisoformat(
+                    pd.to_datetime(input_df_T[col].dropna()[0]).isoformat()
+                )
             )
         else:
             temp_df = input_df_T[col].dropna()
             temp_array = []
             for v in temp_df.values:
                 if ":" in v:
-                    if len(v) == 8:
+                    if len(v) == 7:
+                        obj = (
+                            datetime.time.fromisoformat(
+                                pd.to_datetime(v).strftime("%H:%M:%S")
+                            )
+                        )
+                    elif len(v) == 8:
                         obj = datetime.time.fromisoformat(v)
                     elif len(v) > 8:
-                        obj = datetime.datetime.fromisoformat(v)
+                        obj = (
+                            datetime.datetime.fromisoformat(
+                                pd.to_datetime(v).isoformat()
+                            )
+                        )
                     else:
                         obj = np.safe_eval(v)
                 elif "DoseType" in v:
@@ -261,3 +280,13 @@ newest_loop_output = update(from_file_dict)
 
 # TODO: make this a test, should be something like:
 assert(loop_output == newest_loop_output)
+
+# test using custom input templates
+cutom_scenario_files = [
+    "custom-scenario-table-template-simple.csv",
+    "custom-scenario-table-template-complex.csv",
+]
+table_path_name = os.path.join(path, cutom_scenario_files[0])
+custom_table_df = pd.read_csv(table_path_name, index_col=0)
+cumstom_file_dict = input_table_to_dict(custom_table_df)
+custom_output = update(cumstom_file_dict)

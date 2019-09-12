@@ -481,9 +481,10 @@ def prepare_suspend(suspend_threshold):
 cutom_scenario_files = [
     "custom-scenario-table-template-simple.csv",
     "custom-scenario-table-template-complex.csv",
+    "custom-scenario-table-example-3.csv",
 ]
 path = os.path.join(".", "example_files")
-table_path_name = os.path.join(path, cutom_scenario_files[0])
+table_path_name = os.path.join(path, cutom_scenario_files[2])
 custom_table_df = pd.read_csv(table_path_name, index_col=0)
 inputs = input_table_to_dict(custom_table_df)
 # first make sure that the scenario runs

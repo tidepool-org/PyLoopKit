@@ -15,8 +15,6 @@ import plotly.graph_objs as go
 from plotly.offline import plot
 
 
-
-
 # %% functions
 def get_bg_colors(df):
     df['bg_colors'] = 'mediumaquamarine'
@@ -77,6 +75,8 @@ def prepare_bg(df):
         ayref="y2",
         ay=425
     )
+
+    df_trace.yaxis = "y2"
 
     return df, df_trace, df_axis, df_annotations
 
@@ -171,32 +171,8 @@ def prepare_basal(basal_rates, df_dose, contig_ts):
         df.loc[df["delivered"].isnull(), "basal_rate_values"]
     )
 
-    # downsample basal
+    # downsample
     df = downsample(df, current_time, freq="5min")
-#    basal_range = pd.date_range(
-#        df["datetime"].min(),
-#        current_time,
-#        freq="5min"
-#    )
-#
-#    basal_ts = pd.DataFrame(basal_range, columns=["datetime"])
-#    df = pd.merge(basal_ts, df, on="datetime", how="left")
-#
-#    # add back in the current time
-#    last_index = df.index.max()
-#    df.loc[last_index + 1, :] = df.loc[last_index, :]
-#    df.loc[last_index + 1, "datetime"] = current_time
-
-#    import pdb
-#    pdb.set_trace()
-#    df.loc[last_index + 1, "datetime"] = current_time
-#    df.loc[last_index + 1, "basal_rate_values"] = (
-#        df.loc[last_index, "basal_rate_values"]
-#    )
-#
-#    df.loc[last_index + 1, "tbr"] = df.loc[last_index, "tbr"]
-#    df.loc[last_index + 1, "delivered"] = df.loc[last_index, "delivered"]
-#    df.loc[last_index + 1, "type"] = df.loc[last_index, "type"]
 
     sbr_trace = go.Scattergl(
         name="scheduled basal rate",
@@ -212,7 +188,7 @@ def prepare_basal(basal_rates, df_dose, contig_ts):
     )
 
     basal_trace = go.Scatter(
-        name="delivered",
+        name="basal delivered",
         mode='lines',
         x=df["datetime"],
         y=df["delivered"],
@@ -224,27 +200,31 @@ def prepare_basal(basal_rates, df_dose, contig_ts):
         fill='tonexty'
     )
 
+    sbr_trace.yaxis = "y"
+    basal_trace.yaxis = "y"
+
     return df, sbr_trace, basal_trace
 
 
 def prepare_bolus(df_dose):
     unique_dose_types = df_dose["type"].unique()
     if "bolus" in unique_dose_types:
-        bolus = df_dose[df_dose["type"] == "bolus"]
+        df = df_dose[df_dose["type"] == "bolus"]
 
-        bolus_trace = go.Bar(
+        df_trace = go.Bar(
             name="bolus",
-            x=bolus["dose_start_times"],
-            y=bolus["dose_values"],
+            x=df["dose_start_times"],
+            y=df["dose_values"],
             hoverinfo="y+name",
             width=2000*60*10,
             marker=dict(color='cornflowerblue'),
             opacity=0.5
         )
     else:
-        bolus_trace = []
+        df_trace = []
 
-    return bolus, bolus_trace
+    df_trace.yaxis = "y"
+    return df, df_trace
 
 
 def prepare_carbs(df_events, df_ratios, continguous_ts):
@@ -268,7 +248,9 @@ def prepare_carbs(df_events, df_ratios, continguous_ts):
     )
 
     # add bolus height for figure
-    carb_df["bolus_height"] = carb_df["carb_values"] / carb_df["carb_ratio_values"]
+    carb_df["bolus_height"] = (
+        carb_df["carb_values"] / carb_df["carb_ratio_values"]
+    )
 
     # TODO: visualize the carb-to-insulin-ratio (cir)
     # in the meantime drop rows where grams is null
@@ -287,7 +269,123 @@ def prepare_carbs(df_events, df_ratios, continguous_ts):
         text=carb_df["carb_values"],
         textposition='middle center'
     )
+
+    df_trace.yaxis = "y"
+
     return carb_df, df_trace
+
+
+def prepare_target_range(df_target_range, continguous_ts):
+    df = pd.merge(
+        continguous_ts,
+        df_target_range,
+        left_on="time",
+        right_on="target_range_start_times",
+        how="left"
+    )
+    df["target_range_minimum_values"].fillna(method='ffill', inplace=True)
+    df["target_range_maximum_values"].fillna(method='ffill', inplace=True)
+    df.dropna(subset=['target_range_minimum_values'], inplace=True)
+
+    # downsample
+    df = downsample(df, current_time, freq="5min")
+
+    trace_top = go.Scatter(
+        name="target range",
+        mode='lines',
+        x=df["datetime"],
+        y=df["target_range_maximum_values"],
+        hoverinfo="y+name",
+        line=dict(
+            shape='vh',
+            color='lightskyblue',
+            width=5
+        ),
+        opacity=0.125
+    )
+
+    trace_bottom = go.Scatter(
+        showlegend=False,
+        name="target range",
+        mode='lines',
+        x=df["datetime"],
+        y=df["target_range_minimum_values"],
+        hoverinfo="y+name",
+        line=dict(
+            shape='vh',
+            color='lightskyblue',
+            width=5
+        ),
+        opacity=0.125
+    )
+
+    trace_top.yaxis = "y2"
+    trace_bottom.yaxis = "y2"
+
+    return df, trace_top, trace_bottom
+
+
+def prepare_insulin_axis(basal, bolus, carbs):
+
+    axis = dict(
+        domain=[0, 0.3],
+        range=[0, max(
+            basal["basal_rate_values"].max() + 1,
+            basal["tbr"].max() + 1,
+            carbs["bolus_height"].max() + 2,
+            bolus["dose_values"].max() + 2,
+        )],
+        fixedrange=True,
+        hoverformat=".2f",
+        showgrid=True,
+        gridcolor="#c0c0c0",
+        title=dict(
+            text="Insulin (U, U/hr)",
+            font=dict(
+                size=12
+            )
+        )
+    )
+
+    annotation = go.layout.Annotation(
+        x=current_time,
+        y=0,
+        xref="x",
+        yref="y",
+        text="current time",
+        showarrow=True,
+        arrowhead=1,
+        ax=0,
+        ayref="y",
+        ay=-1.5
+    )
+    return axis, annotation
+
+
+def prepare_layout(
+    current_time, top_axis, bottom_axis, top_annotation, bottom_annotation
+):
+    layout = go.Layout(
+        showlegend=True,
+        plot_bgcolor="white",
+        yaxis=bottom_axis,
+        yaxis2=top_axis,
+        xaxis=dict(
+            range=(
+                current_time - datetime.timedelta(hours=8),
+                current_time + datetime.timedelta(hours=4)
+            ),
+            showgrid=True,
+            gridcolor="#c0c0c0",
+        ),
+        annotations=[
+            top_annotation,
+            bottom_annotation
+        ],
+        dragmode="pan",
+        hovermode="x"
+    )
+    return layout
 
 
 # %% view the scenario
@@ -315,137 +413,44 @@ current_time = inputs.get("time_to_calculate_at")
 
 
 # %% blood glucose data
-bg_df, bg_trace, bg_axis, bg_annotations = prepare_bg(bg_df.copy())
-bg_trace.yaxis = "y2"
+bg_df, bg_trace, bg_axis, bg_annotation = prepare_bg(bg_df.copy())
 
 # create a contiguous time series for the other data types
 date_min = bg_df["glucose_dates"].min() - datetime.timedelta(days=1)
 continguous_ts = create_contiguous_ts(date_min, current_time)
 
-
-# %% dose data
-dose_events["type"] = dose_events["dose_types"].apply(convert_times_and_types)
-
-insulin_annotations = go.layout.Annotation(
-    x=current_time,
-    y=0,
-    xref="x",
-    yref="y",
-    text="current time",
-    showarrow=True,
-    arrowhead=1,
-    ax=0,
-    ayref="y",
-    ay=-1.5
+# get target range
+target_range, target_trace_top, target_trace_bottom = (
+    prepare_target_range(df_target_range, continguous_ts)
 )
+
+
+# %% insulin and carb data
+dose_events["type"] = dose_events["dose_types"].apply(convert_times_and_types)
 
 # bolus data
 bolus, bolus_trace = prepare_bolus(dose_events)
-bolus_trace.yaxis = "y"
 
 # basal data
 basal, scheduled_basal_trace, basal_delivered_trace = (
     prepare_basal(basal_rates, dose_events, continguous_ts)
 )
-scheduled_basal_trace.yaxis = "y"
-basal_delivered_trace.yaxis = "y"
 
-# Carb Data (CIR and Carb Events)
+# carb data (cir and carb events)
 carbs, carb_trace = prepare_carbs(carb_events, carb_ratios, continguous_ts)
-carb_trace.yaxis = "y"
 
-# get target range
+# prepare insulin axis
+insulin_axis, insulin_annotation = prepare_insulin_axis(basal, bolus, carbs)
 
-df = pd.merge(
-    continguous_ts,
-    df_target_range,
-    left_on="time",
-    right_on="target_range_start_times",
-    how="left"
-)
-df["target_range_minimum_values"].fillna(method='ffill', inplace=True)
-df["target_range_maximum_values"].fillna(method='ffill', inplace=True)
-df.dropna(subset=['target_range_minimum_values'], inplace=True)
 
-# downsample
-df = downsample(df, current_time, freq="5min")
-
-target_trace_top = go.Scatter(
-    name="target range",
-    mode='lines',
-    x=df["datetime"],
-    y=df["target_range_maximum_values"],
-    hoverinfo="y+name",
-    line=dict(
-        shape='vh',
-        color='lightskyblue',
-        width=5
-    ),
-#    fill='tonextx',
-    opacity=0.125
+# %% make figure
+fig_layout = prepare_layout(
+    current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation
 )
 
-target_trace_bottom = go.Scatter(
-    showlegend=False,
-    name="target range",
-    mode='lines',
-    x=df["datetime"],
-    y=df["target_range_minimum_values"],
-    hoverinfo="y+name",
-    line=dict(
-        shape='vh',
-        color='lightskyblue',
-        width=5
-    ),
-#    fill='tonexty',
-    opacity=0.125
-)
-
-target_trace_top.yaxis = "y2"
-target_trace_bottom.yaxis = "y2"
-
-layout = go.Layout(
-    showlegend=True,
-    plot_bgcolor="white",
-    yaxis=dict(
-        domain=[0, 0.3],
-        range=[0, max(
-            basal["basal_rate_values"].max() + 1,
-            basal["tbr"].max() + 1,
-            carbs["bolus_height"].max() + 2,
-            bolus["dose_values"].max() + 2,
-        )],
-        fixedrange=True,
-        hoverformat=".2f",
-        showgrid=True,
-        gridcolor="#c0c0c0",
-        title=dict(
-            text="Insulin (U, U/hr)",
-            font=dict(
-                size=12
-            )
-        )
-    ),
-    yaxis2=bg_axis,
-    xaxis=dict(
-        range=(
-            current_time - datetime.timedelta(hours=6),
-            current_time + datetime.timedelta(hours=6)
-        ),
-        showgrid=True,
-        gridcolor="#c0c0c0",
-    ),
-    annotations=[
-        bg_annotations,
-        insulin_annotations
-    ],
-    dragmode="pan",
-    hovermode="x"
-)
-
-data = [
-    bg_trace, bolus_trace, scheduled_basal_trace, basal_delivered_trace,
-    carb_trace, target_trace_top, target_trace_bottom
+traces = [
+    basal_delivered_trace, scheduled_basal_trace, bolus_trace,
+    carb_trace, target_trace_top, target_trace_bottom, bg_trace
 ]
-fig = go.Figure(data=data, layout=layout)
+fig = go.Figure(data=traces, layout=fig_layout)
 plot(fig)

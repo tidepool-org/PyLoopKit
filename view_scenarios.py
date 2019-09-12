@@ -123,7 +123,6 @@ def downsample(df, current_time, freq="5min"):
 
 
 def prepare_basal(basal_rates, df_dose, contig_ts):
-
     unique_dose_types = df_dose["type"].unique()
     df = pd.merge(
         contig_ts,
@@ -172,38 +171,42 @@ def prepare_basal(basal_rates, df_dose, contig_ts):
     )
 
     # downsample
-    df = downsample(df, current_time, freq="5min")
+    basal_df = downsample(df, current_time, freq="5min")
+    end_time = current_time + datetime.timedelta(days=1)
+    sbr_df = downsample(df, end_time, freq="5min")
 
     sbr_trace = go.Scattergl(
         name="scheduled basal rate",
         mode='lines',
-        x=df["datetime"],
-        y=df["basal_rate_values"],
+        x=sbr_df["datetime"],
+        y=sbr_df["basal_rate_values"],
         hoverinfo="y+name",
         line=dict(
             shape='vh',
             color='lightskyblue',
-            dash='dot'
+            dash='dash'
         )
     )
 
     basal_trace = go.Scatter(
         name="basal delivered",
         mode='lines',
-        x=df["datetime"],
-        y=df["delivered"],
+        x=basal_df["datetime"],
+        y=basal_df["delivered"],
         hoverinfo="y+name",
         line=dict(
             shape='vh',
-            color='lightskyblue'
+            color='lightskyblue',
+            width=0
         ),
-        fill='tonexty'
+        fill='tonexty',
+        opacity=0.5
     )
 
     sbr_trace.yaxis = "y"
     basal_trace.yaxis = "y"
 
-    return df, sbr_trace, basal_trace
+    return basal_df, sbr_trace, basal_trace, sbr_trace
 
 
 def prepare_bolus(df_dose):
@@ -288,7 +291,7 @@ def prepare_target_range(df_target_range, continguous_ts):
     df.dropna(subset=['target_range_minimum_values'], inplace=True)
 
     # downsample
-    df = downsample(df, current_time, freq="5min")
+    df = downsample(df, current_time + datetime.timedelta(days=1), freq="5min")
 
     trace_top = go.Scatter(
         name="target range",
@@ -373,7 +376,7 @@ def prepare_layout(
         xaxis=dict(
             range=(
                 current_time - datetime.timedelta(hours=8),
-                current_time + datetime.timedelta(hours=4)
+                current_time + datetime.timedelta(hours=6)
             ),
             showgrid=True,
             gridcolor="#c0c0c0",
@@ -386,6 +389,91 @@ def prepare_layout(
         hovermode="x"
     )
     return layout
+
+
+def prepare_loop_prediction(predicted_bg_dates, predicted_bg_values):
+    bg_prediction_trace = go.Scattergl(
+        name="predicted bg",
+        x=predicted_bg_dates,
+        y=predicted_bg_values,
+        hoverinfo="y+name",
+        mode='lines',
+        line=dict(
+            color="#5ac6fa",
+            dash="dot",
+        )
+    )
+    bg_prediction_trace.yaxis = "y2"
+
+    return bg_prediction_trace
+
+
+def prepare_loop_temp_basal(current_time, recommended_temp_basal):
+    if recommended_temp_basal is not None:
+        rec_temp_basal_rate = recommended_temp_basal[0]
+        rec_temp_basal_duration = recommended_temp_basal[1]
+    else:
+        rec_temp_basal_rate = basal.loc[basal.index.max(), "basal_rate_values"]
+        rec_temp_basal_duration = 30
+
+    rec_basal_trace = go.Scatter(
+        name="temp basal set",
+        mode='lines',
+        x=[
+           current_time,
+           current_time + datetime.timedelta(minutes=rec_temp_basal_duration),
+        ],
+        y=[rec_temp_basal_rate, rec_temp_basal_rate],
+        hoverinfo="y+name",
+        line=dict(
+            shape='vh',
+            color='#5ac6fa',
+            dash='dot'
+        ),
+        fill='tozeroy',
+    )
+
+    rec_basal_trace.yaxis = "y"
+
+    return rec_basal_trace
+
+
+def prepare_loop_bolus(recommended_bolus):
+    recommended_bolus_trace = go.Bar(
+        name="bolus recommended",
+        x=[current_time],
+        y=[recommended_bolus],
+        hoverinfo="y+name",
+        width=2000*60*10,
+        marker=dict(color='cornflowerblue'),
+        opacity=0.25
+    )
+
+    recommended_bolus_trace.yaxis = "y"
+
+    return recommended_bolus_trace
+
+
+def prepare_suspend(suspend_threshold):
+    df_trace = go.Scatter(
+        name="suspend threshold = {}".format(suspend_threshold),
+        mode='lines',
+        x=[
+           current_time - datetime.timedelta(days=1),
+           current_time + datetime.timedelta(days=1),
+        ],
+        y=[suspend_threshold, suspend_threshold],
+        hoverinfo="name",
+        line=dict(
+            shape='vh',
+            color='red',
+            dash='solid'
+        ),
+        opacity=0.375,
+    )
+    df_trace.yaxis = "y2"
+
+    return df_trace
 
 
 # %% view the scenario
@@ -417,12 +505,17 @@ bg_df, bg_trace, bg_axis, bg_annotation = prepare_bg(bg_df.copy())
 
 # create a contiguous time series for the other data types
 date_min = bg_df["glucose_dates"].min() - datetime.timedelta(days=1)
-continguous_ts = create_contiguous_ts(date_min, current_time)
+date_max = current_time + datetime.timedelta(days=1)
+continguous_ts = create_contiguous_ts(date_min, date_max)
 
-# get target range
+# target range
 target_range, target_trace_top, target_trace_bottom = (
     prepare_target_range(df_target_range, continguous_ts)
 )
+
+# suspend threshold
+suspend_threshold = inputs["settings_dictionary"]["suspend_threshold"]
+suspend_trace = prepare_suspend(suspend_threshold)
 
 
 # %% insulin and carb data
@@ -432,7 +525,7 @@ dose_events["type"] = dose_events["dose_types"].apply(convert_times_and_types)
 bolus, bolus_trace = prepare_bolus(dose_events)
 
 # basal data
-basal, scheduled_basal_trace, basal_delivered_trace = (
+basal, sbr, basal_delivered_trace, scheduled_basal_trace,  = (
     prepare_basal(basal_rates, dose_events, continguous_ts)
 )
 
@@ -443,14 +536,32 @@ carbs, carb_trace = prepare_carbs(carb_events, carb_ratios, continguous_ts)
 insulin_axis, insulin_annotation = prepare_insulin_axis(basal, bolus, carbs)
 
 
+# %% add loop prediction, temp basal, and bolus recommendation
+# loop prediction
+predicted_glucose_dates = loop_output.get("predicted_glucose_dates")
+predicted_glucose_values = loop_output.get("predicted_glucose_values")
+loop_prediction_trace = (
+    prepare_loop_prediction(predicted_glucose_dates, predicted_glucose_values)
+)
+
+# recommended temp basal
+loop_temp_basal = loop_output.get("recommended_temp_basal")
+loop_basal_trace = prepare_loop_temp_basal(current_time, loop_temp_basal)
+
+# recommended bolus
+loop_rec_bolus = loop_output.get("recommended_bolus")[0]
+loop_bolus_trace = prepare_loop_bolus(loop_rec_bolus)
+
+
 # %% make figure
 fig_layout = prepare_layout(
     current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation
 )
 
 traces = [
-    basal_delivered_trace, scheduled_basal_trace, bolus_trace,
-    carb_trace, target_trace_top, target_trace_bottom, bg_trace
+    basal_delivered_trace, scheduled_basal_trace, bolus_trace, carb_trace,
+    loop_bolus_trace, loop_basal_trace, loop_prediction_trace, suspend_trace,
+    target_trace_top, target_trace_bottom, bg_trace
 ]
 fig = go.Figure(data=traces, layout=fig_layout)
 plot(fig)

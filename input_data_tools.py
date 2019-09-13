@@ -10,8 +10,7 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from pyloop_parser import parse_report_and_run
-from loop_data_manager import update
+
 from dose import DoseType
 
 
@@ -218,80 +217,81 @@ def input_table_to_dict(input_df):
     return dict_
 
 
-# %% load in example file(s)
-''''select the exmaple file you want to run/test'''
-# TODO: Russ, can you make this a test, could run through all 3 examples
-# and the functions should all pass
-example_files = [
-    "example_issue_report_1.json",
-    "example_issue_report_2.json",
-    "example_issue_report_3.json"
-]
-
-name = example_files[2]
-path = os.path.join(".", "example_files")
-
-# run the Loop algorithm with the issue report data
-loop_output = parse_report_and_run(path, name)
-
-# get just the input data
-input_data = loop_output.get("input_data")
-
-# double check that the input data can be used to re-run the scenario
-new_loop_output = update(input_data)
-
-# TODO: make this a test, should be something like:
-assert(loop_output == new_loop_output)
-
-
 # %% test the functions
-'''test dict_inputs_to_dataframes & dataframe_inputs_to_dict:
-    the input dictionaries should be the same after converting to
-    dataframes and then back to one dictionary
-'''
-# convert dict_inputs_to_dataframes
-(
- df_basal_rate, df_carb, df_carb_ratio, df_dose, df_glucose,
- df_last_temporary_basal, df_misc, df_sensitivity_ratio,
- df_settings, df_target_range
-) = dict_inputs_to_dataframes(input_data)
+def test_functions():
+    from pyloop_parser import parse_report_and_run
+    from loop_data_manager import update
+    # load in example file(s)
+    ''''select the example file you want to run/test'''
+    # TODO: make this a test, could run through all 3 examples
+    # and the functions should all pass
 
-input_dataframes = [
-   df_basal_rate, df_carb, df_carb_ratio, df_dose, df_glucose,
-   df_last_temporary_basal, df_sensitivity_ratio, df_target_range
-]
+    example_files = [
+        "example_issue_report_1.json",
+        "example_issue_report_2.json",
+        "example_issue_report_3.json"
+    ]
+    for i in range(0, len(example_files)):
+        name = example_files[i]
+        path = os.path.join(".", "example_files")
 
-# convert dataframe_inputs_to_dict
-input_dict = dataframe_inputs_to_dict(input_dataframes, df_misc, df_settings)
-# TODO: make this a test, should be something like:
-assert(input_dict == input_data)
+        # run the Loop algorithm with the issue report data
+        loop_output = parse_report_and_run(path, name)
 
-'''test input_dict_to_one_dataframe & input_table_to_dict
-'''
-big_df = input_dict_to_one_dataframe(input_data)
-table_name = name + "-input_data_table.csv"
-table_path_name = os.path.join(path, table_name)
-big_df.to_csv(table_path_name)
+        # get just the input data
+        input_data = loop_output.get("input_data")
 
-# let's load the data in from file and get it back in the right format
-# so we know that this will work for when we have custom files
-input_table_df = pd.read_csv(table_path_name, index_col=0)
-from_file_dict = input_table_to_dict(input_table_df)
+        # double check that the input data can be used to re-run the scenario
+        new_loop_output = update(input_data)
 
-assert(from_file_dict == input_data)
+        # TODO: make this a test, should be something like:
+        assert(loop_output == new_loop_output)
 
-# triple check that the input data from file can be used to re-run the scenario
-newest_loop_output = update(from_file_dict)
+        # test the functions
+        '''test dict_inputs_to_dataframes & dataframe_inputs_to_dict:
+            the input dictionaries should be the same after converting to
+            dataframes and then back to one dictionary
+        '''
+        # convert dict_inputs_to_dataframes
+        (
+         df_basal_rate, df_carb, df_carb_ratio, df_dose, df_glucose,
+         df_last_temporary_basal, df_misc, df_sensitivity_ratio,
+         df_settings, df_target_range
+        ) = dict_inputs_to_dataframes(input_data)
 
-# TODO: make this a test, should be something like:
-assert(loop_output == newest_loop_output)
+        input_dataframes = [
+           df_basal_rate, df_carb, df_carb_ratio, df_dose, df_glucose,
+           df_last_temporary_basal, df_sensitivity_ratio, df_target_range
+        ]
 
-# test using custom input templates
-cutom_scenario_files = [
-    "custom-scenario-table-template-simple.csv",
-    "custom-scenario-table-template-complex.csv",
-]
-table_path_name = os.path.join(path, cutom_scenario_files[0])
-custom_table_df = pd.read_csv(table_path_name, index_col=0)
-cumstom_file_dict = input_table_to_dict(custom_table_df)
-custom_output = update(cumstom_file_dict)
+        # convert dataframe_inputs_to_dict
+        input_dict = dataframe_inputs_to_dict(
+            input_dataframes, df_misc, df_settings
+        )
+        # TODO: make this a test, should be something like:
+        assert(input_dict == input_data)
+
+        '''test input_dict_to_one_dataframe & input_table_to_dict
+        '''
+        big_df = input_dict_to_one_dataframe(input_data)
+        table_name = name + "-input_data_table.csv"
+        table_path_name = os.path.join(path, table_name)
+        big_df.to_csv(table_path_name)
+
+        # let's load the data in from file and get it back in the right format
+        # so we know that this will work for when we have custom files
+        input_table_df = pd.read_csv(table_path_name, index_col=0)
+        from_file_dict = input_table_to_dict(input_table_df)
+
+        assert(from_file_dict == input_data)
+
+        # triple check that the input data from file
+        # can be used to re-run the scenario
+        newest_loop_output = update(from_file_dict)
+
+        # TODO: make this a test, should be something like:
+        assert(loop_output == newest_loop_output)
+
+        print("test passed using {}".format(name))
+
+    return

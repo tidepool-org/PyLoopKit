@@ -323,41 +323,69 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
     df.dropna(subset=['target_range_minimum_values'], inplace=True)
 
     # downsample
-    df = downsample(df, current_time + datetime.timedelta(days=1), freq="5min")
+    target = df[df["target_range_value_units"].notnull()].copy()
+    target.reset_index(drop=True, inplace=True)
 
-    trace_top = go.Scatter(
-        name="target range",
-        mode='lines',
-        x=df["datetime"],
-        y=df["target_range_maximum_values"],
-        hoverinfo="y+name",
-        line=dict(
-            shape='vh',
-            color='lightskyblue',
-            width=5
-        ),
-        opacity=0.125
-    )
+    target_traces = []
+    for i in range(0, len(target)):
+        min_val = target["target_range_minimum_values"][i]
+        max_val = target["target_range_maximum_values"][i]
+        if max_val - min_val < 5:
+            width = 5
+        else:
+            width = 1
 
-    trace_bottom = go.Scatter(
-        showlegend=False,
-        name="target range",
-        mode='lines',
-        x=df["datetime"],
-        y=df["target_range_minimum_values"],
-        hoverinfo="y+name",
-        line=dict(
-            shape='vh',
-            color='lightskyblue',
-            width=5
-        ),
-        opacity=0.125
-    )
+        if i < len(target)-1:
+            legend_on = False
+            x_vals = [
+                target["datetime"][i],
+                target["datetime"][i],
+                target["datetime"][i+1],
+                target["datetime"][i+1],
+                target["datetime"][i]
+            ]
 
-    trace_top.yaxis = "y2"
-    trace_bottom.yaxis = "y2"
+            y_vals = [
+                min_val,
+                max_val,
+                max_val,
+                min_val,
+                min_val
+            ]
 
-    return df, trace_top, trace_bottom
+        else:
+            legend_on = True
+            x_vals = [
+                target["datetime"][i],
+                target["datetime"][i]
+            ]
+
+            y_vals = [
+                min_val,
+                max_val,
+            ]
+
+        tmp_trace = go.Scatter(
+            name="target_range",
+            legendgroup="target_range",
+            showlegend=legend_on,
+            mode='lines',
+            x=x_vals,
+            y=y_vals,
+            hoverinfo="none",
+            line=dict(
+                shape='vh',
+                width=width,
+                color="rgba(152, 134, 207, 0.25)"
+            ),
+            fill="tonext",
+            fillcolor="rgba(152, 134, 207, 0.125)",
+        )
+
+        tmp_trace.yaxis = "y2"
+        target_traces.append(tmp_trace)
+
+    return df, target_traces
 
 
 def prepare_insulin_axis(basal, bolus, carbs, current_time):
@@ -531,7 +559,7 @@ def make_scenario_figure(loop_output):
     continguous_ts = create_contiguous_ts(date_min, date_max)
 
     # target range
-    target_range, target_trace_top, target_trace_bottom = (
+    target_range, target_traces = (
         prepare_target_range(df_target_range, continguous_ts, current_time)
     )
 
@@ -584,11 +612,14 @@ def make_scenario_figure(loop_output):
     )
 
     traces = []
+    traces.append(bg_trace)
+    traces.extend(target_traces)
     traces.extend([
-        bg_trace, target_trace_bottom, target_trace_top, suspend_trace,
+        suspend_trace,
         loop_prediction_trace, loop_basal_trace, loop_bolus_trace,
         carb_trace, bolus_trace
     ])
+
     traces.extend(scheduled_basal_traces)
     traces.extend(basal_delivered_traces)
 
@@ -611,7 +642,7 @@ def view_example():
         "hypothetical-scenario-1.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[3])
+    table_path_name = os.path.join(path, cutom_scenario_files[1])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

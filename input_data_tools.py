@@ -10,7 +10,6 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-
 from dose import DoseType
 
 
@@ -295,3 +294,7 @@ def test_functions():
         print("test passed using {}".format(name))
 
     return
+
+
+if __name__ == "__main__":
+    test_functions()

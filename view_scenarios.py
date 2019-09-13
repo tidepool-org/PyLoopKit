@@ -14,22 +14,7 @@ import plotly.graph_objs as go
 
 
 # %% functions
-def get_bg_colors(df):
-    df['bg_colors'] = 'mediumaquamarine'
-    df.loc[df['glucose_values'] < 54, 'bg_colors'] = 'indianred'
-    low_location = (df['glucose_values'] > 54) & (df['glucose_values'] < 70)
-    df.loc[low_location, 'bg_colors'] = 'lightcoral'
-    high_location = (
-        (df['glucose_values'] > 180) & (df['glucose_values'] <= 250)
-    )
-    df.loc[high_location, 'bg_colors'] = 'mediumpurple'
-    df.loc[(df['glucose_values'] > 250), 'bg_colors'] = 'slateblue'
-
-    return df
-
-
 def prepare_bg(df, current_time):
-    df = get_bg_colors(df)
 
     df_trace = go.Scattergl(
         name="bg",
@@ -40,7 +25,7 @@ def prepare_bg(df, current_time):
         marker=dict(
             size=6,
             line=dict(width=0),
-            color=df["bg_colors"]
+            color="#9886CF"
         )
     )
 

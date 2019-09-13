@@ -120,6 +120,70 @@ def downsample(df, current_time, freq="5min"):
     return df
 
 
+def make_basal_traces(df, value_name, trace_name):
+    if "scheduled" in trace_name:
+        dash = "dot"
+        width = 1
+        fill = 'none'
+        opacity = 0.75
+    else:
+        dash = "solid"
+        width = 0
+        fill = 'tozeroy'
+        opacity = 0.25
+
+    b_traces = []
+    for i in range(0, len(df)):
+
+        if i < len(df)-1:
+            legend_on = False
+            x_vals = [
+                df["datetime"][i],
+                df["datetime"][i+1],
+                df["datetime"][i+1],
+            ]
+
+            y_vals = [
+                df[value_name][i],
+                df[value_name][i],
+                df[value_name][i+1],
+            ]
+
+        else:
+            legend_on = True
+            x_vals = [
+                df["datetime"][i],
+            ]
+
+            y_vals = [
+                df[value_name][i],
+            ]
+
+        tmp_trace = go.Scatter(
+            name=trace_name,
+            legendgroup=trace_name,
+            showlegend=legend_on,
+            mode='lines',
+            x=x_vals,
+            y=y_vals,
+            hoverinfo="none",
+            line=dict(
+                shape='vh',
+                color='#5691F0',
+                dash=dash,
+                width=width,
+            ),
+            fill=fill,
+            opacity=opacity
+        )
+
+        tmp_trace.yaxis = "y"
+
+        b_traces.append(tmp_trace)
+
+    return b_traces
+
+
 def prepare_basal(basal_rates, df_dose, contig_ts, current_time):
     unique_dose_types = df_dose["type"].unique()
     df = pd.merge(
@@ -168,74 +232,28 @@ def prepare_basal(basal_rates, df_dose, contig_ts, current_time):
         df.loc[df["delivered"].isnull(), "basal_rate_values"]
     )
 
-    # downsample
-    basal_df = downsample(df, current_time, freq="5min")
+    # preapre scheduled basal rate
     sbr_df = df[df["basal_rate_start_times"].notnull()].copy()
     sbr_df.reset_index(drop=True, inplace=True)
 
-    sbr_traces = []
-    for i in range(0, len(sbr_df)):
-
-        if i < len(sbr_df)-1:
-            legend_on = False
-            x_vals = [
-                sbr_df["datetime"][i],
-                sbr_df["datetime"][i+1],
-                sbr_df["datetime"][i+1],
-            ]
-
-            y_vals = [
-                sbr_df["basal_rate_values"][i],
-                sbr_df["basal_rate_values"][i],
-                sbr_df["basal_rate_values"][i+1],
-            ]
-
-        else:
-            legend_on = True
-            x_vals = [
-                sbr_df["datetime"][i],
-            ]
-
-            y_vals = [
-                sbr_df["basal_rate_values"][i],
-            ]
-
-        tmp_trace = go.Scatter(
-            name="scheduled basal rate",
-            legendgroup="sbr",
-            showlegend=legend_on,
-            mode='lines',
-            x=x_vals,
-            y=y_vals,
-            hoverinfo="y",
-            line=dict(
-                shape='vh',
-                color='#5ac6fa',
-                dash='dot'
-            ),
-        )
-        tmp_trace.yaxis = "y"
-
-        sbr_traces.append(tmp_trace)
-
-    basal_trace = go.Scatter(
-        name="basal delivered",
-        mode='lines',
-        x=basal_df["datetime"],
-        y=basal_df["delivered"],
-        hoverinfo="y+name",
-        line=dict(
-            shape='vh',
-            color='lightskyblue',
-            width=0
-        ),
-        fill='tonexty',
-        opacity=0.5
+    sbr_traces = (
+        make_basal_traces(sbr_df, "basal_rate_values", "scheduled basal rate")
     )
 
-    basal_trace.yaxis = "y"
+    # prepare basal delivered
+    basal_df = df[df["datetime"] <= current_time].copy()
+    basal_df["transition"] = (
+        basal_df["delivered"] != basal_df["delivered"].shift(1)
+    )
+    basal_df.loc[basal_df.index.max(), "transition"] = True
+    basal_df = basal_df[basal_df["transition"]]
+    basal_df.reset_index(drop=True, inplace=True)
 
-    return basal_df, sbr_df, basal_trace, sbr_traces
+    basal_traces = (
+        make_basal_traces(basal_df, "delivered", "basal delivered")
+    )
+
+    return basal_df, sbr_df, basal_traces, sbr_traces
 
 
 def prepare_bolus(df_dose):
@@ -545,13 +563,7 @@ def make_scenario_figure(loop_output):
     bolus, bolus_trace = prepare_bolus(dose_events)
 
     # basal data
-    basal_rates["basal_rate_end_times"] = (
-        basal_rates["basal_rate_start_times"].shift(-1).fillna(
-            datetime.time(0, 0)
-        )
-    )
-
-    basal, sbr, basal_delivered_trace, scheduled_basal_trace,  = (
+    basal, sbr, basal_delivered_traces, scheduled_basal_traces,  = (
         prepare_basal(basal_rates, dose_events, continguous_ts, current_time)
     )
 
@@ -587,13 +599,13 @@ def make_scenario_figure(loop_output):
     )
 
     traces = []
-    traces.append(basal_delivered_trace)
-    traces.extend(scheduled_basal_trace)
     traces.extend([
-        bolus_trace, carb_trace,
-        loop_bolus_trace, loop_basal_trace, loop_prediction_trace,
-        suspend_trace, target_trace_top, target_trace_bottom, bg_trace
+        bg_trace, target_trace_bottom, target_trace_top, suspend_trace,
+        loop_prediction_trace, loop_basal_trace, loop_bolus_trace,
+        carb_trace, bolus_trace
     ])
+    traces.extend(scheduled_basal_traces)
+    traces.extend(basal_delivered_traces)
 
     fig = go.Figure(data=traces, layout=fig_layout)
 
@@ -614,7 +626,7 @@ def view_example():
         "hypothetical-scenario-1.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[1])
+    table_path_name = os.path.join(path, cutom_scenario_files[3])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

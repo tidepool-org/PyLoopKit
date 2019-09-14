@@ -538,7 +538,7 @@ def prepare_loop_bolus(recommended_bolus, current_time):
 
 def prepare_suspend(suspend_threshold, current_time):
     df_trace = go.Scatter(
-        name="suspend threshold = {}".format(suspend_threshold),
+        name="suspend threshold = {} mg/dL".format(suspend_threshold),
         mode='lines',
         x=[
            current_time - datetime.timedelta(days=1),
@@ -634,11 +634,10 @@ def make_scenario_figure(loop_output):
     )
 
     traces = []
-    traces.append(bg_trace)
+    traces.extend([bg_trace, loop_prediction_trace])
     traces.extend(target_traces)
     traces.extend([
-        suspend_trace,
-        loop_prediction_trace, loop_basal_trace, loop_bolus_trace,
+        suspend_trace, loop_basal_trace, loop_bolus_trace,
         carb_trace, bolus_trace
     ])
     traces.extend(scheduled_basal_traces)
@@ -663,7 +662,7 @@ def view_example():
         "hypothetical-scenario-1.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[2])
+    table_path_name = os.path.join(path, cutom_scenario_files[0])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

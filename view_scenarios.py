@@ -448,6 +448,7 @@ def prepare_layout(
         dragmode="pan",
         hovermode="x"
     )
+
     return layout
 
 
@@ -523,13 +524,13 @@ def prepare_suspend(suspend_threshold, current_time):
            current_time + datetime.timedelta(days=1),
         ],
         y=[suspend_threshold, suspend_threshold],
-        hoverinfo="name",
+        hoverinfo="none",
         line=dict(
             shape='vh',
             color='red',
             dash='solid'
         ),
-        opacity=0.375,
+        opacity=0.25,
     )
     df_trace.yaxis = "y2"
 

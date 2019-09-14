@@ -159,7 +159,7 @@ def make_basal_traces(df, value_name, trace_name):
                 width=width,
             ),
             fill=fill,
-            opacity=opacity
+            fillcolor='rgba(86,145,240,{})'.format(opacity)
         )
 
         tmp_trace.yaxis = "y"
@@ -296,12 +296,13 @@ def prepare_carbs(df_events, df_ratios, continguous_ts):
         name="carbs",
         mode='markers + text',
         x=carb_df["datetime"],
-        y=carb_df["bolus_height"] + 0.5,
+        y=carb_df["bolus_height"] + 0.75,
         hoverinfo="name",
         marker=dict(
-            color='gold',
+            color="#0AA648",
             size=25
         ),
+        opacity=0.75,
         text=carb_df["carb_values"],
         textposition='middle center'
     )
@@ -461,8 +462,8 @@ def prepare_loop_prediction(predicted_bg_dates, predicted_bg_values):
         hoverinfo="y+name",
         mode='lines',
         line=dict(
-            color="#5ac6fa",
-            dash="dot",
+            color="#9886CF",
+            dash="longdash",
         )
     )
     bg_prediction_trace.yaxis = "y2"
@@ -479,7 +480,7 @@ def prepare_loop_temp_basal(basal, current_time, recommended_temp_basal):
         rec_temp_basal_duration = 30
 
     rec_basal_trace = go.Scatter(
-        name="temp basal set",
+        name="temp basal set = {} U/hr".format(rec_temp_basal_rate),
         mode='lines',
         x=[
            current_time,
@@ -489,8 +490,8 @@ def prepare_loop_temp_basal(basal, current_time, recommended_temp_basal):
         hoverinfo="y+name",
         line=dict(
             shape='vh',
-            color='#5ac6fa',
-            dash='dot'
+            color='#5691F0',
+            dash='solid'
         ),
         fill='tozeroy',
     )
@@ -501,19 +502,38 @@ def prepare_loop_temp_basal(basal, current_time, recommended_temp_basal):
 
 
 def prepare_loop_bolus(recommended_bolus, current_time):
-    recommended_bolus_trace = go.Bar(
-        name="bolus recommended",
+
+    df_trace = go.Scatter(
+        name="recommended bolus = {} U".format(recommended_bolus),
+        showlegend=True,
+        mode='markers',
         x=[current_time],
-        y=[recommended_bolus],
-        hoverinfo="y+name",
-        width=2000*60*10,
-        marker=dict(color='cornflowerblue'),
-        opacity=0.25
+        y=[recommended_bolus+0.25],
+        hoverinfo="text",
+        hovertext=["{} rec. bolus".format(recommended_bolus)],
+        marker=dict(
+            symbol='triangle-down-open',
+            size=15,
+            color="#5691F0"
+        ),
     )
 
-    recommended_bolus_trace.yaxis = "y"
+    df_trace.yaxis = "y"
 
-    return recommended_bolus_trace
+
+#    recommended_bolus_trace = go.Bar(
+#        name="recommended bolus",
+#        x=[current_time],
+#        y=[recommended_bolus],
+#        hoverinfo="y+name",
+#        width=2000*60*10,
+#        marker=dict(color='cornflowerblue'),
+#        opacity=0.25
+#    )
+#
+#    recommended_bolus_trace.yaxis = "y"
+
+    return df_trace
 
 
 def prepare_suspend(suspend_threshold, current_time):
@@ -643,7 +663,7 @@ def view_example():
         "hypothetical-scenario-1.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[3])
+    table_path_name = os.path.join(path, cutom_scenario_files[2])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

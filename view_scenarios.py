@@ -242,23 +242,24 @@ def prepare_basal(basal_rates, df_dose, contig_ts, current_time):
 
 
 def prepare_bolus(df_dose):
-    unique_dose_types = df_dose["type"].unique()
-    if "bolus" in unique_dose_types:
-        df = df_dose[df_dose["type"] == "bolus"]
+    df = df_dose[df_dose["type"] == "bolus"]
 
-        df_trace = go.Bar(
-            name="bolus",
-            x=df["dose_start_times"],
-            y=df["dose_values"],
-            hoverinfo="y+name",
-            width=2000*60*10,
-            marker=dict(color='cornflowerblue'),
-            opacity=0.5
-        )
-    else:
-        df_trace = []
+    df_trace = go.Scatter(
+        name="bolus",
+        showlegend=True,
+        mode='markers',
+        x=df["dose_start_times"],
+        y=df["dose_values"],
+        hoverinfo="y+name",
+        marker=dict(
+            symbol='triangle-down',
+            size=15,
+            color="#5691F0"
+        ),
+    )
 
     df_trace.yaxis = "y"
+
     return df, df_trace
 
 
@@ -573,13 +574,13 @@ def make_scenario_figure(loop_output):
         dose_events["dose_types"].apply(convert_times_and_types)
     )
 
-    # bolus data
-    bolus, bolus_trace = prepare_bolus(dose_events)
-
     # basal data
     basal, sbr, basal_delivered_traces, scheduled_basal_traces,  = (
         prepare_basal(basal_rates, dose_events, continguous_ts, current_time)
     )
+
+    # bolus data
+    bolus, bolus_trace = prepare_bolus(dose_events)
 
     # carb data (cir and carb events)
     carbs, carb_trace = prepare_carbs(carb_events, carb_ratios, continguous_ts)
@@ -620,7 +621,6 @@ def make_scenario_figure(loop_output):
         loop_prediction_trace, loop_basal_trace, loop_bolus_trace,
         carb_trace, bolus_trace
     ])
-
     traces.extend(scheduled_basal_traces)
     traces.extend(basal_delivered_traces)
 
@@ -643,7 +643,7 @@ def view_example():
         "hypothetical-scenario-1.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[1])
+    table_path_name = os.path.join(path, cutom_scenario_files[3])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

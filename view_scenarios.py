@@ -30,7 +30,7 @@ def prepare_bg(df, current_time):
     )
 
     df_axis = dict(
-            domain=[0.4, 1],
+            domain=[0.5, 1],
             range=[0, 400],
             tickvals=[-100, 40, 70, 180, 250, 400],
             fixedrange=True,
@@ -41,7 +41,7 @@ def prepare_bg(df, current_time):
             title=dict(
                 text="Blood Glucose (mg/dL)",
                 font=dict(
-                    size=12
+                    size=11
                 )
             )
         )
@@ -51,7 +51,7 @@ def prepare_bg(df, current_time):
         y=df["glucose_values"].values[-1] + 10,
         xref="x",
         yref="y2",
-        text="current time",
+        text="evaluation point",
         showarrow=True,
         arrowhead=1,
         ax=0,
@@ -253,7 +253,7 @@ def prepare_bolus(df_dose):
         hoverinfo="y+name",
         marker=dict(
             symbol='triangle-down',
-            size=15,
+            size=15 + df["dose_values"],
             color="#5691F0"
         ),
     )
@@ -322,6 +322,7 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
     )
     df["target_range_minimum_values"].fillna(method='ffill', inplace=True)
     df["target_range_maximum_values"].fillna(method='ffill', inplace=True)
+    target_at_eval_df = df[df["datetime"] == current_time]
     df.dropna(subset=['target_range_minimum_values'], inplace=True)
 
     # downsample
@@ -368,7 +369,10 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
             ]
 
         tmp_trace = go.Scatter(
-            name="target_range",
+            name="target at eval {}-{} mg/dL".format(
+                int(target_at_eval_df["target_range_minimum_values"].values[0]),
+                int(target_at_eval_df["target_range_maximum_values"].values[0])
+            ),
             legendgroup="target_range",
             showlegend=legend_on,
             mode='lines',
@@ -392,14 +396,16 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
 
 def prepare_insulin_axis(basal, bolus, carbs, current_time):
 
+    max_value = max(
+        basal["basal_rate_values"].max() + 1,
+        basal["tbr"].max() + 1,
+        carbs["bolus_height"].max() + 2,
+        bolus["dose_values"].max() + 2,
+    )
+
     axis = dict(
-        domain=[0, 0.3],
-        range=[0, max(
-            basal["basal_rate_values"].max() + 1,
-            basal["tbr"].max() + 1,
-            carbs["bolus_height"].max() + 2,
-            bolus["dose_values"].max() + 2,
-        )],
+        domain=[0, 0.2],
+        range=[0, max_value],
         fixedrange=True,
         hoverformat=".2f",
         showgrid=True,
@@ -407,51 +413,24 @@ def prepare_insulin_axis(basal, bolus, carbs, current_time):
         title=dict(
             text="Insulin (U, U/hr)",
             font=dict(
-                size=12
+                size=10
             )
         )
     )
 
     annotation = go.layout.Annotation(
         x=current_time,
-        y=0,
+        y=max_value - 0.25,
         xref="x",
         yref="y",
-        text="current time",
+        text="evaluation point",
         showarrow=True,
         arrowhead=1,
         ax=0,
         ayref="y",
-        ay=-1.5
+        ay=max_value + 0.25
     )
     return axis, annotation
-
-
-def prepare_layout(
-    current_time, top_axis, bottom_axis, top_annotation, bottom_annotation
-):
-    layout = go.Layout(
-        showlegend=True,
-        plot_bgcolor="white",
-        yaxis=bottom_axis,
-        yaxis2=top_axis,
-        xaxis=dict(
-            range=(
-                current_time - datetime.timedelta(hours=8),
-                current_time + datetime.timedelta(hours=6)
-            ),
-            showgrid=True,
-            gridcolor="#c0c0c0",
-        ),
-        annotations=[
-            top_annotation,
-            bottom_annotation
-        ],
-        dragmode="pan",
-        hovermode="x"
-    )
-
-    return layout
 
 
 def prepare_loop_prediction(predicted_bg_dates, predicted_bg_values):
@@ -510,28 +489,15 @@ def prepare_loop_bolus(recommended_bolus, current_time):
         x=[current_time],
         y=[recommended_bolus+0.25],
         hoverinfo="text",
-        hovertext=["{} rec. bolus".format(recommended_bolus)],
+        hovertext=["{} rec bolus".format(recommended_bolus)],
         marker=dict(
             symbol='triangle-down-open',
-            size=15,
+            size=10 + recommended_bolus,
             color="#5691F0"
         ),
     )
 
     df_trace.yaxis = "y"
-
-
-#    recommended_bolus_trace = go.Bar(
-#        name="recommended bolus",
-#        x=[current_time],
-#        y=[recommended_bolus],
-#        hoverinfo="y+name",
-#        width=2000*60*10,
-#        marker=dict(color='cornflowerblue'),
-#        opacity=0.25
-#    )
-#
-#    recommended_bolus_trace.yaxis = "y"
 
     return df_trace
 
@@ -556,6 +522,129 @@ def prepare_suspend(suspend_threshold, current_time):
     df_trace.yaxis = "y2"
 
     return df_trace
+
+
+def prepare_insulin_effect_onboard_trace(
+        loop_output, bolus, isf, continguous_ts
+):
+    insulin_effect_df = pd.DataFrame()
+    insulin_effect_df["insulin_effect_dates"] = (
+        loop_output["historical_insulin_effect_dates"]
+    )
+    insulin_effect_df["insulin_effect_values"] = (
+        loop_output["historical_insulin_effect_values"]
+    )
+    insulin_effect_df["delta"] = (
+        insulin_effect_df["insulin_effect_values"]
+        - insulin_effect_df["insulin_effect_values"].shift(1)
+    )
+
+    # get bolus and isf time series
+    df = pd.merge(
+        continguous_ts,
+        bolus,
+        left_on="datetime",
+        right_on="dose_start_times",
+        how="left"
+    )
+
+    # add isf time series
+    df = pd.merge(
+        df,
+        isf,
+        left_on="time",
+        right_on="sensitivity_ratio_start_times",
+        how="left"
+    )
+
+    df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
+
+    df["total_effect"] = (
+        df["dose_values"] * df["sensitivity_ratio_values"]
+    )
+
+    df = df.dropna(subset=['total_effect'])
+
+    insulin_effect_onboard_df = pd.merge(
+        df,
+        insulin_effect_df.rename(columns={"insulin_effect_dates": "datetime"}),
+        on="datetime",
+        how="outer"
+    )
+
+    insulin_effect_onboard_df["total_effect"].fillna(0, inplace=True)
+    insulin_effect_onboard_df.sort_values("datetime", inplace=True)
+    insulin_effect_onboard_df.reset_index(drop=True, inplace=True)
+
+    insulin_effect_onboard_df["temp"] = (
+        insulin_effect_onboard_df["total_effect"]
+        + insulin_effect_onboard_df["delta"].fillna(0)
+    )
+
+    insulin_effect_onboard_df["values"] = (
+        insulin_effect_onboard_df["temp"].cumsum()
+    )
+
+    df_trace = go.Scatter(
+        name="insulin effect on board",
+        mode='lines',
+        x=insulin_effect_onboard_df["datetime"],
+        y=insulin_effect_onboard_df["values"],
+        hoverinfo="y+name",
+        line=dict(
+            color='#5691F0',
+            dash='solid'
+        ),
+        fill='tozeroy',
+        fillcolor='rgba(86,145,240, 0.125)'
+    )
+    df_trace.yaxis = "y3"
+
+    df_axis = dict(
+            domain=[0.25, .475],
+            fixedrange=True,
+            hoverformat=".0f",
+            zeroline=False,
+            showgrid=True,
+            gridcolor="#c0c0c0",
+            title=dict(
+                text="Effect On-Board (mg/dL)",
+                font=dict(
+                    size=10
+                )
+            )
+        )
+
+    return df_trace, df_axis
+
+
+def prepare_layout(
+    current_time, top_axis, bottom_axis, top_annotation, bottom_annotation,
+    middle_axis
+):
+    layout = go.Layout(
+        showlegend=True,
+        plot_bgcolor="white",
+        yaxis=bottom_axis,
+        yaxis2=top_axis,
+        yaxis3=middle_axis,
+        xaxis=dict(
+            range=(
+                current_time - datetime.timedelta(hours=8),
+                current_time + datetime.timedelta(hours=6)
+            ),
+            showgrid=True,
+            gridcolor="#c0c0c0",
+        ),
+        annotations=[
+            top_annotation,
+            bottom_annotation
+        ],
+        dragmode="pan",
+        hovermode="x"
+    )
+
+    return layout
 
 
 def make_scenario_figure(loop_output):
@@ -628,17 +717,25 @@ def make_scenario_figure(loop_output):
     loop_rec_bolus = loop_output.get("recommended_bolus")[0]
     loop_bolus_trace = prepare_loop_bolus(loop_rec_bolus, current_time)
 
+    # insulin effect on-board trace
+    insulin_effect_on_board_trace, effect_on_board_axis = (
+        prepare_insulin_effect_onboard_trace(
+            loop_output, bolus, df_sensitivity_ratio, continguous_ts
+        )
+    )
+
     # %% make figure
     fig_layout = prepare_layout(
-        current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation
+        current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation,
+        effect_on_board_axis
     )
 
     traces = []
     traces.extend([bg_trace, loop_prediction_trace])
     traces.extend(target_traces)
     traces.extend([
-        suspend_trace, loop_basal_trace, loop_bolus_trace,
-        carb_trace, bolus_trace
+        suspend_trace, insulin_effect_on_board_trace,
+        loop_basal_trace, loop_bolus_trace, carb_trace, bolus_trace
     ])
     traces.extend(scheduled_basal_traces)
     traces.extend(basal_delivered_traces)
@@ -653,7 +750,6 @@ def view_example():
     from input_data_tools import input_table_to_dict
     from loop_data_manager import update
     from plotly.offline import plot
-
     # load in example scenario files
     cutom_scenario_files = [
         "custom-scenario-table-template-simple.csv",

@@ -161,7 +161,7 @@ def update(input_dict):
             or not are_carb_readings_valid(
                 carb_dates, carb_values, carb_absorptions
             )
-            
+
             or not are_insulin_doses_valid(
                 dose_types, dose_starts, dose_ends, dose_values
             )
@@ -339,6 +339,9 @@ def update(input_dict):
     recommendations["cob_timeline_dates"] = cob_dates
     recommendations["cob_timeline_values"] = cob_values
     recommendations["input_data"] = input_dict
+
+    recommendations["historical_insulin_effect_dates"] = insulin_effect_dates
+    recommendations["historical_insulin_effect_values"] = insulin_effect_values
 
     return recommendations
 

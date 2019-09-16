@@ -115,7 +115,7 @@ def make_basal_traces(df, value_name, trace_name):
         opacity = 0.75
     else:
         dash = "solid"
-        width = 0
+        width = 1
         fill = 'tozeroy'
         opacity = 0.25
 
@@ -185,11 +185,18 @@ def prepare_basal(basal_rates, df_dose, contig_ts, current_time):
     df.dropna(subset=['basal_rate_values'], inplace=True)
 
     # temp basal data
-    if (("basal" in unique_dose_types) | ("suspend" in unique_dose_types)):
+    if (
+            ("basal" in str(unique_dose_types))
+            | ("tempbasal" in unique_dose_types)
+            | ("suspend" in unique_dose_types)
+
+    ):
         temp_basal = (
-            df_dose[
-                ((df_dose["type"] == "basal") | (df_dose["type"] == "suspend"))
-            ].copy()
+            df_dose[(
+                (df_dose["type"] == "basal")
+                | (df_dose["type"] == "tempbasal")
+                | (df_dose["type"] == "suspend")
+            )].copy()
         )
 
         temp_basal["type"].replace("basal", "temp", inplace=True)
@@ -932,10 +939,11 @@ def view_example():
         "custom-scenario-table-template-simple.csv",
         "custom-scenario-table-template-complex.csv",
         "custom-scenario-table-example-3.csv",
-        "hypothetical-scenario-1.csv"
+        "hypothetical-scenario-1.csv",
+        "hypothetical-scenario-2.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[2])
+    table_path_name = os.path.join(path, cutom_scenario_files[4])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

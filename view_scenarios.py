@@ -516,7 +516,7 @@ def prepare_suspend(suspend_threshold, current_time):
         hoverinfo="none",
         line=dict(
             shape='vh',
-            color='red',
+            color='#FA8E8E',
             dash='solid'
         ),
         opacity=0.25,
@@ -594,7 +594,7 @@ def prepare_insulin_effect_onboard_trace(
             name="insulin effect on board",
             mode='lines',
             x=insulin_effect_onboard_df["datetime"],
-            y=insulin_effect_onboard_df["values"],
+            y=-insulin_effect_onboard_df["values"],
             hoverinfo="y+name",
             line=dict(
                 color='#5691F0',
@@ -737,6 +737,52 @@ def prepare_carb_effect_onboard_trace(
     return carb_effect_ob_trace
 
 
+def prepare_momentum_effect_trace(loop_output):
+
+    momentum_effect_trace = go.Scatter(
+        name="momentum effect",
+        mode='lines',
+        x=loop_output["momentum_effect_dates"],
+        y=loop_output["momentum_effect_values"],
+        hoverinfo="y+name",
+        line=dict(
+            color='#CF7911',
+            dash='solid'
+        ),
+        fill='tozeroy',
+        fillcolor='rgba(207, 121, 17, 0.125)'
+    )
+
+    momentum_effect_trace.yaxis = "y3"
+
+    return momentum_effect_trace
+
+
+def prepare_retrospective_correction_effect_trace(loop_output):
+
+    rc_values = (
+        loop_output["retrospective_effect_values"]
+        - loop_output["predicted_glucose_values"][0]
+    )
+    rc_effect_trace = go.Scatter(
+        name="rc effect",
+        mode='lines',
+        x=loop_output["retrospective_effect_dates"],
+        y=rc_values,
+        hoverinfo="y+name",
+        line=dict(
+            color="#9886CF",
+            dash='solid'
+        ),
+        fill='tozeroy',
+        fillcolor="rgba(152, 134, 207, 0.125)"
+    )
+
+    rc_effect_trace.yaxis = "y3"
+
+    return rc_effect_trace
+
+
 def prepare_layout(
     current_time, top_axis, bottom_axis, top_annotation, bottom_annotation,
     middle_axis
@@ -851,6 +897,12 @@ def make_scenario_figure(loop_output):
         )
     )
 
+    # momentum effect trace
+    momentum_trace = prepare_momentum_effect_trace(loop_output)
+
+    # retrospective correction effect trace
+    rc_trace = prepare_retrospective_correction_effect_trace(loop_output)
+
     # %% make figure
     fig_layout = prepare_layout(
         current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation,
@@ -862,7 +914,7 @@ def make_scenario_figure(loop_output):
     traces.extend(target_traces)
     traces.extend([
         suspend_trace, insulin_effect_on_board_trace,
-        carb_effect_on_board_trace,
+        carb_effect_on_board_trace, momentum_trace, rc_trace,
         loop_basal_trace, loop_bolus_trace, carb_trace, bolus_trace
     ])
     traces.extend(scheduled_basal_traces)

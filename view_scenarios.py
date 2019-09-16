@@ -9,8 +9,10 @@ import os
 import datetime
 import pandas as pd
 import numpy as np
-from input_data_tools import dict_inputs_to_dataframes
+from input_data_tools import dict_inputs_to_dataframes, input_table_to_dict
+from loop_data_manager import update
 import plotly.graph_objs as go
+from plotly.offline import plot
 
 
 # %% functions
@@ -64,11 +66,11 @@ def prepare_bg(df, current_time):
     return df, df_trace, df_axis, df_annotations
 
 
-def create_contiguous_ts(date_min, date_max):
+def create_contiguous_ts(date_min, date_max, freq="1s"):
     date_range = pd.date_range(
         date_min,
         date_max,
-        freq="1s"
+        freq=freq
     )
 
     contig_ts = pd.DataFrame(date_range, columns=["datetime"])
@@ -369,9 +371,9 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
             ]
 
         tmp_trace = go.Scatter(
-            name="target at eval {}-{} mg/dL".format(
-                int(target_at_eval_df["target_range_minimum_values"].values[0]),
-                int(target_at_eval_df["target_range_maximum_values"].values[0])
+            name="target range (@ eval = {}-{} mg/dL)".format(
+              int(target_at_eval_df["target_range_minimum_values"].values[0]),
+              int(target_at_eval_df["target_range_maximum_values"].values[0])
             ),
             legendgroup="target_range",
             showlegend=legend_on,
@@ -527,77 +529,97 @@ def prepare_suspend(suspend_threshold, current_time):
 def prepare_insulin_effect_onboard_trace(
         loop_output, bolus, isf, continguous_ts
 ):
-    insulin_effect_df = pd.DataFrame()
-    insulin_effect_df["insulin_effect_dates"] = (
-        loop_output["historical_insulin_effect_dates"]
-    )
-    insulin_effect_df["insulin_effect_values"] = (
-        loop_output["historical_insulin_effect_values"]
-    )
-    insulin_effect_df["delta"] = (
-        insulin_effect_df["insulin_effect_values"]
-        - insulin_effect_df["insulin_effect_values"].shift(1)
-    )
+    if len(bolus) > 0:
+        insulin_effect_df = pd.DataFrame()
+        insulin_effect_df["insulin_effect_dates"] = (
+            loop_output["historical_insulin_effect_dates"]
+        )
+        insulin_effect_df["insulin_effect_values"] = (
+            loop_output["historical_insulin_effect_values"]
+        )
+        insulin_effect_df["delta"] = (
+            insulin_effect_df["insulin_effect_values"]
+            - insulin_effect_df["insulin_effect_values"].shift(1)
+        )
 
-    # get bolus and isf time series
-    df = pd.merge(
-        continguous_ts,
-        bolus,
-        left_on="datetime",
-        right_on="dose_start_times",
-        how="left"
-    )
+        # get bolus and isf time series
+        df = pd.merge(
+            continguous_ts,
+            bolus,
+            left_on="datetime",
+            right_on="dose_start_times",
+            how="left"
+        )
 
-    # add isf time series
-    df = pd.merge(
-        df,
-        isf,
-        left_on="time",
-        right_on="sensitivity_ratio_start_times",
-        how="left"
-    )
+        # add isf time series
+        df = pd.merge(
+            df,
+            isf,
+            left_on="time",
+            right_on="sensitivity_ratio_start_times",
+            how="left"
+        )
 
-    df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
+        df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
 
-    df["total_effect"] = (
-        df["dose_values"] * df["sensitivity_ratio_values"]
-    )
+        df["total_effect"] = (
+            df["dose_values"] * df["sensitivity_ratio_values"]
+        )
 
-    df = df.dropna(subset=['total_effect'])
+        df = df.dropna(subset=['total_effect'])
 
-    insulin_effect_onboard_df = pd.merge(
-        df,
-        insulin_effect_df.rename(columns={"insulin_effect_dates": "datetime"}),
-        on="datetime",
-        how="outer"
-    )
+        insulin_effect_onboard_df = pd.merge(
+            df,
+            insulin_effect_df.rename(
+                columns={"insulin_effect_dates": "datetime"}
+            ),
+            on="datetime",
+            how="outer"
+        )
 
-    insulin_effect_onboard_df["total_effect"].fillna(0, inplace=True)
-    insulin_effect_onboard_df.sort_values("datetime", inplace=True)
-    insulin_effect_onboard_df.reset_index(drop=True, inplace=True)
+        insulin_effect_onboard_df["total_effect"].fillna(0, inplace=True)
+        insulin_effect_onboard_df.sort_values("datetime", inplace=True)
+        insulin_effect_onboard_df.reset_index(drop=True, inplace=True)
 
-    insulin_effect_onboard_df["temp"] = (
-        insulin_effect_onboard_df["total_effect"]
-        + insulin_effect_onboard_df["delta"].fillna(0)
-    )
+        insulin_effect_onboard_df["temp"] = (
+            insulin_effect_onboard_df["total_effect"]
+            + insulin_effect_onboard_df["delta"].fillna(0)
+        )
 
-    insulin_effect_onboard_df["values"] = (
-        insulin_effect_onboard_df["temp"].cumsum()
-    )
+        insulin_effect_onboard_df["values"] = (
+            insulin_effect_onboard_df["temp"].cumsum()
+        )
 
-    df_trace = go.Scatter(
-        name="insulin effect on board",
-        mode='lines',
-        x=insulin_effect_onboard_df["datetime"],
-        y=insulin_effect_onboard_df["values"],
-        hoverinfo="y+name",
-        line=dict(
-            color='#5691F0',
-            dash='solid'
-        ),
-        fill='tozeroy',
-        fillcolor='rgba(86,145,240, 0.125)'
-    )
+        df_trace = go.Scatter(
+            name="insulin effect on board",
+            mode='lines',
+            x=insulin_effect_onboard_df["datetime"],
+            y=insulin_effect_onboard_df["values"],
+            hoverinfo="y+name",
+            line=dict(
+                color='#5691F0',
+                dash='solid'
+            ),
+            fill='tozeroy',
+            fillcolor='rgba(86,145,240, 0.125)'
+        )
+
+    else:
+
+        df_trace = go.Scatter(
+            name="insulin effect on board",
+            mode='lines',
+            x=[],
+            y=[],
+            hoverinfo="y+name",
+            line=dict(
+                color='#5691F0',
+                dash='solid'
+            ),
+            fill='tozeroy',
+            fillcolor='rgba(86,145,240, 0.125)'
+        )
+
     df_trace.yaxis = "y3"
 
     df_axis = dict(
@@ -616,6 +638,103 @@ def prepare_insulin_effect_onboard_trace(
         )
 
     return df_trace, df_axis
+
+
+def prepare_carb_effect_onboard_trace(
+        loop_output, carbs, isf, carb_ratios, continguous_ts
+):
+    if len(carbs) > 0:
+        df = pd.merge(
+            continguous_ts,
+            isf,
+            left_on="time",
+            right_on="sensitivity_ratio_start_times",
+            how="left"
+        )
+        df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
+
+        df = pd.merge(
+            df,
+            carb_ratios,
+            left_on="time",
+            right_on="carb_ratio_start_times",
+            how="left"
+        )
+        df["carb_ratio_values"].fillna(method='ffill', inplace=True)
+
+        df["csf"] = df["sensitivity_ratio_values"] / df["carb_ratio_values"]
+
+        date_min = (
+            carbs["datetime"].dt.round("5min").min() - pd.Timedelta("5min")
+        )
+        date_max = loop_output["cob_timeline_dates"][0] - pd.Timedelta("5min")
+        carb_effect_ob = (
+            create_contiguous_ts(date_min, date_max, freq="5min")
+        )
+        carb_effect_ob["cob"] = np.nan
+        # TODO: there has to be a better way to get historical carbs on board
+        # this method is re-running the loop algorithm
+        for d in carb_effect_ob["datetime"]:
+            inputs = loop_output["input_data"]
+            inputs["time_to_calculate_at"] = (
+                datetime.datetime.fromisoformat(d.isoformat())
+            )
+            temp_loop_output = update(inputs)
+            carb_effect_ob.loc[carb_effect_ob["datetime"] == d, "cob"] = (
+                temp_loop_output["carbs_on_board"]
+            )
+
+        # get the carbs on board time series
+        cob_df = pd.DataFrame()
+        cob_df["datetime"] = loop_output["cob_timeline_dates"]
+        cob_df["cob"] = loop_output["cob_timeline_values"]
+
+        carb_effect_ob = pd.concat(
+            [carb_effect_ob, cob_df], ignore_index=True, sort=True
+        )
+
+        carb_effect_ob = pd.merge(
+            carb_effect_ob,
+            df[["datetime", "csf"]],
+            on="datetime",
+            how="left"
+        )
+
+        carb_effect_ob["values"] = (
+            carb_effect_ob["cob"] * carb_effect_ob["csf"]
+        )
+
+        carb_effect_ob_trace = go.Scatter(
+            name="carb effect on board",
+            mode='lines',
+            x=carb_effect_ob["datetime"],
+            y=carb_effect_ob["values"],
+            hoverinfo="y+name",
+            line=dict(
+                color='#0AA648',
+                dash='solid'
+            ),
+            fill='tozeroy',
+            fillcolor='rgba(10,166,72, 0.125)'
+        )
+
+    else:
+        carb_effect_ob_trace = go.Scatter(
+            name="carb effect on board",
+            mode='lines',
+            x=[],
+            y=[],
+            line=dict(
+                color='#0AA648',
+                dash='solid'
+            ),
+            fill='tozeroy',
+            fillcolor='rgba(10,166,72, 0.125)'
+        )
+
+    carb_effect_ob_trace.yaxis = "y3"
+
+    return carb_effect_ob_trace
 
 
 def prepare_layout(
@@ -724,6 +843,14 @@ def make_scenario_figure(loop_output):
         )
     )
 
+    # carb effect on-board trace
+    carb_effect_on_board_trace = (
+        prepare_carb_effect_onboard_trace(
+            loop_output, carbs, df_sensitivity_ratio,
+            carb_ratios, continguous_ts
+        )
+    )
+
     # %% make figure
     fig_layout = prepare_layout(
         current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation,
@@ -735,6 +862,7 @@ def make_scenario_figure(loop_output):
     traces.extend(target_traces)
     traces.extend([
         suspend_trace, insulin_effect_on_board_trace,
+        carb_effect_on_board_trace,
         loop_basal_trace, loop_bolus_trace, carb_trace, bolus_trace
     ])
     traces.extend(scheduled_basal_traces)
@@ -747,9 +875,6 @@ def make_scenario_figure(loop_output):
 
 # %% view example scenario(s)
 def view_example():
-    from input_data_tools import input_table_to_dict
-    from loop_data_manager import update
-    from plotly.offline import plot
     # load in example scenario files
     cutom_scenario_files = [
         "custom-scenario-table-template-simple.csv",
@@ -758,7 +883,7 @@ def view_example():
         "hypothetical-scenario-1.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[0])
+    table_path_name = os.path.join(path, cutom_scenario_files[2])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

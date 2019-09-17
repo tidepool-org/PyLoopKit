@@ -34,9 +34,9 @@ def prepare_bg(df, current_time):
     )
 
     df_axis = dict(
-            domain=[0.65, 1],
+            domain=[0.5, 1],
             range=[0, 400],
-            tickvals=[-100, 40, 70, 180, 250, 400],
+            tickvals=[-100, 54, 70, 140, 180, 250, 400],
             fixedrange=True,
             hoverformat=".0f",
             zeroline=False,
@@ -424,7 +424,7 @@ def prepare_insulin_axis(basal, bolus, carbs, current_time):
         title=dict(
             text="Events<br>(U, U/hr)",
             font=dict(
-                size=12
+                size=11
             )
         )
     )
@@ -451,10 +451,14 @@ def prepare_loop_prediction(predicted_bg_dates, predicted_bg_values):
         x=predicted_bg_dates,
         y=predicted_bg_values,
         hoverinfo="y+name",
-        mode='lines',
+        mode='markers+lines',
         line=dict(
             color="#9886CF",
-            dash="dash",
+            dash="solid",
+            width=0.5
+        ),
+        marker=dict(
+            size=5,
         )
     )
     bg_prediction_trace.yaxis = "y2"
@@ -630,16 +634,16 @@ def prepare_insulin_effect_onboard_trace(
     df_trace.yaxis = "y3"
 
     df_axis = dict(
-            domain=[0.4, 0.625],
+            domain=[0.2875, 0.4875],
             fixedrange=True,
-            hoverformat=".0f",
+            hoverformat=".1f",
             zeroline=False,
             showgrid=True,
             gridcolor="#c0c0c0",
             title=dict(
                 text="Effects (mg/dL)",
                 font=dict(
-                    size=12
+                    size=11
                 )
             )
         )
@@ -767,14 +771,37 @@ def prepare_carb_effect_onboard_trace(
 
 def prepare_all_effect_traces(loop_output):
 
+    starting_date = loop_output.get("input_data").get("glucose_dates")[-1]
+    starting_glucose = 0
+
     predict_bg_values = (
         loop_output["predicted_glucose_values"]
         - loop_output["predicted_glucose_values"][0]
     )
+
+    predict_bg_dates, predict_bg_values = (
+        predict_glucose(
+            starting_date,
+            starting_glucose,
+            insulin_effect_dates=loop_output.get("insulin_effect_dates"),
+            insulin_effect_values=loop_output.get("insulin_effect_values"),
+            carb_effect_dates=loop_output.get("carb_effect_dates"),
+            carb_effect_values=loop_output.get("carb_effect_values"),
+            correction_effect_dates=(
+                loop_output.get("retrospective_effect_dates")
+            ),
+            correction_effect_values=(
+                loop_output.get("retrospective_effect_values")
+            ),
+            momentum_dates=loop_output.get("momentum_effect_dates"),
+            momentum_values=loop_output.get("momentum_effect_values")
+        )
+    )
+
     predict_bg_effect_trace = go.Scatter(
         name="predicted bg (relative) effect",
         mode='markers+lines',
-        x=loop_output["predicted_glucose_dates"],
+        x=predict_bg_dates,
         y=predict_bg_values,
         hoverinfo="y+name",
         line=dict(
@@ -787,9 +814,6 @@ def prepare_all_effect_traces(loop_output):
         )
     )
     predict_bg_effect_trace.yaxis = "y3"
-
-    starting_date = loop_output.get("input_data").get("glucose_dates")[-1]
-    starting_glucose = 0
 
     insulin_predicted_glucose_dates, insulin_predicted_glucose_values = (
         predict_glucose(
@@ -827,8 +851,12 @@ def prepare_all_effect_traces(loop_output):
     carb_effect_trace = go.Scatter(
         name="carb effect",
         mode='markers+lines',
-        x=carb_predicted_glucose_dates,
-        y=carb_predicted_glucose_values,
+        x=carb_predicted_glucose_dates[
+            0:len(insulin_predicted_glucose_dates)
+        ],
+        y=carb_predicted_glucose_values[
+            0:len(insulin_predicted_glucose_dates)
+        ],
         hoverinfo="y+name",
         line=dict(
             color='#0AA648',
@@ -840,31 +868,6 @@ def prepare_all_effect_traces(loop_output):
         )
     )
     carb_effect_trace.yaxis = "y3"
-
-    momentum_predicted_glucose_dates, momentum_predicted_glucose_values = (
-        predict_glucose(
-            starting_date,
-            starting_glucose,
-            momentum_dates=loop_output.get("momentum_effect_dates"),
-            momentum_values=loop_output.get("momentum_effect_values")
-        )
-    )
-    momentum_effect_trace = go.Scatter(
-        name="insulin effect",
-        mode='markers+lines',
-        x=momentum_predicted_glucose_dates,
-        y=momentum_predicted_glucose_values,
-        hoverinfo="y+name",
-        line=dict(
-            color='#CF7911',
-            dash='solid',
-            width=0.25
-        ),
-        marker=dict(
-            size=4,
-        )
-    )
-    momentum_effect_trace.yaxis = "y3"
 
     if loop_output.get("retrospective_effect_dates"):
         rc_predicted_glucose_dates, rc_predicted_glucose_values = (
@@ -914,6 +917,41 @@ def prepare_all_effect_traces(loop_output):
         )
 
     rc_effect_trace.yaxis = "y3"
+
+    momentum_predicted_glucose_dates, momentum_predicted_glucose_values = (
+        predict_glucose(
+            starting_date,
+            starting_glucose,
+            momentum_dates=loop_output.get("momentum_effect_dates"),
+            momentum_values=loop_output.get("momentum_effect_values")
+        )
+    )
+
+    momentum_values = (
+        np.array(predict_bg_values[0:len(momentum_predicted_glucose_values)])
+        - np.array(insulin_predicted_glucose_values[0:len(momentum_predicted_glucose_values)])
+        - np.array(carb_predicted_glucose_values[0:len(momentum_predicted_glucose_values)])
+        - np.array(rc_predicted_glucose_values[0:len(momentum_predicted_glucose_values)])
+    )
+
+    momentum_effect_trace = go.Scatter(
+        name="momentum effect",
+        mode='markers+lines',
+        x=momentum_predicted_glucose_dates,
+        y=momentum_values,
+        hoverinfo="y+name",
+        line=dict(
+            color='#CF7911',
+            dash='solid',
+            width=0.25
+        ),
+        marker=dict(
+            size=4,
+        )
+    )
+    momentum_effect_trace.yaxis = "y3"
+
+
 
     return (
         predict_bg_effect_trace, insulin_effect_trace, carb_effect_trace,
@@ -965,7 +1003,7 @@ def make_settings_traces(settings_schedules):
     csf_effect_trace.yaxis = "y4"
 
     settings_axis = dict(
-            domain=[0.25, 0.35],
+            domain=[0.2125, 0.2625],
             fixedrange=True,
             hoverformat=".1f",
             zeroline=False,
@@ -974,7 +1012,7 @@ def make_settings_traces(settings_schedules):
             title=dict(
                 text="Sensitivity<br>Schedule",
                 font=dict(
-                    size=12
+                    size=11
                 )
             )
     )

@@ -29,7 +29,7 @@ def prepare_bg(df, current_time):
         marker=dict(
             size=6,
             line=dict(width=0),
-            color="#9886CF"
+            color="#7A68B3"
         )
     )
 

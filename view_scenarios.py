@@ -603,6 +603,8 @@ def prepare_insulin_effect_onboard_trace(
 
         df_trace = go.Scatter(
             name="iob potential",
+            legendgroup="ob potential",
+            visible="legendonly",
             mode='lines',
             x=iob_effect["datetime"],
             y=-iob_effect["values"],
@@ -641,7 +643,7 @@ def prepare_insulin_effect_onboard_trace(
             showgrid=True,
             gridcolor="#c0c0c0",
             title=dict(
-                text="Effects (mg/dL)",
+                text="Relative<br>Effects (mg/dL)",
                 font=dict(
                     size=11
                 )
@@ -738,6 +740,8 @@ def prepare_carb_effect_onboard_trace(
 
         carb_effect_ob_trace = go.Scatter(
             name="cob potential",
+            legendgroup="ob potential",
+            visible="legendonly",
             mode='lines',
             x=carb_effect_ob["datetime"],
             y=carb_effect_ob["values"],
@@ -772,37 +776,22 @@ def prepare_carb_effect_onboard_trace(
 def prepare_all_effect_traces(loop_output):
 
     starting_date = loop_output.get("input_data").get("glucose_dates")[-1]
-    starting_glucose = 0
+    starting_glucose = loop_output.get("input_data").get("glucose_values")[-1]
 
-    predict_bg_values = (
-        loop_output["predicted_glucose_values"]
-        - loop_output["predicted_glucose_values"][0]
+    predict_bg_df = pd.DataFrame(
+        loop_output["predicted_glucose_dates"], columns=["datetime"]
     )
-
-    predict_bg_dates, predict_bg_values = (
-        predict_glucose(
-            starting_date,
-            starting_glucose,
-            insulin_effect_dates=loop_output.get("insulin_effect_dates"),
-            insulin_effect_values=loop_output.get("insulin_effect_values"),
-            carb_effect_dates=loop_output.get("carb_effect_dates"),
-            carb_effect_values=loop_output.get("carb_effect_values"),
-            correction_effect_dates=(
-                loop_output.get("retrospective_effect_dates")
-            ),
-            correction_effect_values=(
-                loop_output.get("retrospective_effect_values")
-            ),
-            momentum_dates=loop_output.get("momentum_effect_dates"),
-            momentum_values=loop_output.get("momentum_effect_values")
-        )
-    )
+    predict_bg_df["values"] = loop_output["predicted_glucose_values"]
+    predict_bg_df["relValues"] = (
+        predict_bg_df["values"] - predict_bg_df["values"].shift(1)
+    ).fillna(0)
 
     predict_bg_effect_trace = go.Scatter(
         name="predicted bg (relative) effect",
+        legendgroup="rel predictions",
         mode='markers+lines',
-        x=predict_bg_dates,
-        y=predict_bg_values,
+        x=predict_bg_df["datetime"],
+        y=predict_bg_df["relValues"],
         hoverinfo="y+name",
         line=dict(
             color='#9886CF',
@@ -823,11 +812,21 @@ def prepare_all_effect_traces(loop_output):
             insulin_effect_values=loop_output.get("insulin_effect_values")
         )
     )
+
+    insulin_df = pd.DataFrame(
+        insulin_predicted_glucose_dates, columns=["datetime"]
+    )
+    insulin_df["values"] = insulin_predicted_glucose_values
+    insulin_df["relValues"] = (
+        insulin_df["values"] - insulin_df["values"].shift(1)
+    ).fillna(0)
+
     insulin_effect_trace = go.Scatter(
         name="insulin effect",
+        legendgroup="rel predictions",
         mode='markers+lines',
-        x=insulin_predicted_glucose_dates,
-        y=insulin_predicted_glucose_values,
+        x=insulin_df["datetime"],
+        y=insulin_df["relValues"],
         hoverinfo="y+name",
         line=dict(
             color='#5691F0',
@@ -848,15 +847,21 @@ def prepare_all_effect_traces(loop_output):
             carb_effect_values=loop_output.get("carb_effect_values")
         )
     )
+
+    carb_df = pd.DataFrame(
+        carb_predicted_glucose_dates, columns=["datetime"]
+    )
+    carb_df["values"] = carb_predicted_glucose_values
+    carb_df["relValues"] = (
+        carb_df["values"] - carb_df["values"].shift(1)
+    ).fillna(0)
+
     carb_effect_trace = go.Scatter(
         name="carb effect",
+        legendgroup="rel predictions",
         mode='markers+lines',
-        x=carb_predicted_glucose_dates[
-            0:len(insulin_predicted_glucose_dates)
-        ],
-        y=carb_predicted_glucose_values[
-            0:len(insulin_predicted_glucose_dates)
-        ],
+        x=carb_df["datetime"],
+        y=carb_df["relValues"],
         hoverinfo="y+name",
         line=dict(
             color='#0AA648',
@@ -868,6 +873,17 @@ def prepare_all_effect_traces(loop_output):
         )
     )
     carb_effect_trace.yaxis = "y3"
+
+    momentum_predicted_glucose_dates, momentum_predicted_glucose_values = (
+        predict_glucose(
+            starting_date,
+            starting_glucose,
+            momentum_dates=loop_output.get("momentum_effect_dates"),
+            momentum_values=loop_output.get("momentum_effect_values")
+        )
+    )
+
+    momentum_indices = np.arange(0, len(momentum_predicted_glucose_values))
 
     if loop_output.get("retrospective_effect_dates"):
         rc_predicted_glucose_dates, rc_predicted_glucose_values = (
@@ -883,11 +899,18 @@ def prepare_all_effect_traces(loop_output):
             )
         )
 
+        rc_df = pd.DataFrame(rc_predicted_glucose_dates, columns=["datetime"])
+        rc_df["values"] = rc_predicted_glucose_values
+        rc_df["relValues"] = (
+            rc_df["values"] - rc_df["values"].shift(1)
+        ).fillna(0)
+
         rc_effect_trace = go.Scatter(
             name="rc effect",
+            legendgroup="rel predictions",
             mode='markers+lines',
-            x=rc_predicted_glucose_dates,
-            y=rc_predicted_glucose_values,
+            x=rc_df["datetime"],
+            y=rc_df["relValues"],
             hoverinfo="y+name",
             line=dict(
                 color='#ED5393',
@@ -899,9 +922,17 @@ def prepare_all_effect_traces(loop_output):
             )
         )
 
+        momentum_values = (
+            predict_bg_df.loc[momentum_indices, "relValues"]
+            - insulin_df.loc[momentum_indices, "relValues"]
+            - carb_df.loc[momentum_indices, "relValues"]
+            - rc_df.loc[momentum_indices, "relValues"]
+        )
+
     else:
         rc_effect_trace = go.Scatter(
             name="rc effect",
+            legendgroup="rel predictions",
             mode='markers+lines',
             x=[],
             y=[],
@@ -916,38 +947,17 @@ def prepare_all_effect_traces(loop_output):
             )
         )
 
+        momentum_values = (
+            predict_bg_df.loc[momentum_indices, "relValues"]
+            - insulin_df.loc[momentum_indices, "relValues"]
+            - carb_df.loc[momentum_indices, "relValues"]
+        )
+
     rc_effect_trace.yaxis = "y3"
-
-    momentum_predicted_glucose_dates, momentum_predicted_glucose_values = (
-        predict_glucose(
-            starting_date,
-            starting_glucose,
-            momentum_dates=loop_output.get("momentum_effect_dates"),
-            momentum_values=loop_output.get("momentum_effect_values")
-        )
-    )
-
-    momentum_values = (
-        np.array(predict_bg_values[0:len(momentum_predicted_glucose_values)])
-        - np.array(
-            insulin_predicted_glucose_values[
-                0:len(momentum_predicted_glucose_values)
-            ]
-        )
-        - np.array(
-            carb_predicted_glucose_values[
-                0:len(momentum_predicted_glucose_values)
-            ]
-        )
-        - np.array(
-            rc_predicted_glucose_values[
-                0:len(momentum_predicted_glucose_values)
-            ]
-        )
-    )
 
     momentum_effect_trace = go.Scatter(
         name="momentum effect",
+        legendgroup="rel predictions",
         mode='markers+lines',
         x=momentum_predicted_glucose_dates,
         y=momentum_values,
@@ -1171,13 +1181,13 @@ def make_scenario_figure(loop_output):
         carb_effect_on_board_trace, predict_bg_effect_trace,
         insulin_effect_trace, carb_effect_trace,
         momentum_effect_trace, rc_effect_trace,
-        loop_basal_trace, loop_bolus_trace,
         isf_effect_trace, cir_effect_trace, csf_effect_trace,
         carb_trace, bolus_trace,
 
     ])
     traces.extend(scheduled_basal_traces)
     traces.extend(basal_delivered_traces)
+    traces.extend([loop_basal_trace, loop_bolus_trace])
 
     fig = go.Figure(data=traces, layout=fig_layout)
 

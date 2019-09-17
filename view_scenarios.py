@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 from input_data_tools import dict_inputs_to_dataframes, input_table_to_dict
 from loop_data_manager import update
+from insulin_math import insulin_on_board
 import plotly.graph_objs as go
 from plotly.offline import plot
 
@@ -534,34 +535,21 @@ def prepare_suspend(suspend_threshold, current_time):
 
 
 def prepare_insulin_effect_onboard_trace(
-        loop_output, bolus, isf, continguous_ts
+        inputs, dose_events, basal_rates, isf, continguous_ts
 ):
-    if len(bolus) > 0:
-        insulin_effect_df = pd.DataFrame()
-        insulin_effect_df["insulin_effect_dates"] = (
-            loop_output["historical_insulin_effect_dates"]
-        )
-        insulin_effect_df["insulin_effect_values"] = (
-            loop_output["historical_insulin_effect_values"]
-        )
-        insulin_effect_df["delta"] = (
-            insulin_effect_df["insulin_effect_values"]
-            - insulin_effect_df["insulin_effect_values"].shift(1)
-        )
-
-        # get bolus and isf time series
+    if len(dose_events) > 0:
+        # add basal rates to time series
         df = pd.merge(
             continguous_ts,
-            bolus,
-            left_on="datetime",
-            right_on="dose_start_times",
+            basal_rates[["datetime", "basal_rate_values"]],
+            on="datetime",
             how="left"
         )
+        df["basal_rate_values"].fillna(method='ffill', inplace=True)
 
-        # add isf time series
         df = pd.merge(
             df,
-            isf,
+            isf[["sensitivity_ratio_start_times", "sensitivity_ratio_values"]],
             left_on="time",
             right_on="sensitivity_ratio_start_times",
             how="left"
@@ -569,39 +557,49 @@ def prepare_insulin_effect_onboard_trace(
 
         df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
 
-        df["total_effect"] = (
-            df["dose_values"] * df["sensitivity_ratio_values"]
-        )
-
-        df = df.dropna(subset=['total_effect'])
-
-        insulin_effect_onboard_df = pd.merge(
+        dose_data = pd.merge(
+            dose_events,
             df,
-            insulin_effect_df.rename(
-                columns={"insulin_effect_dates": "datetime"}
-            ),
+            left_on="dose_start_times",
+            right_on="datetime",
+            how="left"
+        )
+
+        scheduled_basal_rates = list(dose_data["basal_rate_values"].values)
+
+        (iob_dates, iob_values) = insulin_on_board(
+            dose_types=inputs["dose_types"],
+            start_dates=inputs["dose_start_times"],
+            end_dates=inputs["dose_end_times"],
+            values=inputs["dose_values"],
+            scheduled_basal_rates=scheduled_basal_rates,
+            model=inputs["settings_dictionary"]["model"],
+            start=None,
+            end=None,
+            delay=10,
+            delta=5
+        )
+
+        iob_df = pd.DataFrame(iob_dates, columns=["datetime"])
+        iob_df["iob_values"] = iob_values
+
+        # add isf time series
+        iob_effect = pd.merge(
+            iob_df,
+            df,
             on="datetime",
-            how="outer"
+            how="left"
         )
 
-        insulin_effect_onboard_df["total_effect"].fillna(0, inplace=True)
-        insulin_effect_onboard_df.sort_values("datetime", inplace=True)
-        insulin_effect_onboard_df.reset_index(drop=True, inplace=True)
-
-        insulin_effect_onboard_df["temp"] = (
-            insulin_effect_onboard_df["total_effect"]
-            + insulin_effect_onboard_df["delta"].fillna(0)
-        )
-
-        insulin_effect_onboard_df["values"] = (
-            insulin_effect_onboard_df["temp"].cumsum()
+        iob_effect["values"] = (
+            iob_effect["iob_values"] * iob_effect["sensitivity_ratio_values"]
         )
 
         df_trace = go.Scatter(
             name="insulin effect on board",
             mode='lines',
-            x=insulin_effect_onboard_df["datetime"],
-            y=-insulin_effect_onboard_df["values"],
+            x=iob_effect["datetime"],
+            y=-iob_effect["values"],
             hoverinfo="y+name",
             line=dict(
                 color='#5691F0',
@@ -767,23 +765,38 @@ def prepare_momentum_effect_trace(loop_output):
 
 def prepare_retrospective_correction_effect_trace(loop_output):
 
-    rc_values = (
-        loop_output["retrospective_effect_values"]
-        - loop_output["predicted_glucose_values"][0]
-    )
-    rc_effect_trace = go.Scatter(
-        name="rc effect",
-        mode='lines',
-        x=loop_output["retrospective_effect_dates"],
-        y=rc_values,
-        hoverinfo="y+name",
-        line=dict(
-            color="#9886CF",
-            dash='solid'
-        ),
-        fill='tozeroy',
-        fillcolor="rgba(152, 134, 207, 0.125)"
-    )
+    if loop_output["retrospective_effect_values"] is not None:
+        rc_values = (
+            loop_output["retrospective_effect_values"]
+            - loop_output["predicted_glucose_values"][0]
+        )
+        rc_effect_trace = go.Scatter(
+            name="rc effect",
+            mode='lines',
+            x=loop_output["retrospective_effect_dates"],
+            y=rc_values,
+            hoverinfo="y+name",
+            line=dict(
+                color="#9886CF",
+                dash='solid'
+            ),
+            fill='tozeroy',
+            fillcolor="rgba(152, 134, 207, 0.125)"
+        )
+    else:
+        rc_effect_trace = go.Scatter(
+            name="rc effect (off)",
+            mode='lines',
+            x=[],
+            y=[],
+            hoverinfo="y+name",
+            line=dict(
+                color="#9886CF",
+                dash='solid'
+            ),
+            fill='tozeroy',
+            fillcolor="rgba(152, 134, 207, 0.125)"
+        )
 
     rc_effect_trace.yaxis = "y3"
 
@@ -892,7 +905,7 @@ def make_scenario_figure(loop_output):
     # insulin effect on-board trace
     insulin_effect_on_board_trace, effect_on_board_axis = (
         prepare_insulin_effect_onboard_trace(
-            loop_output, bolus, df_sensitivity_ratio, continguous_ts
+            inputs, dose_events, sbr, df_sensitivity_ratio, continguous_ts
         )
     )
 

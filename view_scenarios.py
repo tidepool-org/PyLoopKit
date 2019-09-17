@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 from input_data_tools import dict_inputs_to_dataframes, input_table_to_dict
 from loop_data_manager import update
+from loop_math import predict_glucose
 from insulin_math import insulin_on_board
 import plotly.graph_objs as go
 from plotly.offline import plot
@@ -42,7 +43,7 @@ def prepare_bg(df, current_time):
             showgrid=True,
             gridcolor="#c0c0c0",
             title=dict(
-                text="Blood Glucose (mg/dL)",
+                text="Blood Glucose<br>(mg/dL)",
                 font=dict(
                     size=12
                 )
@@ -303,7 +304,7 @@ def prepare_carbs(df_events, df_ratios, continguous_ts):
     carb_df.dropna(subset=['carb_values'], inplace=True)
 
     df_trace = go.Scatter(
-        name="carbs",
+        name="carbs (g)",
         mode='markers + text',
         x=carb_df["datetime"],
         y=carb_df["bolus_height"] + 0.75,
@@ -421,7 +422,7 @@ def prepare_insulin_axis(basal, bolus, carbs, current_time):
         showgrid=True,
         gridcolor="#c0c0c0",
         title=dict(
-            text="Events (U, U/hr)",
+            text="Events<br>(U, U/hr)",
             font=dict(
                 size=12
             )
@@ -597,11 +598,11 @@ def prepare_insulin_effect_onboard_trace(
         )
 
         df_trace = go.Scatter(
-            name="insulin effect on board",
+            name="iob potential",
             mode='lines',
             x=iob_effect["datetime"],
             y=-iob_effect["values"],
-            hoverinfo="y+name",
+            hoverinfo="name",
             line=dict(
                 color='#5691F0',
                 dash='solid'
@@ -732,11 +733,11 @@ def prepare_carb_effect_onboard_trace(
         )
 
         carb_effect_ob_trace = go.Scatter(
-            name="carb effect on board",
+            name="cob potential",
             mode='lines',
             x=carb_effect_ob["datetime"],
             y=carb_effect_ob["values"],
-            hoverinfo="y+name",
+            hoverinfo="name",
             line=dict(
                 color='#0AA648',
                 dash='solid'
@@ -764,65 +765,160 @@ def prepare_carb_effect_onboard_trace(
     return carb_effect_ob_trace, settings_schedules
 
 
-def prepare_momentum_effect_trace(loop_output):
+def prepare_all_effect_traces(loop_output):
 
+    predict_bg_values = (
+        loop_output["predicted_glucose_values"]
+        - loop_output["predicted_glucose_values"][0]
+    )
+    predict_bg_effect_trace = go.Scatter(
+        name="predicted bg (relative) effect",
+        mode='markers+lines',
+        x=loop_output["predicted_glucose_dates"],
+        y=predict_bg_values,
+        hoverinfo="y+name",
+        line=dict(
+            color='#9886CF',
+            dash='solid',
+            width=0.25
+        ),
+        marker=dict(
+            size=4,
+        )
+    )
+    predict_bg_effect_trace.yaxis = "y3"
+
+    starting_date = loop_output.get("input_data").get("glucose_dates")[-1]
+    starting_glucose = 0
+
+    insulin_predicted_glucose_dates, insulin_predicted_glucose_values = (
+        predict_glucose(
+            starting_date,
+            starting_glucose,
+            insulin_effect_dates=loop_output.get("insulin_effect_dates"),
+            insulin_effect_values=loop_output.get("insulin_effect_values")
+        )
+    )
+    insulin_effect_trace = go.Scatter(
+        name="insulin effect",
+        mode='markers+lines',
+        x=insulin_predicted_glucose_dates,
+        y=insulin_predicted_glucose_values,
+        hoverinfo="y+name",
+        line=dict(
+            color='#5691F0',
+            dash='solid',
+            width=0.25
+        ),
+        marker=dict(
+            size=4,
+        )
+    )
+    insulin_effect_trace.yaxis = "y3"
+
+    carb_predicted_glucose_dates, carb_predicted_glucose_values = (
+        predict_glucose(
+            starting_date,
+            starting_glucose,
+            carb_effect_dates=loop_output.get("carb_effect_dates"),
+            carb_effect_values=loop_output.get("carb_effect_values")
+        )
+    )
+    carb_effect_trace = go.Scatter(
+        name="carb effect",
+        mode='markers+lines',
+        x=carb_predicted_glucose_dates,
+        y=carb_predicted_glucose_values,
+        hoverinfo="y+name",
+        line=dict(
+            color='#0AA648',
+            dash='solid',
+            width=0.25
+        ),
+        marker=dict(
+            size=4,
+        )
+    )
+    carb_effect_trace.yaxis = "y3"
+
+    momentum_predicted_glucose_dates, momentum_predicted_glucose_values = (
+        predict_glucose(
+            starting_date,
+            starting_glucose,
+            momentum_dates=loop_output.get("momentum_effect_dates"),
+            momentum_values=loop_output.get("momentum_effect_values")
+        )
+    )
     momentum_effect_trace = go.Scatter(
-        name="momentum effect",
-        mode='lines',
-        x=loop_output["momentum_effect_dates"],
-        y=loop_output["momentum_effect_values"],
+        name="insulin effect",
+        mode='markers+lines',
+        x=momentum_predicted_glucose_dates,
+        y=momentum_predicted_glucose_values,
         hoverinfo="y+name",
         line=dict(
             color='#CF7911',
-            dash='solid'
+            dash='solid',
+            width=0.25
         ),
-        fill='tozeroy',
-        fillcolor='rgba(207, 121, 17, 0.125)'
+        marker=dict(
+            size=4,
+        )
     )
-
     momentum_effect_trace.yaxis = "y3"
 
-    return momentum_effect_trace
-
-
-def prepare_retrospective_correction_effect_trace(loop_output):
-
-    if loop_output["retrospective_effect_values"] is not None:
-        rc_values = (
-            loop_output["retrospective_effect_values"]
-            - loop_output["predicted_glucose_values"][0]
+    if loop_output.get("retrospective_effect_dates"):
+        rc_predicted_glucose_dates, rc_predicted_glucose_values = (
+            predict_glucose(
+                starting_date,
+                starting_glucose,
+                correction_effect_dates=(
+                    loop_output.get("retrospective_effect_dates")
+                ),
+                correction_effect_values=(
+                    loop_output.get("retrospective_effect_values")
+                )
+            )
         )
+
         rc_effect_trace = go.Scatter(
             name="rc effect",
-            mode='lines',
-            x=loop_output["retrospective_effect_dates"],
-            y=rc_values,
+            mode='markers+lines',
+            x=rc_predicted_glucose_dates,
+            y=rc_predicted_glucose_values,
             hoverinfo="y+name",
             line=dict(
-                color="#9886CF",
-                dash='solid'
+                color='#ED5393',
+                dash='solid',
+                width=0.25
             ),
-            fill='tozeroy',
-            fillcolor="rgba(152, 134, 207, 0.125)"
+            marker=dict(
+                size=4,
+            )
         )
+
     else:
         rc_effect_trace = go.Scatter(
-            name="rc effect (off)",
-            mode='lines',
+            name="rc effect",
+            mode='markers+lines',
             x=[],
             y=[],
             hoverinfo="y+name",
             line=dict(
-                color="#9886CF",
-                dash='solid'
+                color='#ED5393',
+                dash='solid',
+                width=0.25
             ),
-            fill='tozeroy',
-            fillcolor="rgba(152, 134, 207, 0.125)"
+            marker=dict(
+                size=4,
+            )
         )
 
     rc_effect_trace.yaxis = "y3"
 
-    return rc_effect_trace
+    return (
+        predict_bg_effect_trace, insulin_effect_trace, carb_effect_trace,
+        momentum_effect_trace, rc_effect_trace
+    )
 
 
 def make_settings_traces(settings_schedules):
@@ -862,7 +958,7 @@ def make_settings_traces(settings_schedules):
         hoverinfo="y+name",
         line=dict(
             color='#6483B4',
-            dash='dot',
+            dash='solid',
             width=0.75
         ),
     )
@@ -876,7 +972,7 @@ def make_settings_traces(settings_schedules):
             showgrid=True,
             gridcolor="#c0c0c0",
             title=dict(
-                text="Sensitivity",
+                text="Sensitivity<br>Schedule",
                 font=dict(
                     size=12
                 )
@@ -1001,11 +1097,11 @@ def make_scenario_figure(loop_output):
         )
     )
 
-    # momentum effect trace
-    momentum_trace = prepare_momentum_effect_trace(loop_output)
-
-    # retrospective correction effect trace
-    rc_trace = prepare_retrospective_correction_effect_trace(loop_output)
+    # get effect traces
+    (
+     predict_bg_effect_trace, insulin_effect_trace, carb_effect_trace,
+     momentum_effect_trace, rc_effect_trace
+    ) = prepare_all_effect_traces(loop_output)
 
     # make a settings trace
     isf_effect_trace, cir_effect_trace, csf_effect_trace, settings_axis = (
@@ -1024,7 +1120,9 @@ def make_scenario_figure(loop_output):
     traces.extend(target_traces)
     traces.extend([
         suspend_trace, insulin_effect_on_board_trace,
-        carb_effect_on_board_trace, momentum_trace, rc_trace,
+        carb_effect_on_board_trace, predict_bg_effect_trace,
+        insulin_effect_trace, carb_effect_trace,
+        momentum_effect_trace, rc_effect_trace,
         loop_basal_trace, loop_bolus_trace,
         isf_effect_trace, cir_effect_trace, csf_effect_trace,
         carb_trace, bolus_trace,

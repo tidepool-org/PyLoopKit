@@ -929,9 +929,21 @@ def prepare_all_effect_traces(loop_output):
 
     momentum_values = (
         np.array(predict_bg_values[0:len(momentum_predicted_glucose_values)])
-        - np.array(insulin_predicted_glucose_values[0:len(momentum_predicted_glucose_values)])
-        - np.array(carb_predicted_glucose_values[0:len(momentum_predicted_glucose_values)])
-        - np.array(rc_predicted_glucose_values[0:len(momentum_predicted_glucose_values)])
+        - np.array(
+            insulin_predicted_glucose_values[
+                0:len(momentum_predicted_glucose_values)
+            ]
+        )
+        - np.array(
+            carb_predicted_glucose_values[
+                0:len(momentum_predicted_glucose_values)
+            ]
+        )
+        - np.array(
+            rc_predicted_glucose_values[
+                0:len(momentum_predicted_glucose_values)
+            ]
+        )
     )
 
     momentum_effect_trace = go.Scatter(
@@ -950,8 +962,6 @@ def prepare_all_effect_traces(loop_output):
         )
     )
     momentum_effect_trace.yaxis = "y3"
-
-
 
     return (
         predict_bg_effect_trace, insulin_effect_trace, carb_effect_trace,

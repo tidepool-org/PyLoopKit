@@ -33,7 +33,7 @@ def prepare_bg(df, current_time):
     )
 
     df_axis = dict(
-            domain=[0.5, 1],
+            domain=[0.65, 1],
             range=[0, 400],
             tickvals=[-100, 40, 70, 180, 250, 400],
             fixedrange=True,
@@ -44,7 +44,7 @@ def prepare_bg(df, current_time):
             title=dict(
                 text="Blood Glucose (mg/dL)",
                 font=dict(
-                    size=11
+                    size=12
                 )
             )
         )
@@ -421,16 +421,16 @@ def prepare_insulin_axis(basal, bolus, carbs, current_time):
         showgrid=True,
         gridcolor="#c0c0c0",
         title=dict(
-            text="Insulin (U, U/hr)",
+            text="Events (U, U/hr)",
             font=dict(
-                size=10
+                size=12
             )
         )
     )
 
     annotation = go.layout.Annotation(
         x=current_time,
-        y=max_value - 0.25,
+        y=0,
         xref="x",
         yref="y",
         text="evaluation point",
@@ -438,8 +438,9 @@ def prepare_insulin_axis(basal, bolus, carbs, current_time):
         arrowhead=1,
         ax=0,
         ayref="y",
-        ay=max_value + 0.25
+        ay=-1.5
     )
+
     return axis, annotation
 
 
@@ -452,7 +453,7 @@ def prepare_loop_prediction(predicted_bg_dates, predicted_bg_values):
         mode='lines',
         line=dict(
             color="#9886CF",
-            dash="longdash",
+            dash="dash",
         )
     )
     bg_prediction_trace.yaxis = "y2"
@@ -628,16 +629,16 @@ def prepare_insulin_effect_onboard_trace(
     df_trace.yaxis = "y3"
 
     df_axis = dict(
-            domain=[0.25, .475],
+            domain=[0.4, 0.625],
             fixedrange=True,
             hoverformat=".0f",
             zeroline=False,
             showgrid=True,
             gridcolor="#c0c0c0",
             title=dict(
-                text="Effect On-Board (mg/dL)",
+                text="Effects (mg/dL)",
                 font=dict(
-                    size=10
+                    size=12
                 )
             )
         )
@@ -648,26 +649,47 @@ def prepare_insulin_effect_onboard_trace(
 def prepare_carb_effect_onboard_trace(
         loop_output, carbs, isf, carb_ratios, continguous_ts
 ):
+    df = pd.merge(
+        continguous_ts,
+        isf,
+        left_on="time",
+        right_on="sensitivity_ratio_start_times",
+        how="left"
+    )
+    df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
+
+    df = pd.merge(
+        df,
+        carb_ratios,
+        left_on="time",
+        right_on="carb_ratio_start_times",
+        how="left"
+    )
+    df["carb_ratio_values"].fillna(method='ffill', inplace=True)
+
+    df["csf"] = df["sensitivity_ratio_values"] / df["carb_ratio_values"]
+
+    settings_schedules = df[[
+        "datetime",
+        "sensitivity_ratio_values",
+        "carb_ratio_values",
+        "csf"
+    ]].copy()
+
+    settings_schedules.dropna(subset=['csf'], inplace=True)
+
+    settings_schedules = pd.merge(
+        create_contiguous_ts(
+            settings_schedules["datetime"].min(),
+            settings_schedules["datetime"].max(),
+            freq="5min"
+        ),
+        settings_schedules,
+        on="datetime",
+        how="left"
+    )
+
     if len(carbs) > 0:
-        df = pd.merge(
-            continguous_ts,
-            isf,
-            left_on="time",
-            right_on="sensitivity_ratio_start_times",
-            how="left"
-        )
-        df["sensitivity_ratio_values"].fillna(method='ffill', inplace=True)
-
-        df = pd.merge(
-            df,
-            carb_ratios,
-            left_on="time",
-            right_on="carb_ratio_start_times",
-            how="left"
-        )
-        df["carb_ratio_values"].fillna(method='ffill', inplace=True)
-
-        df["csf"] = df["sensitivity_ratio_values"] / df["carb_ratio_values"]
 
         date_min = (
             carbs["datetime"].dt.round("5min").min() - pd.Timedelta("5min")
@@ -739,7 +761,7 @@ def prepare_carb_effect_onboard_trace(
 
     carb_effect_ob_trace.yaxis = "y3"
 
-    return carb_effect_ob_trace
+    return carb_effect_ob_trace, settings_schedules
 
 
 def prepare_momentum_effect_trace(loop_output):
@@ -803,16 +825,78 @@ def prepare_retrospective_correction_effect_trace(loop_output):
     return rc_effect_trace
 
 
+def make_settings_traces(settings_schedules):
+    isf_effect_trace = go.Scatter(
+        name="isf (mg/dL/U)",
+        mode='lines',
+        x=settings_schedules["datetime"],
+        y=settings_schedules["sensitivity_ratio_values"],
+        hoverinfo="y+name",
+        line=dict(
+            color='#5691F0',
+            dash='solid',
+            width=0.75
+        ),
+    )
+    isf_effect_trace.yaxis = "y4"
+
+    cir_effect_trace = go.Scatter(
+        name="cir (g/U)",
+        mode='lines',
+        x=settings_schedules["datetime"],
+        y=settings_schedules["carb_ratio_values"],
+        hoverinfo="y+name",
+        line=dict(
+            color='#0AA648',
+            dash='solid',
+            width=0.75
+        ),
+    )
+    cir_effect_trace.yaxis = "y4"
+
+    csf_effect_trace = go.Scatter(
+        name="csf (mg/dL/g)",
+        mode='lines',
+        x=settings_schedules["datetime"],
+        y=settings_schedules["csf"],
+        hoverinfo="y+name",
+        line=dict(
+            color='#6483B4',
+            dash='dot',
+            width=0.75
+        ),
+    )
+    csf_effect_trace.yaxis = "y4"
+
+    settings_axis = dict(
+            domain=[0.25, 0.35],
+            fixedrange=True,
+            hoverformat=".1f",
+            zeroline=False,
+            showgrid=True,
+            gridcolor="#c0c0c0",
+            title=dict(
+                text="Sensitivity",
+                font=dict(
+                    size=12
+                )
+            )
+    )
+    return isf_effect_trace, cir_effect_trace, csf_effect_trace, settings_axis
+
+
 def prepare_layout(
-    current_time, top_axis, bottom_axis, top_annotation, bottom_annotation,
-    middle_axis
+    current_time, bg_axis, insulin_axis, effect_on_board_axis, settings_axis,
+    top_annotation, bottom_annotation,
 ):
     layout = go.Layout(
         showlegend=True,
         plot_bgcolor="white",
-        yaxis=bottom_axis,
-        yaxis2=top_axis,
-        yaxis3=middle_axis,
+        yaxis2=bg_axis,
+        yaxis=insulin_axis,
+        yaxis3=effect_on_board_axis,
+        yaxis4=settings_axis,
+
         xaxis=dict(
             range=(
                 current_time - datetime.timedelta(hours=8),
@@ -910,7 +994,7 @@ def make_scenario_figure(loop_output):
     )
 
     # carb effect on-board trace
-    carb_effect_on_board_trace = (
+    carb_effect_on_board_trace, settings_schedules = (
         prepare_carb_effect_onboard_trace(
             loop_output, carbs, df_sensitivity_ratio,
             carb_ratios, continguous_ts
@@ -923,10 +1007,16 @@ def make_scenario_figure(loop_output):
     # retrospective correction effect trace
     rc_trace = prepare_retrospective_correction_effect_trace(loop_output)
 
+    # make a settings trace
+    isf_effect_trace, cir_effect_trace, csf_effect_trace, settings_axis = (
+            make_settings_traces(settings_schedules)
+    )
+
     # %% make figure
     fig_layout = prepare_layout(
-        current_time, bg_axis, insulin_axis, bg_annotation, insulin_annotation,
-        effect_on_board_axis
+        current_time,
+        bg_axis, insulin_axis, effect_on_board_axis, settings_axis,
+        bg_annotation, insulin_annotation,
     )
 
     traces = []
@@ -935,7 +1025,10 @@ def make_scenario_figure(loop_output):
     traces.extend([
         suspend_trace, insulin_effect_on_board_trace,
         carb_effect_on_board_trace, momentum_trace, rc_trace,
-        loop_basal_trace, loop_bolus_trace, carb_trace, bolus_trace
+        loop_basal_trace, loop_bolus_trace,
+        isf_effect_trace, cir_effect_trace, csf_effect_trace,
+        carb_trace, bolus_trace,
+
     ])
     traces.extend(scheduled_basal_traces)
     traces.extend(basal_delivered_traces)
@@ -956,7 +1049,7 @@ def view_example():
         "hypothetical-scenario-2.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[4])
+    table_path_name = os.path.join(path, cutom_scenario_files[2])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

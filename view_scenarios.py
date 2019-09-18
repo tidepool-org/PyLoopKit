@@ -701,7 +701,7 @@ def prepare_carb_effect_onboard_trace(
         date_min = (
             carbs["datetime"].dt.round("5min").min() - pd.Timedelta("5min")
         )
-        date_max = loop_output["cob_timeline_dates"][0] - pd.Timedelta("5min")
+        date_max = loop_output.get("cob_timeline_dates")[0] - pd.Timedelta("5min")
         carb_effect_ob = (
             create_contiguous_ts(date_min, date_max, freq="5min")
         )
@@ -709,19 +709,19 @@ def prepare_carb_effect_onboard_trace(
         # TODO: there has to be a better way to get historical carbs on board
         # this method is re-running the loop algorithm
         for d in carb_effect_ob["datetime"]:
-            inputs = loop_output["input_data"]
+            inputs = loop_output.get("input_data")
             inputs["time_to_calculate_at"] = (
                 datetime.datetime.fromisoformat(d.isoformat())
             )
             temp_loop_output = update(inputs)
             carb_effect_ob.loc[carb_effect_ob["datetime"] == d, "cob"] = (
-                temp_loop_output["carbs_on_board"]
+                temp_loop_output.get("carbs_on_board")
             )
 
         # get the carbs on board time series
         cob_df = pd.DataFrame()
-        cob_df["datetime"] = loop_output["cob_timeline_dates"]
-        cob_df["cob"] = loop_output["cob_timeline_values"]
+        cob_df["datetime"] = loop_output.get("cob_timeline_dates")
+        cob_df["cob"] = loop_output.get("cob_timeline_values")
 
         carb_effect_ob = pd.concat(
             [carb_effect_ob, cob_df], ignore_index=True, sort=True
@@ -779,9 +779,9 @@ def prepare_all_effect_traces(loop_output):
     starting_glucose = loop_output.get("input_data").get("glucose_values")[-1]
 
     predict_bg_df = pd.DataFrame(
-        loop_output["predicted_glucose_dates"], columns=["datetime"]
+        loop_output.get("predicted_glucose_dates"), columns=["datetime"]
     )
-    predict_bg_df["values"] = loop_output["predicted_glucose_values"]
+    predict_bg_df["values"] = loop_output.get("predicted_glucose_values")
     predict_bg_df["relValues"] = (
         predict_bg_df["values"] - predict_bg_df["values"].shift(1)
     ).fillna(0)
@@ -1071,7 +1071,7 @@ def prepare_layout(
 
 
 def make_scenario_figure(loop_output):
-    inputs = loop_output["input_data"]
+    inputs = loop_output.get("input_data")
 
     # convert dict_inputs_to_dataframes
     (

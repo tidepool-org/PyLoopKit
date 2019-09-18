@@ -574,12 +574,12 @@ def prepare_insulin_effect_onboard_trace(
         scheduled_basal_rates = list(dose_data["basal_rate_values"].values)
 
         (iob_dates, iob_values) = insulin_on_board(
-            dose_types=inputs["dose_types"],
-            start_dates=inputs["dose_start_times"],
-            end_dates=inputs["dose_end_times"],
-            values=inputs["dose_values"],
+            dose_types=inputs.get("dose_types"),
+            start_dates=inputs.get("dose_start_times"),
+            end_dates=inputs.get("dose_end_times"),
+            values=inputs.get("dose_values"),
             scheduled_basal_rates=scheduled_basal_rates,
-            model=inputs["settings_dictionary"]["model"],
+            model=inputs.get("settings_dictionary").get("model"),
             start=None,
             end=None,
             delay=10,
@@ -709,7 +709,7 @@ def prepare_carb_effect_onboard_trace(
         # TODO: there has to be a better way to get historical carbs on board
         # this method is re-running the loop algorithm
         for d in carb_effect_ob["datetime"]:
-            inputs = loop_output.get("input_data")
+            inputs = loop_output.get("input_data").copy()
             inputs["time_to_calculate_at"] = (
                 datetime.datetime.fromisoformat(d.isoformat())
             )
@@ -1098,7 +1098,7 @@ def make_scenario_figure(loop_output):
     )
 
     # suspend threshold
-    suspend_threshold = inputs["settings_dictionary"]["suspend_threshold"]
+    suspend_threshold = inputs.get("settings_dictionary").get("suspend_threshold")
     suspend_trace = prepare_suspend(suspend_threshold, current_time)
 
     # %% insulin and carb data

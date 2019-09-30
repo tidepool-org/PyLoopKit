@@ -1203,10 +1203,11 @@ def view_example():
         "custom-scenario-table-template-complex.csv",
         "custom-scenario-table-example-3.csv",
         "hypothetical-scenario-1.csv",
-        "hypothetical-scenario-2.csv"
+        "hypothetical-scenario-2.csv",
+        "custom-scenario-varying-isf-correction-target.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[1])
+    table_path_name = os.path.join(path, cutom_scenario_files[5])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

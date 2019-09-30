@@ -333,7 +333,7 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
     )
     df["target_range_minimum_values"].fillna(method='ffill', inplace=True)
     df["target_range_maximum_values"].fillna(method='ffill', inplace=True)
-    target_at_eval_df = df[df["datetime"] == current_time]
+#    target_at_eval_df = df[df["datetime"] == current_time]
     df.dropna(subset=['target_range_minimum_values'], inplace=True)
 
     # downsample
@@ -380,11 +380,8 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
             ]
 
         tmp_trace = go.Scatter(
-            name="target range (@ eval = {}-{} mg/dL)".format(
-              int(target_at_eval_df["target_range_minimum_values"].values[0]),
-              int(target_at_eval_df["target_range_maximum_values"].values[0])
-            ),
-            legendgroup="target_range",
+            name="correction range",
+            legendgroup="correction range",
             showlegend=legend_on,
             mode='lines',
             x=x_vals,
@@ -1093,7 +1090,7 @@ def make_scenario_figure(loop_output):
     date_max = current_time + datetime.timedelta(days=1)
     continguous_ts = create_contiguous_ts(date_min, date_max)
 
-    # target range
+    # correction range
     target_range, target_traces = (
         prepare_target_range(df_target_range, continguous_ts, current_time)
     )

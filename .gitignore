@@ -5,6 +5,6 @@
 
 *.png
 
-*output.html
-
 *-output.json
+
+*.html

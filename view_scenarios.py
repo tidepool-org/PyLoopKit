@@ -24,7 +24,7 @@ def prepare_bg(df, current_time):
         name="bg",
         x=df["glucose_dates"],
         y=df["glucose_values"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         mode='markers',
         marker=dict(
             size=6,
@@ -261,7 +261,7 @@ def prepare_bolus(df_dose):
         mode='markers',
         x=df["dose_start_times"],
         y=df["dose_values"],
-        hoverinfo="y+name",
+                hoverinfo="y+name+x",
         marker=dict(
             symbol='triangle-down',
             size=15 + df["dose_values"],
@@ -308,7 +308,7 @@ def prepare_carbs(df_events, df_ratios, continguous_ts):
         mode='markers + text',
         x=carb_df["datetime"],
         y=carb_df["bolus_height"] + 0.75,
-        hoverinfo="name",
+        hoverinfo="name+x",
         marker=dict(
             color="#0AA648",
             size=25
@@ -450,7 +450,7 @@ def prepare_loop_prediction(predicted_bg_dates, predicted_bg_values):
         name="predicted bg",
         x=predicted_bg_dates,
         y=predicted_bg_values,
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         mode='markers+lines',
         line=dict(
             color="#9886CF",
@@ -482,7 +482,7 @@ def prepare_loop_temp_basal(basal, current_time, recommended_temp_basal):
            current_time + datetime.timedelta(minutes=rec_temp_basal_duration),
         ],
         y=[rec_temp_basal_rate, rec_temp_basal_rate],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             shape='vh',
             color='#5691F0',
@@ -608,7 +608,7 @@ def prepare_insulin_effect_onboard_trace(
             mode='lines',
             x=iob_effect["datetime"],
             y=-iob_effect["values"],
-            hoverinfo="name",
+            hoverinfo="name+x",
             line=dict(
                 color='#5691F0',
                 dash='solid'
@@ -624,7 +624,7 @@ def prepare_insulin_effect_onboard_trace(
             mode='lines',
             x=[],
             y=[],
-            hoverinfo="y+name",
+            hoverinfo="y+name+x",
             line=dict(
                 color='#5691F0',
                 dash='solid'
@@ -745,7 +745,7 @@ def prepare_carb_effect_onboard_trace(
             mode='lines',
             x=carb_effect_ob["datetime"],
             y=carb_effect_ob["values"],
-            hoverinfo="name",
+            hoverinfo="name+x",
             line=dict(
                 color='#0AA648',
                 dash='solid'
@@ -792,7 +792,7 @@ def prepare_all_effect_traces(loop_output):
         mode='markers+lines',
         x=predict_bg_df["datetime"],
         y=predict_bg_df["relValues"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#9886CF',
             dash='solid',
@@ -827,7 +827,7 @@ def prepare_all_effect_traces(loop_output):
         mode='markers+lines',
         x=insulin_df["datetime"],
         y=insulin_df["relValues"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#5691F0',
             dash='solid',
@@ -862,7 +862,7 @@ def prepare_all_effect_traces(loop_output):
         mode='markers+lines',
         x=carb_df["datetime"],
         y=carb_df["relValues"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#0AA648',
             dash='solid',
@@ -911,7 +911,7 @@ def prepare_all_effect_traces(loop_output):
             mode='markers+lines',
             x=rc_df["datetime"],
             y=rc_df["relValues"],
-            hoverinfo="y+name",
+            hoverinfo="y+name+x",
             line=dict(
                 color='#ED5393',
                 dash='solid',
@@ -936,7 +936,7 @@ def prepare_all_effect_traces(loop_output):
             mode='markers+lines',
             x=[],
             y=[],
-            hoverinfo="y+name",
+            hoverinfo="y+name+x",
             line=dict(
                 color='#ED5393',
                 dash='solid',
@@ -961,7 +961,7 @@ def prepare_all_effect_traces(loop_output):
         mode='markers+lines',
         x=momentum_predicted_glucose_dates,
         y=momentum_values,
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#CF7911',
             dash='solid',
@@ -985,7 +985,7 @@ def make_settings_traces(settings_schedules):
         mode='lines',
         x=settings_schedules["datetime"],
         y=settings_schedules["sensitivity_ratio_values"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#5691F0',
             dash='solid',
@@ -999,7 +999,7 @@ def make_settings_traces(settings_schedules):
         mode='lines',
         x=settings_schedules["datetime"],
         y=settings_schedules["carb_ratio_values"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#0AA648',
             dash='solid',
@@ -1013,7 +1013,7 @@ def make_settings_traces(settings_schedules):
         mode='lines',
         x=settings_schedules["datetime"],
         y=settings_schedules["csf"],
-        hoverinfo="y+name",
+        hoverinfo="y+name+x",
         line=dict(
             color='#6483B4',
             dash='solid',
@@ -1058,6 +1058,7 @@ def prepare_layout(
             ),
             showgrid=True,
             gridcolor="#c0c0c0",
+            hoverformat="%H:%M"
         ),
         annotations=[
             top_annotation,
@@ -1205,7 +1206,7 @@ def view_example():
         "hypothetical-scenario-2.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[2])
+    table_path_name = os.path.join(path, cutom_scenario_files[1])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

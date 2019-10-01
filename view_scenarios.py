@@ -12,7 +12,8 @@ import numpy as np
 from input_data_tools import dict_inputs_to_dataframes, input_table_to_dict
 from loop_data_manager import update
 from loop_math import predict_glucose
-from insulin_math import insulin_on_board
+from insulin_math import insulin_on_board, find_ratio_at_time
+from dose_math import insulin_correction
 import plotly.graph_objs as go
 from plotly.offline import plot
 
@@ -323,7 +324,57 @@ def prepare_carbs(df_events, df_ratios, continguous_ts):
     return carb_df, df_trace
 
 
-def prepare_target_range(df_target_range, continguous_ts, current_time):
+def get_correction_details(la_outs):
+
+    la_ins = la_outs.get("input_data")
+
+    prediction_dates = la_outs.get("predicted_glucose_dates")
+    prediction_values = la_outs.get("predicted_glucose_values")
+
+    target_starts = la_ins.get("target_range_start_times")
+    target_ends = la_ins.get("target_range_end_times")
+    target_mins = la_ins.get("target_range_minimum_values")
+    target_maxes = la_ins.get("target_range_maximum_values")
+
+    at_date = la_ins.get("time_to_calculate_at")
+
+    suspend_threshold_value = (
+        la_ins.get("settings_dictionary").get("suspend_threshold")
+    )
+
+    sensitivity_starts = la_ins.get("sensitivity_ratio_start_times")
+    sensitivity_ends = la_ins.get("sensitivity_ratio_end_times")
+    sensitivity_values = la_ins.get("sensitivity_ratio_values")
+
+    sensitivity_value = find_ratio_at_time(
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        at_date
+    )
+
+    model = (
+        la_ins.get("settings_dictionary").get("model")
+    )
+
+    _, correction_details = insulin_correction(
+        prediction_dates,
+        prediction_values,
+        target_starts,
+        target_ends,
+        target_mins,
+        target_maxes,
+        at_date,
+        suspend_threshold_value,
+        sensitivity_value,
+        model
+    )
+
+    return correction_details
+
+
+def prepare_target_range(
+        df_target_range, continguous_ts, current_time, la_outs
+):
+
     df = pd.merge(
         continguous_ts,
         df_target_range,
@@ -398,6 +449,26 @@ def prepare_target_range(df_target_range, continguous_ts, current_time):
 
         tmp_trace.yaxis = "y2"
         target_traces.append(tmp_trace)
+
+    # add in the correction target (blend of suspend and correction range)
+    correction_details = get_correction_details(la_outs)
+
+    correction_target_trace = go.Scatter(
+        name="correction target",
+        legendgroup="correction target",
+        showlegend=True,
+        mode='lines',
+        x=correction_details["datetime"],
+        y=correction_details["correctionTarget"],
+        hoverinfo="all",
+        line=dict(
+            width=2,
+            color="rgba(152, 134, 207, 0.75)"
+        ),
+    )
+
+    correction_target_trace.yaxis = "y2"
+    target_traces.append(correction_target_trace)
 
     return df, target_traces
 
@@ -1036,6 +1107,9 @@ def make_settings_traces(settings_schedules):
     return isf_effect_trace, cir_effect_trace, csf_effect_trace, settings_axis
 
 
+
+
+
 def prepare_layout(
     current_time, bg_axis, insulin_axis, effect_on_board_axis, settings_axis,
     top_annotation, bottom_annotation,
@@ -1092,7 +1166,9 @@ def make_scenario_figure(loop_output):
 
     # correction range
     target_range, target_traces = (
-        prepare_target_range(df_target_range, continguous_ts, current_time)
+        prepare_target_range(
+            df_target_range, continguous_ts, current_time, loop_output
+        )
     )
 
     # suspend threshold
@@ -1199,12 +1275,10 @@ def view_example():
         "custom-scenario-table-template-simple.csv",
         "custom-scenario-table-template-complex.csv",
         "custom-scenario-table-example-3.csv",
-        "hypothetical-scenario-1.csv",
-        "hypothetical-scenario-2.csv",
         "custom-scenario-varying-isf-correction-target.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[5])
+    table_path_name = os.path.join(path, cutom_scenario_files[2])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

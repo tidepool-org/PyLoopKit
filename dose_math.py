@@ -12,7 +12,7 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 from datetime import timedelta
 from enum import Enum
 import sys
-
+import pandas as pd
 from insulin_math import is_time_between, find_ratio_at_time
 from date import time_interval_since
 from dose import DoseType
@@ -209,6 +209,7 @@ def insulin_correction(
     """ Computes a total insulin amount necessary to correct a glucose
         differential at a given sensitivity
 
+    Inputs:
     prediction_dates -- dates glucose values were predicted (datetime)
     prediction_values -- predicted glucose values (mg/dL)
 
@@ -223,9 +224,11 @@ def insulin_correction(
     model -- list of insulin model parameters in format [DIA, peak_time] if
              exponential model, or [DIA] if Walsh model
 
-    Output:
-    A list of insulin correction information. All lists have the type as the
-    first index, and may include additional information based on the type.
+    Outputs:
+
+    correction -- A list of insulin correction information. All lists have
+    the type as the first index, and may include additional information
+    based on the type:
 
         Types:
         - entirely_below_range
@@ -239,12 +242,18 @@ def insulin_correction(
             Structure: [type, minimum predicted glucose value,
                         glucose value to be corrected, minimum target,
                         units of correction insulin]
+
+    correction_df -- a pandas dataframe that contains correction target
+    details. Please note, this is NOT a part of the core loop algortihm,
+    but rather, additional data to help visualize how loop is working.
     """
     assert len(prediction_dates) == len(prediction_values),\
         "expected input shapes to match"
 
     assert len(target_starts) == len(target_ends) == len(target_mins)\
         == len(target_maxes), "expected input shapes to match"
+
+    correction_df = pd.DataFrame()
 
     (min_glucose,
      eventual_glucose,
@@ -277,6 +286,10 @@ def insulin_correction(
     # necessary to correct glucose based on the modeled effectiveness of
     # the insulin at that time
     for i in range(0, len(prediction_dates)):
+        # get/store details for each time step
+        correction_df.loc[i, "datetime"] = prediction_dates[i]
+        correction_df.loc[i, "bgHat"] = prediction_values[i]
+
         if not is_time_between(
                 date_range[0],
                 date_range[1],
@@ -287,7 +300,7 @@ def insulin_correction(
         # If any predicted value is below the suspend threshold,
         # return immediately
         if prediction_values[i] < suspend_threshold_value:
-            return [Correction.suspend, prediction_values[i]]
+            return [Correction.suspend, prediction_values[i]], correction_df
 
         # Update range statistics
         if not min_glucose or prediction_values[i] < min_glucose[1]:
@@ -325,6 +338,7 @@ def insulin_correction(
             suspend_threshold_value,
             average_target
         )
+        correction_df.loc[i, "correctionTarget"] = target_value
 
         # Compute the dose required to bring this prediction to target:
         # dose = (Glucose delta) / (% effect × sensitivity)
@@ -340,6 +354,9 @@ def insulin_correction(
                 model[1]
             )
         effected_sensitivity = percent_effected * sensitivity_value
+        correction_df.loc[i, "isf"] = sensitivity_value
+        correction_df.loc[i, "percentEffected"] = percent_effected
+        correction_df.loc[i, "effectedSensitivity"] = effected_sensitivity
 
         # calculate the Units needed to correct that predicted glucose value
         correction_units = insulin_correction_units(
@@ -347,6 +364,7 @@ def insulin_correction(
             target_value,
             effected_sensitivity
         )
+        correction_df.loc[i, "dose"] = correction_units
 
         if not correction_units or correction_units <= 0:
             continue
@@ -360,7 +378,7 @@ def insulin_correction(
         min_correction_units = correction_units
 
     if not eventual_glucose or not min_glucose:
-        return None
+        return None, correction_df
 
     # Choose either the minimum glucose or eventual glucose as correction delta
     min_glucose_targets = [
@@ -418,7 +436,7 @@ def insulin_correction(
             )
 
         if not units:
-            return None
+            return None, correction_df
 
         # we're way below target
         return [
@@ -426,7 +444,7 @@ def insulin_correction(
             min_glucose[1],
             min_glucose_targets[0],
             units
-            ]
+            ], correction_df
 
     # we're above target
     elif (eventual_glucose[1] > eventual_glucose_targets[1]
@@ -439,10 +457,10 @@ def insulin_correction(
             correcting_glucose[1],
             eventual_glucose_targets[0],
             min_correction_units
-            ]
+            ], correction_df
     # we're in range
     else:
-        return [Correction.in_range]
+        return [Correction.in_range], correction_df
 
 
 def as_temp_basal(
@@ -621,7 +639,7 @@ def recommended_temp_basal(
         at_date
         )
 
-    correction = insulin_correction(
+    correction, _ = insulin_correction(
         glucose_dates, glucose_values,
         target_starts, target_ends, target_mins, target_maxes,
         at_date,
@@ -729,7 +747,7 @@ def recommended_bolus(
         at_date
         )
 
-    correction = insulin_correction(
+    correction, _ = insulin_correction(
         glucose_dates, glucose_values,
         target_starts, target_ends, target_mins, target_maxes,
         at_date,

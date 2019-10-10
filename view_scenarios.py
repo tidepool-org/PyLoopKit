@@ -460,6 +460,11 @@ def prepare_target_range(
         mode='lines',
         x=correction_details["datetime"],
         y=correction_details["correctionTarget"],
+        hovertext=(
+            "correction dose="
+            + correction_details["dose"].round(1).astype(str)
+            + "U"
+        ),
         hoverinfo="all",
         line=dict(
             width=2,
@@ -1278,7 +1283,7 @@ def view_example():
         "custom-scenario-varying-isf-correction-target.csv"
     ]
     path = os.path.join(".", "example_files")
-    table_path_name = os.path.join(path, cutom_scenario_files[2])
+    table_path_name = os.path.join(path, cutom_scenario_files[1])
     custom_table_df = pd.read_csv(table_path_name, index_col=0)
     inputs_from_file = input_table_to_dict(custom_table_df)
     loop_algorithm_output = update(inputs_from_file)

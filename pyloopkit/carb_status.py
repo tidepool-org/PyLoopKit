@@ -11,8 +11,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # pylint: disable=R0913, R0914
 from datetime import timedelta
 
-from date import time_interval_since
-import carb_math
+from .date import time_interval_since
+from . import carb_math
 
 
 def dynamic_carbs_on_board_helper(

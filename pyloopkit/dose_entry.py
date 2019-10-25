@@ -8,8 +8,8 @@ Created on Fri Jun 21 09:57:26 2019
 Github URL: https://github.com/tidepool-org/LoopKit/blob/
 57a9f2ba65ae3765ef7baafe66b883e654e08391/LoopKit/InsulinKit/DoseEntry.swift
 """
-from date import time_interval_since
-from dose import DoseType
+from .date import time_interval_since
+from .dose import DoseType
 
 
 def net_basal_units(type_, value, start, end, scheduled_basal_rate):

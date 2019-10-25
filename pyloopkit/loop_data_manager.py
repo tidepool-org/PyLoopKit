@@ -12,20 +12,20 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 from datetime import timedelta
 import warnings
 
-from carb_store import get_carb_glucose_effects, get_carbs_on_board
-from date import time_interval_since
-from dose import DoseType
-from dose_math import recommended_temp_basal, recommended_bolus
-from dose_store import get_glucose_effects
-from glucose_store import (get_recent_momentum_effects,
+from pyloopkit.carb_store import get_carb_glucose_effects, get_carbs_on_board
+from pyloopkit.date import time_interval_since
+from pyloopkit.dose import DoseType
+from pyloopkit.dose_math import recommended_temp_basal, recommended_bolus
+from pyloopkit.dose_store import get_glucose_effects
+from pyloopkit.glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
-from input_validation_tools import (
+from pyloopkit.input_validation_tools import (
     are_settings_valid, are_glucose_readings_valid, are_carb_readings_valid,
     is_insulin_sensitivity_schedule_valid, are_carb_ratios_valid,
     are_basal_rates_valid, are_correction_ranges_valid,
     are_insulin_doses_valid)
-from insulin_math import find_ratio_at_time
-from loop_math import (combined_sums, decay_effect, subtracting,
+from pyloopkit.insulin_math import find_ratio_at_time
+from pyloopkit.loop_math import (combined_sums, decay_effect, subtracting,
                        predict_glucose)
 
 
@@ -161,7 +161,7 @@ def update(input_dict):
             or not are_carb_readings_valid(
                 carb_dates, carb_values, carb_absorptions
             )
-            
+
             or not are_insulin_doses_valid(
                 dose_types, dose_starts, dose_ends, dose_values
             )

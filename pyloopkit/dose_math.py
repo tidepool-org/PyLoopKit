@@ -13,11 +13,11 @@ from datetime import timedelta
 from enum import Enum
 import sys
 
-from insulin_math import is_time_between, find_ratio_at_time
-from date import time_interval_since
-from dose import DoseType
-from walsh_insulin_model import walsh_percent_effect_remaining
-from exponential_insulin_model import percent_effect_remaining
+from pyloopkit.insulin_math import is_time_between, find_ratio_at_time
+from pyloopkit.date import time_interval_since
+from pyloopkit.dose import DoseType
+from pyloopkit.walsh_insulin_model import walsh_percent_effect_remaining
+from pyloopkit.exponential_insulin_model import percent_effect_remaining
 
 
 class Correction(Enum):

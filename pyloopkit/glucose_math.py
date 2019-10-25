@@ -13,8 +13,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 import math
 from datetime import timedelta
 
-from date import time_interval_since
-from loop_math import simulation_date_range_for_samples
+from .date import time_interval_since
+from .loop_math import simulation_date_range_for_samples
 
 
 def linear_regression(x_list, y_list):

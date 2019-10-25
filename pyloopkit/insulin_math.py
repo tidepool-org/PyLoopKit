@@ -13,12 +13,12 @@ from math import floor
 from datetime import timedelta, datetime
 import sys
 
-from date import time_interval_since, time_interval_since_reference_date
-from dose import DoseType
-from loop_math import simulation_date_range_for_samples
-from dose_entry import net_basal_units, total_units_given
-from exponential_insulin_model import percent_effect_remaining
-from walsh_insulin_model import walsh_percent_effect_remaining
+from pyloopkit.date import time_interval_since, time_interval_since_reference_date
+from pyloopkit.dose import DoseType
+from pyloopkit.loop_math import simulation_date_range_for_samples
+from pyloopkit.dose_entry import net_basal_units, total_units_given
+from pyloopkit.exponential_insulin_model import percent_effect_remaining
+from pyloopkit.walsh_insulin_model import walsh_percent_effect_remaining
 
 MAXIMUM_RESERVOIR_DROP_PER_MINUTE = 6.5
 DISTANT_PAST = datetime.fromisoformat("2001-01-01T00:00:00")

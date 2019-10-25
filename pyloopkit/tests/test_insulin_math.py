@@ -16,7 +16,6 @@ import unittest
 from datetime import datetime, time
 import numpy
 
-import path_grabber  # pylint: disable=unused-import
 from dose import DoseType
 from exponential_insulin_model import percent_effect_remaining
 from insulin_math import (dose_entries, is_continuous, insulin_on_board,

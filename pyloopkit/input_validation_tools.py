@@ -7,7 +7,7 @@ Created on Mon Jul 29 16:39:23 2019
 """
 # pylint: disable=R0911, W0613
 import warnings
-from dose import DoseType
+from .dose import DoseType
 
 
 def are_settings_valid(settings):

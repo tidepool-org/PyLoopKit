@@ -6455,5 +6455,5 @@
         }
     ],
     "suspend_threshold_unit": "mg/dL",
-    "suspend_threshold": "50"
+    "suspend_threshold": "56"
 }

@@ -16,12 +16,12 @@ import unittest
 from datetime import datetime, time
 import numpy
 
-from dose import DoseType
-from exponential_insulin_model import percent_effect_remaining
-from insulin_math import (dose_entries, is_continuous, insulin_on_board,
+from pyloopkit.dose import DoseType
+from pyloopkit.exponential_insulin_model import percent_effect_remaining
+from pyloopkit.insulin_math import (dose_entries, is_continuous, insulin_on_board,
                           glucose_effects, annotated, reconciled,
                           total_delivery, trim, overlay_basal_schedule)
-from loop_kit_tests import load_fixture
+from pyloopkit.loop_kit_tests import load_fixture
 
 
 class TestInsulinKitFunctions(unittest.TestCase):

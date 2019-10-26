@@ -11,8 +11,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # pylint: disable=R0913, W0612
 from datetime import timedelta
 
-from .loop_math import filter_date_range
-from .glucose_math import linear_momentum_effect, counteraction_effects
+from pyloopkit.loop_math import filter_date_range
+from pyloopkit.glucose_math import linear_momentum_effect, counteraction_effects
 
 
 def get_recent_momentum_effects(

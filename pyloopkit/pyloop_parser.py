@@ -13,9 +13,9 @@ import warnings
 from datetime import datetime, time, timedelta
 import numpy
 
-from dose import DoseType
-from loop_data_manager import update
-from loop_math import sort_dose_lists
+from pyloopkit.dose import DoseType
+from pyloopkit.loop_data_manager import update
+from pyloopkit.loop_math import sort_dose_lists
 
 
 # %% Functions to get various data from an issue report
@@ -887,5 +887,5 @@ def parse_dictionary_from_previous_run(path, name):
     ]
 
     output = update(dictionary)
-    
+
     return output

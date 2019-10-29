@@ -21,7 +21,7 @@ from pyloopkit.exponential_insulin_model import percent_effect_remaining
 from pyloopkit.insulin_math import (dose_entries, is_continuous, insulin_on_board,
                                     glucose_effects, annotated, reconciled,
                                     total_delivery, trim, overlay_basal_schedule)
-from loop_kit_tests import load_fixture
+from test.loop_kit_tests import load_fixture
 
 
 class TestInsulinKitFunctions(unittest.TestCase):

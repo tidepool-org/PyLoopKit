@@ -15,7 +15,7 @@ from pyloopkit.dose import DoseType
 from pyloopkit.glucose_store import (
     get_recent_momentum_effects, get_counteraction_effects
 )
-from loop_kit_tests import load_fixture
+from test.loop_kit_tests import load_fixture
 from pyloopkit.pyloop_parser import (
     load_momentum_effects, get_glucose_data
     )

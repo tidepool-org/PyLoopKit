@@ -13,7 +13,7 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 import unittest
 from datetime import datetime
 
-from loop_kit_tests import load_fixture
+from test.loop_kit_tests import load_fixture
 from pyloopkit.glucose_math import linear_momentum_effect, counteraction_effects
 
 

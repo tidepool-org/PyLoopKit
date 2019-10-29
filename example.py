@@ -23,9 +23,9 @@ from pyloop_parser import (
 
 # %% find the path to the file in the repo
 # uncomment the name of the file you'd like to run
-name = "example_issue_report_1.json"
+#name = "example_issue_report_1.json"
 # name = "example_issue_report_2.json"
-# name = "example_issue_report_3.json"
+name = "example_issue_report_3.json"
 # name = "example_from_previous_run.json"
 
 path = find_root_path(name.split(".")[0], "." + name.split(".")[1])

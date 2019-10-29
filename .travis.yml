@@ -17,5 +17,6 @@ install:
   - source activate py-loop
 
 script:
-  - cd test
-  - python -m unittest -v
+  - sh travis.sh run_tests
+  #- cd test
+  #- python -m unittest -v

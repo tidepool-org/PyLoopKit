@@ -4,3 +4,7 @@
 build
 dist 
 pyloopkit.egg-info
+
+*output.html
+
+*-output.json

@@ -11,14 +11,15 @@ import datetime
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
-from plotly.offline import plot, iplot
+from plotly.offline import plot
 
 from dose import DoseType
 from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
 from loop_kit_tests import find_root_path
 from loop_math import predict_glucose
-from pyloop_parser import (parse_report_and_run,
-                           parse_dictionary_from_previous_run)
+from pyloop_parser import (
+    parse_report_and_run, parse_dictionary_from_previous_run
+)
 
 # %% find the path to the file in the repo
 # uncomment the name of the file you'd like to run
@@ -216,7 +217,6 @@ bg_trace = go.Scattergl(
     )
 )
 
-# insulin (bolus and basal)
 # bolus data
 dose_start_times = (
     pd.DataFrame(inputs.get("dose_start_times"), columns=["startTime"])
@@ -230,6 +230,9 @@ dose_values = (
 dose_types = (
     pd.DataFrame(inputs.get("dose_types"), columns=["type"])
 )
+
+dose_types["type"] = dose_types["type"].apply(convert_times_and_types)
+
 dose = pd.concat(
     [dose_start_times, dose_end_times, dose_values, dose_types],
     axis=1

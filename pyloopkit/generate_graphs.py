@@ -10,8 +10,8 @@ from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
 from matplotlib import collections as mc
 
-from date import time_interval_since
-from insulin_math import schedule_offset
+from pyloopkit.date import time_interval_since
+from pyloopkit.insulin_math import schedule_offset
 
 
 def plot_graph(

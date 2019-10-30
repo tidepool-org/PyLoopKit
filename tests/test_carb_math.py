@@ -12,9 +12,9 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 import unittest
 from datetime import datetime, time, timedelta
 
-import pyloopkit.tests.path_grabber  # pylint: disable=unused-import
-from loop_kit_tests import load_fixture
-from carb_math import (map_, carb_glucose_effects, carbs_on_board,
+from . import path_grabber  # pylint: disable=unused-import
+from .loop_kit_tests import load_fixture
+from pyloopkit.carb_math import (map_, carb_glucose_effects, carbs_on_board,
                        dynamic_carbs_on_board, dynamic_glucose_effects)
 
 

@@ -13,8 +13,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 import unittest
 from datetime import datetime
 
-import pyloopkit.tests.path_grabber  # pylint: disable=unused-import
-from pyloopkit.loop_kit_tests import load_fixture
+from . import path_grabber  # pylint: disable=unused-import
+from .loop_kit_tests import load_fixture
 from pyloopkit.glucose_math import linear_momentum_effect, counteraction_effects
 
 

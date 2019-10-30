@@ -9,8 +9,8 @@ Created on Mon Jun 24 14:25:03 2019
 from datetime import datetime, time
 import json
 from . import path_grabber  # pylint: disable=unused-import
-from loop_kit_tests import load_fixture
-from insulin_math import glucose_effects, insulin_on_board
+from .loop_kit_tests import load_fixture
+from pyloopkit.insulin_math import glucose_effects, insulin_on_board
 
 WITHIN = 30
 

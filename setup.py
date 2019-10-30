@@ -28,10 +28,6 @@ setup(
     ],
     install_requires=[
           'numpy==1.16.4',
-          'pandas==0.24.2',
-          'tensorflow==2.0.0-beta1',
-          'plotly==4.1.0',
-          'matplotlib==3.1.1',
       ],
     python_requires='>=3.6',
 )

@@ -4,5 +4,4 @@ python:
   - '3.7'
 
 script:
-  - cd test/pyloopkit
   - python -m unittest -v

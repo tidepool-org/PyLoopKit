@@ -13,11 +13,11 @@ import numpy as np
 import plotly.graph_objs as go
 from plotly.offline import plot
 
-from dose import DoseType
-from generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
-from loop_kit_tests import find_root_path
-from loop_math import predict_glucose
-from pyloop_parser import (
+from pyloopkit.dose import DoseType
+from pyloopkit.generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
+#from .loop_kit_tests import find_root_path
+from pyloopkit.loop_math import predict_glucose
+from pyloopkit.pyloop_parser import (
     parse_report_and_run, parse_dictionary_from_previous_run
 )
 
@@ -28,7 +28,7 @@ name = "example_issue_report_1.json"
 # name = "example_issue_report_3.json"
 # name = "example_from_previous_run.json"
 
-path = find_root_path(name.split(".")[0], "." + name.split(".")[1])
+path = "pyloopkit/example_files/"
 
 # run the Loop algorithm with the issue report data
 

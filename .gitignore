@@ -1,9 +1,9 @@
-
 \.DS_Store
-
 *.pyc
-
 *.png
+build
+dist 
+pyloopkit.egg-info
 
 *output.html
 

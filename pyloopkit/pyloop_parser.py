@@ -102,13 +102,18 @@ def get_insulin_data(
     ]
     values = []
     for i in range(0, len(data)):
+        value = float(data[i].get("value"))
+        if 'deliveredUnits' in data[i].keys() and data[i].get("deliveredUnits") != 'nil':
+            value = float(data[i].get("deliveredUnits"))
+
+
         values.append(
             convert_to_correct_units(
                 dose_types[i],
                 start_dates[i],
                 end_dates[i],
-                float(data[i].get("value"))
-            ) if convert_to_units else float(data[i].get("value"))
+                value
+            ) if convert_to_units else value
         )
 
     if entry_to_add and now_time:

@@ -9,7 +9,7 @@ Created on Wed Jul 24 09:48:51 2019
 from datetime import datetime, time, timedelta
 import unittest
 
-from . import path_grabber  # pylint: disable=unused-import
+#from . import path_grabber  # pylint: disable=unused-import
 from pyloopkit.carb_store import get_carb_glucose_effects, get_carbs_on_board
 from pyloopkit.dose_store import get_glucose_effects
 from pyloopkit.dose import DoseType

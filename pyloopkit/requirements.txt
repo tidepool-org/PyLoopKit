@@ -1,0 +1,3 @@
+numpy==1.16.4
+backports-datetime-fromisoformat==1.0.0
+

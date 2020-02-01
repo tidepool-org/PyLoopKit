@@ -548,6 +548,10 @@ def remove_too_new_values(
 
 # %% Take an issue report and run it through the Loop algorithm
 def parse_report_and_run(path, name):
+    return parse_report_and_run_with_name(os.path.join(path, name))
+
+ # %% Take an issue report and run it through the Loop algorithm
+def parse_report_and_run_with_name(data_path_and_name):
     """ Get relevent information from a Loop issue report and use it to
         run PyLoopKit
 
@@ -559,7 +563,6 @@ def parse_report_and_run(path, name):
     A dictionary of all 4 effects, the predicted glucose values, and the
     recommended basal and bolus
     """
-    data_path_and_name = os.path.join(path, name)
 
     with open(data_path_and_name, "r") as file:
         issue_dict = json.load(file)

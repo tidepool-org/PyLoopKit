@@ -407,7 +407,9 @@ table_path_name = os.path.join(path, scenario_file_names[scenario_number])
 custom_table_df = pd.read_csv(table_path_name, index_col=0)
 
 # create output dataframes
-sim_dur_mins = simulation_duration_hours * 60
+metab_dur_mins = 8 * 60  # 8 hours
+sim_dur_mins = np.max([simulation_duration_hours * 60, metab_dur_mins])
+
 delta_bgs_df = pd.DataFrame(
     index=np.arange(0, sim_dur_mins*2, 5)
 )
@@ -466,7 +468,7 @@ delta_bg, ts, carbs_consumed, insulin_delivered, iob = simple_metabolism_model(
 delta_bgs_df["initial_scenario"] = np.nan
 bg_times = (
     (delta_bgs_df.index >= 0) &
-    (delta_bgs_df.index < sim_dur_mins)
+    (delta_bgs_df.index < metab_dur_mins)
 )
 delta_bgs_df.loc[bg_times, "initial_scenario"] = delta_bg
 
@@ -566,7 +568,7 @@ for t in np.arange(0, sim_dur_mins, 5):
 
     delta_bgs_df["t={}".format(t)] = np.nan
     bg_times = (
-        (delta_bgs_df.index >= t) & (delta_bgs_df.index < (t + sim_dur_mins))
+        (delta_bgs_df.index >= t) & (delta_bgs_df.index < (t + metab_dur_mins))
     )
     delta_bgs_df.loc[bg_times, "t={}".format(t)] = delta_bg
 

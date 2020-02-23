@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 import sys
 
 
-if sys.version_info < (3, 7):
-    sys.exit("Sorry, Python < 3.7 is not supported")
+if sys.version_info < (3, 6):
+    sys.exit("Sorry, Python < 3.6 is not supported")
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-version_string = "v0.0.1"
+version_string = "v0.1.0"
 
 setup(
     name="pyloopkit",
@@ -23,11 +23,13 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD-2-Clause',
+        'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.6',
     ],
     install_requires=[
           'numpy==1.16.4',
+          'backports-datetime-fromisoformat==1.0.0',
       ],
     python_requires='>=3.6',
 )

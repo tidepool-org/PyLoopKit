@@ -12,7 +12,7 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 import unittest
 from datetime import time, datetime, timedelta
 
-from . import path_grabber  # pylint: disable=unused-import
+#from . import path_grabber  # pylint: disable=unused-import
 from .loop_kit_tests import load_fixture
 from pyloopkit.dose_math import recommended_temp_basal, recommended_bolus
 from pyloopkit.dose import DoseType

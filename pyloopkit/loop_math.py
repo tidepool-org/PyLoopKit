@@ -12,6 +12,8 @@ Github URL: https://github.com/tidepool-org/LoopKit/blob/
 # disable pylint errors for too many arguments/variables
 from datetime import timedelta
 import numpy
+from backports.datetime_fromisoformat import MonkeyPatch
+MonkeyPatch.patch_fromisoformat()
 
 from pyloopkit.date import (date_floored_to_time_interval,
                   date_ceiled_to_time_interval, time_interval_since)

@@ -3,8 +3,6 @@
 
 *.pyc
 
-*.png
-
 *-output.json
 
 *.html

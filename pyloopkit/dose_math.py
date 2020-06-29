@@ -29,7 +29,7 @@ class Correction(Enum):
 
 
 def filter_date_range_for_doses(
-        types, starts, ends, values,
+        types, starts, ends, values, delivered_units,
         start_date,
         end_date
         ):
@@ -49,14 +49,15 @@ def filter_date_range_for_doses(
     """
     # ends might not necesarily be the same length as starts/values
     # because not all types have "end dates"
-    assert len(types) == len(starts) == len(values),\
+    assert len(types) == len(starts) == len(values) == len(delivered_units),\
         "expected input shapes to match"
 
     (filtered_types,
      filtered_starts,
      filtered_ends,
-     filtered_values
-     ) = ([], [], [], [])
+     filtered_values,
+     filtered_delivered_units
+     ) = ([], [], [], [], [])
 
     for i in range(0, len(starts)):
         if start_date and ends and ends[i] < start_date:
@@ -72,16 +73,18 @@ def filter_date_range_for_doses(
         filtered_starts.append(starts[i])
         filtered_ends.append(ends[i] if ends else None)
         filtered_values.append(values[i])
+        filtered_delivered_units.append(delivered_units[i])
 
     assert len(filtered_types) == len(filtered_starts) == len(filtered_ends)\
-        == len(filtered_values),\
+        == len(filtered_values) == len(filtered_delivered_units),\
         "expected output shapes to match"
 
     return (
         filtered_types,
         filtered_starts,
         filtered_ends,
-        filtered_values
+        filtered_values,
+        filtered_delivered_units
         )
 
 

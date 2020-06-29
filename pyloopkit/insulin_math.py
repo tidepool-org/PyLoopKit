@@ -186,7 +186,7 @@ def is_continuous(reservoir_dates, unit_volumes, start, end,
     return True
 
 
-def reconciled(dose_types, start_dates, end_dates, values):
+def reconciled(dose_types, start_dates, end_dates, values, delivered_units):
     """ Maps a timeline of dose entries with overlapping start and end dates
         to a timeline of doses that represents actual insulin delivery.
 
@@ -209,12 +209,13 @@ def reconciled(dose_types, start_dates, end_dates, values):
     output_starts = []
     output_ends = []
     output_values = []
+    output_delivered_units = []
 
     last_suspend_index = None
     last_basal = []
 
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values),\
+        len(values) == len(delivered_units),\
         "expected input shapes to match"
 
     for (i, type_) in enumerate(dose_types):
@@ -223,6 +224,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
             output_starts.append(start_dates[i])
             output_ends.append(end_dates[i])
             output_values.append(values[i])
+            output_delivered_units.append(delivered_units[i])
 
         elif type_ in [DoseType.tempbasal, DoseType.basal]:
             if last_basal and not last_suspend_index:
@@ -235,8 +237,9 @@ def reconciled(dose_types, start_dates, end_dates, values):
                     output_starts.append(last[1])
                     output_ends.append(end_date)
                     output_values.append(last[3])
+                    output_delivered_units.append(last[4])
             last_basal = [type_, start_dates[i], end_dates[i],
-                          values[i]]
+                          values[i], delivered_units[i]]
 
         elif type_ == DoseType.resume:
             if last_suspend_index:
@@ -246,6 +249,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
                 output_starts.append(start_dates[suspend])
                 output_ends.append(end_dates[i])
                 output_values.append(values[suspend])
+                output_delivered_units.append(delivered_units[suspend])
 
                 last_suspend_index = None
 
@@ -253,7 +257,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
                 if last_basal:
                     last = last_basal
                     if last[2] > end_dates[i]:
-                        last_basal = [last[0], end_dates[i], last[2], last[3]]
+                        last_basal = [last[0], end_dates[i], last[2], last[3], last[4]]
                     else:
                         last_basal = []
 
@@ -265,6 +269,7 @@ def reconciled(dose_types, start_dates, end_dates, values):
                 output_starts.append(last[1])
                 output_ends.append(min(last[2], start_dates[i]))
                 output_values.append(last[3])
+                output_delivered_units.append(last[4])
 
                 if last[2] <= start_dates[i]:
                     last_basal = []
@@ -278,18 +283,21 @@ def reconciled(dose_types, start_dates, end_dates, values):
                 output_starts.append(start_dates[i])
                 output_ends.append(end_dates[i])
                 output_values.append(values[i])
+                output_delivered_units.append(delivered_units[i])
 
         elif type_ == DoseType.meal:
             output_types.append(type_)
             output_starts.append(start_dates[i])
             output_ends.append(end_dates[i])
             output_values.append(values[i])
+            output_delivered_units.append(delivered_units[i])
 
     if last_suspend_index is not None:
         output_types.append(dose_types[last_suspend_index])
         output_starts.append(start_dates[last_suspend_index])
         output_ends.append(end_dates[last_suspend_index])
         output_values.append(values[last_suspend_index])
+        output_delivered_units.append(delivered_units[last_suspend_index])
 
     elif (last_basal
           and last_basal[2] > last_basal[1]
@@ -300,19 +308,21 @@ def reconciled(dose_types, start_dates, end_dates, values):
         output_starts.append(last_basal[1])
         output_ends.append(last_basal[2])
         output_values.append(last_basal[3])
+        output_delivered_units.append(last_basal[4])
 
     assert len(output_types) == len(output_starts) == len(output_ends) ==\
-        len(output_values), "expected output shape to match"
+        len(output_values) == len(output_delivered_units), "expected output shape to match"
 
     return (output_types,
             output_starts,
             output_ends,
-            output_values
+            output_values,
+            output_delivered_units
             )
 
 
 def annotated(
-        dose_types, start_dates, end_dates, values,
+        dose_types, start_dates, end_dates, values, delivered_units,
         basal_start_times, basal_rates, basal_minutes,
         convert_to_units_hr=True
     ):
@@ -337,7 +347,7 @@ def annotated(
     5 lists of annotated dose properties
     """
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values),\
+        len(values) == len(delivered_units),\
         "expected input shapes to match"
 
     assert len(basal_start_times) == len(basal_rates) == len(basal_minutes),\
@@ -351,15 +361,17 @@ def annotated(
     output_end_dates = []
     output_values = []
     output_scheduled_basal_rates = []
+    output_delivered_units = []
 
     for i in range(0, len(dose_types)):
         (dose_type,
          start_date,
          end_date,
          value,
-         scheduled_basal_rate
+         scheduled_basal_rate,
+         delivered_unit
          ) = annotate_individual_dose(
-             dose_types[i], start_dates[i], end_dates[i], values[i],
+             dose_types[i], start_dates[i], end_dates[i], values[i], delivered_units[i],
              basal_start_times, basal_rates, basal_minutes,
              convert_to_units_hr
              )
@@ -369,20 +381,22 @@ def annotated(
         output_end_dates.extend(end_date)
         output_values.extend(value)
         output_scheduled_basal_rates.extend(scheduled_basal_rate)
+        output_delivered_units.extend(delivered_unit)
 
     assert len(output_types) == len(output_start_dates) ==\
         len(output_end_dates) == len(output_values) ==\
-        len(output_scheduled_basal_rates), "expected output shapes to match"
+        len(output_scheduled_basal_rates) == len(output_delivered_units), "expected output shapes to match"
 
     return (output_types,
             output_start_dates,
             output_end_dates,
             output_values,
-            output_scheduled_basal_rates
+            output_scheduled_basal_rates,
+            output_delivered_units
             )
 
 
-def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
+def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value, delivered_unit,
                              basal_start_times, basal_rates, basal_minutes,
                              convert_to_units_hr=True):
     """ Annotates a dose with the context of the scheduled basal rate
@@ -407,13 +421,14 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
     if dose_type not in [DoseType.basal, DoseType.tempbasal,
                                  DoseType.suspend]:
         return ([dose_type], [dose_start_date], [dose_end_date], [value],
-                [0])
+                [0], [delivered_unit])
 
     output_types = []
     output_start_dates = []
     output_end_dates = []
     output_values = []
     output_scheduled_basal_rates = []
+    output_delivered_units = []
 
     # these are the lists containing the scheduled basal value(s) within
     # the temp basal's duration
@@ -451,16 +466,18 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value,
             output_values.append(value)
 
         output_scheduled_basal_rates.append(sched_basal_rates[i])
+        output_delivered_units.append(delivered_unit)
 
     assert len(output_types) == len(output_start_dates) ==\
         len(output_end_dates) == len(output_values) ==\
-        len(output_scheduled_basal_rates), "expected output shapes to match"
+        len(output_scheduled_basal_rates) == len(output_delivered_units), "expected output shapes to match"
 
     return (output_types,
             output_start_dates,
             output_end_dates,
             output_values,
-            output_scheduled_basal_rates
+            output_scheduled_basal_rates,
+            output_delivered_units
             )
 
 
@@ -615,7 +632,7 @@ def schedule_offset(date_to_offset, reference_time,
 
 
 def insulin_on_board(
-        dose_types, start_dates, end_dates, values, scheduled_basal_rates,
+        dose_types, start_dates, end_dates, values, scheduled_basal_rates, delivered_units,
         model,
         start=None,
         end=None,
@@ -635,6 +652,7 @@ def insulin_on_board(
                    the doses ended at
     values -- list of insulin values for doses
     scheduled_basal_rates -- basal rates scheduled during the times of doses
+    delivered_units -- units actually delivered by dose
     model -- list of insulin model parameters in format [DIA, peak_time]
     start -- datetime object of time to start calculating the IOB timeline
     end -- datetime object of time to end the IOB timeline
@@ -645,7 +663,7 @@ def insulin_on_board(
     Tuple in format (times_iob_was_calculated_at, iob_values (U of insulin))
     """
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
-        len(values) == len(scheduled_basal_rates),\
+        len(values) == len(scheduled_basal_rates) == len(delivered_units),\
         "expected input shapes to match"
 
     if not dose_types:
@@ -684,6 +702,7 @@ def insulin_on_board(
             end_dates[i],
             values[i],
             scheduled_basal_rates[i],
+            delivered_units[i],
             date,
             model,
             delay,
@@ -691,7 +710,6 @@ def insulin_on_board(
             )
 
     while date <= end:
-
         iob_sum = 0
         for i in range(0, len(start_dates)):
             iob_sum += find_partial_iob(i)
@@ -706,7 +724,7 @@ def insulin_on_board(
 
 
 def insulin_on_board_calc(
-        type_, start_date, end_date, value, scheduled_basal_rate,
+        type_, start_date, end_date, value, scheduled_basal_rate, delivered_units,
         date,
         model,
         delay,
@@ -721,6 +739,7 @@ def insulin_on_board_calc(
     value -- insulin value for dose
     scheduled_basal_rate -- basal rate scheduled during the times of dose
                             (0 for a bolus)
+    delivered_units -- units actually delivered by pump
     date -- date the IOB is being calculated (datetime object)
     model -- list of insulin model parameters in format [DIA, peak_time]
     delay -- the time to delay the dose effect
@@ -741,7 +760,8 @@ def insulin_on_board_calc(
                 value,
                 start_date,
                 end_date,
-                scheduled_basal_rate
+                scheduled_basal_rate,
+                delivered_units,
                 ) * walsh_percent_effect_remaining(
                     (time / 60 - delay),
                     model[0]
@@ -752,7 +772,8 @@ def insulin_on_board_calc(
             value,
             start_date,
             end_date,
-            scheduled_basal_rate) * continuous_delivery_insulin_on_board(
+            scheduled_basal_rate,
+            delivered_units) * continuous_delivery_insulin_on_board(
                 start_date,
                 end_date,
                 date,
@@ -769,7 +790,8 @@ def insulin_on_board_calc(
             value,
             start_date,
             end_date,
-            scheduled_basal_rate
+            scheduled_basal_rate,
+            delivered_units
             ) * percent_effect_remaining(
                 (time / 60 - delay),
                 model[0],
@@ -781,7 +803,8 @@ def insulin_on_board_calc(
         value,
         start_date,
         end_date,
-        scheduled_basal_rate) * continuous_delivery_insulin_on_board(
+        scheduled_basal_rate,
+        delivered_units) * continuous_delivery_insulin_on_board(
             start_date,
             end_date,
             date,
@@ -858,6 +881,7 @@ def glucose_effects(
         dose_end_dates,
         dose_values,
         scheduled_basal_rates,
+        delivered_units,
         model,
         sensitivity_start_times,
         sensitivity_end_times,
@@ -898,7 +922,7 @@ def glucose_effects(
                      glucose_effect_values (mg/dL))
     """
     assert len(dose_types) == len(dose_start_dates) == len(dose_end_dates)\
-        == len(dose_values) == len(scheduled_basal_rates),\
+        == len(dose_values) == len(scheduled_basal_rates) == len(delivered_units),\
         "expected input shapes to match"
 
     if not dose_types and not (start is not None and end is not None):
@@ -942,6 +966,7 @@ def glucose_effects(
             dose_end_dates[i],
             dose_values[i],
             scheduled_basal_rates[i],
+            delivered_units[i],
             date,
             model,
             sensitivity,
@@ -1036,6 +1061,7 @@ def glucose_effect(
         dose_end_date,
         dose_value,
         scheduled_basal_rate,
+        delivered_units,
         date,
         model,
         insulin_sensitivity,
@@ -1077,7 +1103,8 @@ def glucose_effect(
                 dose_type, dose_value,
                 dose_start_date,
                 dose_end_date,
-                scheduled_basal_rate
+                scheduled_basal_rate,
+                delivered_units
                 ) * -insulin_sensitivity * (1 - walsh_percent_effect_remaining(
                     (time - delay) / 60,
                     model[0]
@@ -1088,7 +1115,8 @@ def glucose_effect(
             dose_value,
             dose_start_date,
             dose_end_date,
-            scheduled_basal_rate
+            scheduled_basal_rate,
+            delivered_units
             ) * -insulin_sensitivity * (1 - percent_effect_remaining(
                 (time - delay) / 60,
                 model[0],
@@ -1100,7 +1128,8 @@ def glucose_effect(
         dose_value,
         dose_start_date,
         dose_end_date,
-        scheduled_basal_rate
+        scheduled_basal_rate,
+        delivered_units
         ) * -insulin_sensitivity * continuous_delivery_glucose_effect(
             dose_start_date,
             dose_end_date,
@@ -1177,7 +1206,7 @@ def continuous_delivery_glucose_effect(
 
 
 def trim(
-        dose_type, start, end, value, scheduled_basal_rate,
+        dose_type, start, end, value, scheduled_basal_rate, delivered_units,
         start_interval=None,
         end_interval=None
     ):
@@ -1209,14 +1238,16 @@ def trim(
                     min(end_interval or TIMEZONE_DISTANT_FUTURE, end)
                     ),
                 value,
-                scheduled_basal_rate
+                scheduled_basal_rate,
+                delivered_units
                 ]
 
     return [dose_type,
             start_date,
             max(start_date, min(end_interval or DISTANT_FUTURE, end)),
             value,
-            scheduled_basal_rate
+            scheduled_basal_rate,
+            delivered_units
             ]
 
 

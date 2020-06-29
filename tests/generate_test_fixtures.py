@@ -184,9 +184,11 @@ def generate_iob_fixture(dose_fixture, previous_iob_fixture=False,
     else:
         model = MODEL
 
+    delivered_units = [None for i in range(len(i_types))]
+
     (dates, insulin_values) = insulin_on_board(
         i_types, i_start_dates, i_end_dates, i_values,
-        i_scheduled_basal_rates, model)
+        i_scheduled_basal_rates, delivered_units, model)
 
     if previous_iob_fixture:
         (out_dates, out_insulin_values) = load_insulin_value_fixture(

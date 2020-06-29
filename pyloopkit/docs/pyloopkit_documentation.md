@@ -291,7 +291,7 @@ _Installing the Virtual Environment_
 
 
 1. The PyLoopKit environment was developed with Anaconda. You'll need to install [Miniconda](https://conda.io/miniconda.html) or [Anaconda](https://anaconda-installer.readthedocs.io/en/latest/) for your platform.
-2. In a terminal, navigate to the directory where the environment.yml is located (likely the PyLoopKit folder).
+2. In a terminal, navigate to the directory where the environment.yml is located (likely the PyLoopKit/pyloopkit folder).
 3. Run `conda env create`; this will download all of the package dependencies and install them in a virtual environment named py-loop. PLEASE NOTE: this may take up to 30 minutes to complete.
 
 _Using the Virtual Environment_

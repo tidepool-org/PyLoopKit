@@ -21,3 +21,6 @@ In Bash run `source activate py-loop`, or in the Anaconda Prompt
 run `conda activate py-loop` to start the environment.
 
 Run `deactivate` to stop the environment.
+
+### To create the PyLoopKit package
+If you want to install a version of the PyLoopKit package based on the PyLoopKit on your local machine, run `python3 setup.py install` to call the setup script and install the package. You'll likely want to do this within the `py-loop` environment.

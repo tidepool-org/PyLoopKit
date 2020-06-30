@@ -679,7 +679,7 @@ def parse_report_and_run_with_name(data_path_and_name):
     input_dict["dose_end_times"] = dose_ends
     input_dict["dose_values"] = dose_values
     input_dict["dose_value_units"] = "U or U/hr"
-    input_dict["delivered_units"] = [None for i in range(len(dose_types))]
+    input_dict["dose_delivered_units"] = [None for i in range(len(dose_types))]
 
     if issue_dict.get("cached_carb_entries"):
         (carb_dates,

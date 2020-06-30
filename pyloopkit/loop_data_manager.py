@@ -126,7 +126,7 @@ def update(input_dict):
     dose_starts = input_dict.get("dose_start_times")
     dose_ends = input_dict.get("dose_end_times")
     dose_values = input_dict.get("dose_values")
-    dose_delivered_units = input_dict.get("delivered_units")
+    dose_delivered_units = input_dict.get("dose_delivered_units")
 
     carb_dates = input_dict.get("carb_dates")
     carb_values = input_dict.get("carb_values")

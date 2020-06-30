@@ -344,7 +344,7 @@ def annotated(
         this will normally be for reservoir values
 
     Output:
-    5 lists of annotated dose properties
+    6 lists of annotated dose properties
     """
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values) == len(delivered_units),\
@@ -354,7 +354,7 @@ def annotated(
         "expected input shapes to match"
 
     if not dose_types or not basal_start_times:
-        return ([], [], [], [], [])
+        return ([], [], [], [], [], [])
 
     output_types = []
     output_start_dates = []

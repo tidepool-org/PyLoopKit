@@ -244,6 +244,11 @@ def update(input_dict):
              next_effect_date,
              insulin_effect_dates, insulin_effect_values
              )
+    else:
+        (counteraction_starts,
+         counteraction_ends,
+         counteraction_values
+         ) = counteraction_effects = ([], [], [])
 
     (carb_effect_dates,
      carb_effect_values

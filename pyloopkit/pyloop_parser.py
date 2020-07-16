@@ -548,7 +548,8 @@ def remove_too_new_values(
 def parse_report_and_run(path, name):
     return parse_report_and_run_with_name(os.path.join(path, name))
 
- # %% Take an issue report and run it through the Loop algorithm
+
+# %% Take an issue report and run it through the Loop algorithm
 def parse_report_and_run_with_name(data_path_and_name):
     """ Get relevent information from a Loop issue report and use it to
         run PyLoopKit
@@ -561,7 +562,19 @@ def parse_report_and_run_with_name(data_path_and_name):
     A dictionary of all 4 effects, the predicted glucose values, and the
     recommended basal and bolus
     """
+    input_dict = transform_report_to_inputs(data_path_and_name)
 
+    recommendations = update(
+        input_dict
+        )
+
+    return recommendations
+
+
+def transform_report_to_inputs(data_path_and_name):
+    """
+    Create a Pylookit input dict from an issue report
+    """
     with open(data_path_and_name, "r") as file:
         issue_dict = json.load(file)
     input_dict = {}
@@ -832,11 +845,7 @@ def parse_report_and_run_with_name(data_path_and_name):
 
     input_dict["last_temporary_basal"] = last_temp_basal
 
-    recommendations = update(
-        input_dict
-        )
-
-    return recommendations
+    return input_dict
 
 
 def parse_dictionary_from_previous_run(path, name):

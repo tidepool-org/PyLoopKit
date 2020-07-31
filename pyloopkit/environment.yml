@@ -8,6 +8,7 @@ dependencies:
   - pylint=2.3.1
   - python==3.7.3
   - pip:
+    - backports-datetime-fromisoformat==1.0.0
     - tensorflow==2.0.0-beta1
     - numpy==1.16.4
     - pandas==0.24.2

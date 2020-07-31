@@ -1020,7 +1020,7 @@ def absorbed_carbs(
     Output:
     Grams of absorbed carbs
     """
-    time = time_interval_since(at_date, start_date) / 60
+    time = time_interval_since(at_date, start_date) / 60 - delay
 
     return parabolic_absorbed_carbs(
         carb_value,

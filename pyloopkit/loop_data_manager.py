@@ -251,6 +251,7 @@ def update(input_dict):
         counteraction_starts = input_dict.get("counteraction_starts")
         counteraction_ends = input_dict.get("counteraction_ends")
         counteraction_values = input_dict.get("counteraction_values")
+        counteraction_effects = (counteraction_starts, counteraction_ends, counteraction_values)
 
     # if our BG data is current and we know the expected insulin effects,
     # calculate tbe counteraction effects

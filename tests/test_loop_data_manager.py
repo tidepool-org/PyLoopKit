@@ -7,13 +7,14 @@ Created on Thu Jul 11 15:16:42 2019
 """
 # pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
 from datetime import datetime, time, timedelta
+from copy import deepcopy
 import unittest
 
 #from . import path_grabber  # pylint: disable=unused-import
 from pyloopkit.dose import DoseType
 from pyloopkit.loop_data_manager import (get_pending_insulin,
                                update_retrospective_glucose_effect, update)
-from .loop_kit_tests import load_fixture, find_root_path
+from loop_kit_tests import load_fixture, find_root_path
 from pyloopkit.pyloop_parser import (
     load_momentum_effects, get_glucose_data, load_insulin_effects,
     get_insulin_data, get_basal_schedule, get_carb_ratios,
@@ -508,7 +509,7 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
         self.assertEqual(0, len(dates))
 
 
-class TestLoopDataManagerDosingFromEffects:
+class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
     INSULIN_SENSITIVITY_STARTS = [time(0, 0), time(9, 0)]
     INSULIN_SENSITIVITY_ENDS = [time(9, 0), time(23, 59)]
     INSULIN_SENSITIVITY_VALUES = [45, 55]
@@ -550,6 +551,29 @@ class TestLoopDataManagerDosingFromEffects:
         "rate_rounder": 0.05,
         "insulin_delay": 10,
         "carb_delay": 10
+    }
+
+    STARTER_INPUT_DICT = {
+        "dose_types": [],
+        "dose_start_times": [],
+        "dose_end_times": [],
+        "dose_values": [],
+        "carb_dates": [],
+        "carb_values": [],
+        "carb_absorption_times": [],
+        "settings_dictionary": SETTINGS_DICT,
+        "sensitivity_ratio_start_times": INSULIN_SENSITIVITY_STARTS,
+        "sensitivity_ratio_end_times": INSULIN_SENSITIVITY_ENDS,
+        "sensitivity_ratio_values": INSULIN_SENSITIVITY_VALUES,
+        "carb_ratio_start_times": CARB_RATIO_STARTS,
+        "carb_ratio_values": CARB_RATIO_VALUES,
+        "basal_rate_start_times": BASAL_RATE_STARTS,
+        "basal_rate_minutes": BASAL_RATE_MINUTES,
+        "basal_rate_values": BASAL_RATE_VALUES,
+        "target_range_start_times": GLUCOSE_RANGE_STARTS,
+        "target_range_end_times": GLUCOSE_RANGE_ENDS,
+        "target_range_minimum_values": GLUCOSE_RANGE_MINS,
+        "target_range_maximum_values": GLUCOSE_RANGE_MAXES
     }
 
     def load_effect_fixture(self, name, offset=0):
@@ -619,30 +643,12 @@ class TestLoopDataManagerDosingFromEffects:
         (expected_predicted_glucose_dates, 
         expected_predicted_glucose_values) = self.load_effect_fixture("flat_and_stable_predicted_glucose", offset=self.UTC_OFFSET)
 
-        input_dict = {
+        starter = deepcopy(self.STARTER_INPUT_DICT)
+        
+        test_specific_input = {
             "time_to_calculate_at": now,
             "glucose_dates": glucose_dates,
             "glucose_values": glucose_values,
-            "dose_types": [],
-            "dose_start_times": [],
-            "dose_end_times": [],
-            "dose_values": [],
-            "carb_dates": [],
-            "carb_values": [],
-            "carb_absorption_times": [],
-            "settings_dictionary": self.SETTINGS_DICT,
-            "sensitivity_ratio_start_times": self.INSULIN_SENSITIVITY_STARTS,
-            "sensitivity_ratio_end_times": self.INSULIN_SENSITIVITY_ENDS,
-            "sensitivity_ratio_values": self.INSULIN_SENSITIVITY_VALUES,
-            "carb_ratio_start_times": self.CARB_RATIO_STARTS,
-            "carb_ratio_values": self.CARB_RATIO_VALUES,
-            "basal_rate_start_times": self.BASAL_RATE_STARTS,
-            "basal_rate_minutes": self.BASAL_RATE_MINUTES,
-            "basal_rate_values": self.BASAL_RATE_VALUES,
-            "target_range_start_times": self.GLUCOSE_RANGE_STARTS,
-            "target_range_end_times": self.GLUCOSE_RANGE_ENDS,
-            "target_range_minimum_values": self.GLUCOSE_RANGE_MINS,
-            "target_range_maximum_values": self.GLUCOSE_RANGE_MAXES,
             "momentum_effect_dates": momentum_starts,
             "momentum_effect_values": momentum_values,
             "now_to_dia_insulin_effect_dates": insulin_effect_starts,
@@ -653,9 +659,10 @@ class TestLoopDataManagerDosingFromEffects:
             "carb_effect_dates": carb_effect_starts,
             "carb_effect_values": carb_effect_values,
         }
+        input_dict = {**starter, **test_specific_input}
 
-    result = update(input_dict)
-    print(result)
+        result = update(input_dict)
+        print(result)
 
 
 if __name__ == '__main__':

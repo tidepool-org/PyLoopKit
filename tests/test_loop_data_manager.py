@@ -531,7 +531,7 @@ class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
     CARB_RATIO_STARTS = [time(0, 0)]
     CARB_RATIO_VALUES = [10]
 
-    UTC_OFFSET = 25200
+    UTC_OFFSET = -25200
 
     SETTINGS_DICT = {
         # User-editable
@@ -636,7 +636,7 @@ class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
         (carb_effect_starts,
         carb_effect_values) = self.load_effect_fixture("flat_and_stable_carb_effect", offset=self.UTC_OFFSET)
 
-        now = datetime.fromisoformat("2020-08-11T20:45:02")
+        now = datetime.fromisoformat("2020-08-11T20:45:02") + timedelta(seconds=self.UTC_OFFSET)
         glucose_dates = [now]
         glucose_values = [123.42849966275706]
 
@@ -662,7 +662,81 @@ class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
         input_dict = {**starter, **test_specific_input}
 
         result = update(input_dict)
-        print(result)
+        predicted_glucose_dates = result["predicted_glucose_dates"]
+        predicted_glucose_values = result["predicted_glucose_values"]
+
+        self.assertEqual(
+            len(predicted_glucose_dates),
+            len(expected_predicted_glucose_dates)
+        )
+
+        for i in range(len(predicted_glucose_dates)):
+            self.assertEqual(
+                predicted_glucose_dates[i],
+                expected_predicted_glucose_dates[i]
+            )
+            self.assertAlmostEqual(
+                predicted_glucose_values[i],
+                expected_predicted_glucose_values[i], 1
+            )
+    
+    def test_high_and_stable(self):
+        (momentum_starts,
+        momentum_values) = self.load_effect_fixture("high_and_stable_momentum_effect", offset=self.UTC_OFFSET)
+
+        (insulin_effect_starts,
+        insulin_effect_values) = self.load_effect_fixture("high_and_stable_insulin_effect", offset=self.UTC_OFFSET)
+
+        (counteraction_starts, 
+        counteraction_ends, 
+        counteraction_values) = self.load_effect_velocity_fixture("high_and_stable_counteraction_effect", offset=self.UTC_OFFSET)
+
+        (carb_effect_starts,
+        carb_effect_values) = self.load_effect_fixture("high_and_stable_carb_effect", offset=self.UTC_OFFSET)
+
+        now = datetime.fromisoformat("2020-08-12T12:39:22") + timedelta(seconds=self.UTC_OFFSET)
+        glucose_dates = [now]
+        glucose_values = [200.0]
+
+        (expected_predicted_glucose_dates, 
+        expected_predicted_glucose_values) = self.load_effect_fixture("high_and_stable_predicted_glucose", offset=self.UTC_OFFSET)
+
+        starter = deepcopy(self.STARTER_INPUT_DICT)
+        
+        test_specific_input = {
+            "time_to_calculate_at": now,
+            "glucose_dates": glucose_dates,
+            "glucose_values": glucose_values,
+            "momentum_effect_dates": momentum_starts,
+            "momentum_effect_values": momentum_values,
+            "now_to_dia_insulin_effect_dates": insulin_effect_starts,
+            "now_to_dia_insulin_effect_values": insulin_effect_values,
+            "counteraction_starts": counteraction_starts,
+            "counteraction_ends": counteraction_ends,
+            "counteraction_values": counteraction_values,
+            "carb_effect_dates": carb_effect_starts,
+            "carb_effect_values": carb_effect_values,
+        }
+        input_dict = {**starter, **test_specific_input}
+
+        result = update(input_dict)
+        predicted_glucose_dates = result["predicted_glucose_dates"]
+        predicted_glucose_values = result["predicted_glucose_values"]
+
+        self.assertEqual(
+            len(predicted_glucose_dates),
+            len(expected_predicted_glucose_dates)
+        )
+
+        for i in range(len(predicted_glucose_dates)):
+            self.assertEqual(
+                predicted_glucose_dates[i],
+                expected_predicted_glucose_dates[i]
+            )
+            self.assertAlmostEqual(
+                predicted_glucose_values[i],
+                expected_predicted_glucose_values[i], 1
+            )
 
 
 if __name__ == '__main__':

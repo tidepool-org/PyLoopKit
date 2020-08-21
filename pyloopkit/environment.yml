@@ -13,3 +13,4 @@ dependencies:
     - numpy==1.16.4
     - pandas==0.24.2
     - plotly==4.1.0
+    - git+git://github.com/tidepool-org/PyLoopKit.git@novalegra/add-high-level-tests

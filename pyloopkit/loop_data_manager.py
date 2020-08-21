@@ -309,11 +309,7 @@ def update(input_dict):
             )
         ] if cob_dates else 0
 
-    if (input_dict.get("retrospective_effect_dates") and 
-        input_dict.get("retrospective_effect_values")):
-        retrospective_effect_dates = input_dict.get("retrospective_effect_dates")
-        retrospective_effect_values = input_dict.get("retrospective_effect_values")
-    elif settings_dictionary.get("retrospective_correction_enabled"):
+    if settings_dictionary.get("retrospective_correction_enabled"):
         (retrospective_effect_dates,
          retrospective_effect_values
          ) = update_retrospective_glucose_effect(

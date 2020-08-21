@@ -95,8 +95,8 @@ def update(input_dict):
         "carb_ratio_values" -- carb ratios in grams of carbohydrate per U
 
         "basal_rate_start_times" -- start times for basal rates
-        "basal_rate_end_times" -- basal rates in U/hour
-        "basal_rate_values" -- minutes the basal rate is active for
+        "basal_rate_values" -- basal rates in U/hour
+        "basal_rate_minutes" -- basal rate start minutes of offset from midnight
 
         "target_range_start_times" -- start times for the target ranges
         "target_range_end_times" -- end times for the target ranges

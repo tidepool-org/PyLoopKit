@@ -6,7 +6,7 @@ Created on Thu Jul 11 15:16:42 2019
 @author: annaquinlan
 """
 # pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
-from datetime import datetime
+from datetime import datetime, time
 import unittest
 
 #from . import path_grabber  # pylint: disable=unused-import
@@ -506,6 +506,36 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
              now_time=now_time
              )
         self.assertEqual(0, len(dates))
+
+
+class TestLoopDataManagerDosingFromEffects:
+    MAX_BASAL_RATE = 5 # U/hr
+    MAX_BOLUS = 10 # U
+    SUSPEND_THRESHOLD = 75 # mg/dl
+    ADULT_EXPONENTIAL_MODEL = [360, 75]
+
+    INSULIN_SENSITIVITY_STARTS = [time(0, 0), time(9, 0)]
+    INSULIN_SENSITIVITY_ENDS = [time(9, 0), time(23, 59)]
+    INSULIN_SENSITIVITY_VALUES = [45, 55]
+    SENSITIVITY = (INSULIN_SENSITIVITY_STARTS,
+                   INSULIN_SENSITIVITY_ENDS,
+                   INSULIN_SENSITIVITY_VALUES
+                   )
+
+    GLUCOSE_RANGE_STARTS = [time(0, 0), time(8, 0), time(21, 0)]
+    GLUCOSE_RANGE_ENDS = [time(8, 0), time(21, 0), time(23, 59)]
+    GLUCOSE_RANGE_MINS = [100, 90, 100]
+    GLUCOSE_RANGE_MAXES = [110, 100, 110]
+
+    BASAL_RATE_STARTS = [time(0, 0), time(15, 0)]
+    BASAL_RATE_VALUES = [1, 0.85]
+    BASAL_RATE_MINUTES = [0, 900]
+
+    # This shouldn't actually get used, but is needed so it doesn't error
+    CARB_RATIO_STARTS = [time(0, 0)]
+    CARB_RATIO_VALUES = [10]
+
+
 
 
 if __name__ == '__main__':

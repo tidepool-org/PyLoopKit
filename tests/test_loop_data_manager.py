@@ -679,6 +679,8 @@ class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
                 predicted_glucose_values[i],
                 expected_predicted_glucose_values[i], 1
             )
+        
+        self.assertEqual(1.4, result["recommended_temp_basal"][0])
     
     def test_high_and_stable(self):
         (momentum_starts,
@@ -738,6 +740,127 @@ class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
                 expected_predicted_glucose_values[i], 1
             )
 
+        self.assertEqual(4.65, result["recommended_temp_basal"][0])
+
+    def test_high_and_falling(self):
+        (momentum_starts,
+        momentum_values) = self.load_effect_fixture("high_and_falling_momentum_effect", offset=self.UTC_OFFSET)
+
+        (insulin_effect_starts,
+        insulin_effect_values) = self.load_effect_fixture("high_and_falling_insulin_effect", offset=self.UTC_OFFSET)
+
+        (counteraction_starts, 
+        counteraction_ends, 
+        counteraction_values) = self.load_effect_velocity_fixture("high_and_falling_counteraction_effect", offset=self.UTC_OFFSET)
+
+        (carb_effect_starts,
+        carb_effect_values) = self.load_effect_fixture("high_and_falling_carb_effect", offset=self.UTC_OFFSET)
+
+        now = datetime.fromisoformat("2020-08-11T22:59:45") + timedelta(seconds=self.UTC_OFFSET)
+        glucose_dates = [now]
+        glucose_values = [200.0]
+
+        (expected_predicted_glucose_dates, 
+        expected_predicted_glucose_values) = self.load_effect_fixture("high_and_falling_predicted_glucose", offset=self.UTC_OFFSET)
+
+        starter = deepcopy(self.STARTER_INPUT_DICT)
+        
+        test_specific_input = {
+            "time_to_calculate_at": now,
+            "glucose_dates": glucose_dates,
+            "glucose_values": glucose_values,
+            "momentum_effect_dates": momentum_starts,
+            "momentum_effect_values": momentum_values,
+            "now_to_dia_insulin_effect_dates": insulin_effect_starts,
+            "now_to_dia_insulin_effect_values": insulin_effect_values,
+            "counteraction_starts": counteraction_starts,
+            "counteraction_ends": counteraction_ends,
+            "counteraction_values": counteraction_values,
+            "carb_effect_dates": carb_effect_starts,
+            "carb_effect_values": carb_effect_values,
+        }
+        input_dict = {**starter, **test_specific_input}
+
+        result = update(input_dict)
+        predicted_glucose_dates = result["predicted_glucose_dates"]
+        predicted_glucose_values = result["predicted_glucose_values"]
+
+        self.assertEqual(
+            len(predicted_glucose_dates),
+            len(expected_predicted_glucose_dates)
+        )
+
+        for i in range(len(predicted_glucose_dates)):
+            self.assertEqual(
+                predicted_glucose_dates[i],
+                expected_predicted_glucose_dates[i]
+            )
+            self.assertAlmostEqual(
+                predicted_glucose_values[i],
+                expected_predicted_glucose_values[i], 1
+            )
+
+        self.assertEqual(0, result["recommended_temp_basal"][0])
+
+    def test_high_and_rising_with_cob(self):
+        (momentum_starts,
+        momentum_values) = self.load_effect_fixture("high_and_rising_with_cob_momentum_effect", offset=self.UTC_OFFSET)
+
+        (insulin_effect_starts,
+        insulin_effect_values) = self.load_effect_fixture("high_and_rising_with_cob_insulin_effect", offset=self.UTC_OFFSET)
+
+        (counteraction_starts, 
+        counteraction_ends, 
+        counteraction_values) = self.load_effect_velocity_fixture("high_and_rising_with_cob_counteraction_effect", offset=self.UTC_OFFSET)
+
+        (carb_effect_starts,
+        carb_effect_values) = self.load_effect_fixture("high_and_rising_with_cob_carb_effect", offset=self.UTC_OFFSET)
+
+        now = datetime.fromisoformat("2020-08-11T21:48:17") + timedelta(seconds=self.UTC_OFFSET)
+        glucose_dates = [now]
+        glucose_values = [129.93174411197853]
+
+        (expected_predicted_glucose_dates, 
+        expected_predicted_glucose_values) = self.load_effect_fixture("high_and_rising_with_cob_predicted_glucose", offset=self.UTC_OFFSET)
+
+        starter = deepcopy(self.STARTER_INPUT_DICT)
+        
+        test_specific_input = {
+            "time_to_calculate_at": now,
+            "glucose_dates": glucose_dates,
+            "glucose_values": glucose_values,
+            "momentum_effect_dates": momentum_starts,
+            "momentum_effect_values": momentum_values,
+            "now_to_dia_insulin_effect_dates": insulin_effect_starts,
+            "now_to_dia_insulin_effect_values": insulin_effect_values,
+            "counteraction_starts": counteraction_starts,
+            "counteraction_ends": counteraction_ends,
+            "counteraction_values": counteraction_values,
+            "carb_effect_dates": carb_effect_starts,
+            "carb_effect_values": carb_effect_values,
+        }
+        input_dict = {**starter, **test_specific_input}
+
+        result = update(input_dict)
+        predicted_glucose_dates = result["predicted_glucose_dates"]
+        predicted_glucose_values = result["predicted_glucose_values"]
+
+        self.assertEqual(
+            len(predicted_glucose_dates),
+            len(expected_predicted_glucose_dates)
+        )
+
+        for i in range(len(predicted_glucose_dates)):
+            self.assertEqual(
+                predicted_glucose_dates[i],
+                expected_predicted_glucose_dates[i]
+            )
+            self.assertAlmostEqual(
+                predicted_glucose_values[i],
+                expected_predicted_glucose_values[i], 1
+            )
+
+        self.assertEqual(1.6, result["recommended_bolus"][0])
 
 if __name__ == '__main__':
     unittest.main()

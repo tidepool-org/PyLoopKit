@@ -6,13 +6,13 @@ Created on Thu Jul 11 15:16:42 2019
 @author: annaquinlan
 """
 # pylint: disable=C0111, C0200, R0201, W0105, R0914, R0904
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import unittest
 
 #from . import path_grabber  # pylint: disable=unused-import
 from pyloopkit.dose import DoseType
 from pyloopkit.loop_data_manager import (get_pending_insulin,
-                               update_retrospective_glucose_effect)
+                               update_retrospective_glucose_effect, update)
 from .loop_kit_tests import load_fixture, find_root_path
 from pyloopkit.pyloop_parser import (
     load_momentum_effects, get_glucose_data, load_insulin_effects,
@@ -509,11 +509,6 @@ class TestLoopDataManagerFunctions(unittest.TestCase):
 
 
 class TestLoopDataManagerDosingFromEffects:
-    MAX_BASAL_RATE = 5 # U/hr
-    MAX_BOLUS = 10 # U
-    SUSPEND_THRESHOLD = 75 # mg/dl
-    ADULT_EXPONENTIAL_MODEL = [360, 75]
-
     INSULIN_SENSITIVITY_STARTS = [time(0, 0), time(9, 0)]
     INSULIN_SENSITIVITY_ENDS = [time(9, 0), time(23, 59)]
     INSULIN_SENSITIVITY_VALUES = [45, 55]
@@ -535,7 +530,132 @@ class TestLoopDataManagerDosingFromEffects:
     CARB_RATIO_STARTS = [time(0, 0)]
     CARB_RATIO_VALUES = [10]
 
+    UTC_OFFSET = 25200
 
+    SETTINGS_DICT = {
+        # User-editable
+        "model": [360, 75],
+        "suspend_threshold": 75,
+        "max_basal_rate": 5,
+        "max_bolus": 10,
+        "retrospective_correction_enabled": True,
+
+        # Not commonly user-edited
+        "momentum_data_interval": 15,
+        "default_absorption_times": [120, 180, 240],
+        "dynamic_carb_absorption_enabled": True,
+        "retrospective_correction_integration_interval": 30,
+        "recency_interval": 15,
+        "retrospective_correction_grouping_interval": 30,
+        "rate_rounder": 0.05,
+        "insulin_delay": 10,
+        "carb_delay": 10
+    }
+
+    def load_effect_fixture(self, name, offset=0):
+        """ Load glucose effects from json file
+
+        Output:
+        2 lists in (date, glucose_value) format
+        """
+        fixture = load_fixture(
+            name,
+            ".json"
+        )
+
+        dates = [
+            datetime.fromisoformat(dict_.get("date")) + timedelta(seconds=offset)
+            for dict_ in fixture
+        ]
+        glucose_values = [dict_.get("amount") for dict_ in fixture]
+
+        assert len(dates) == len(glucose_values),\
+            "expected output shape to match"
+
+        return (dates, glucose_values)
+    
+
+    def load_effect_velocity_fixture(self, resource_name, offset=0):
+        """ Load counteraction effects json file
+
+        Arguments:
+        resource_name -- name of file without the extension
+
+        Output:
+        3 lists in (start_date, end_date, glucose_effects) format
+        """
+        fixture = load_fixture(resource_name, ".json")
+
+        start_dates = [datetime.fromisoformat(dict_.get("startDate")) + timedelta(seconds=offset)
+                       for dict_ in fixture]
+        end_dates = [datetime.fromisoformat(dict_.get("endDate")) + timedelta(seconds=offset)
+                     for dict_ in fixture]
+        glucose_effects = [dict_.get("value") for dict_ in fixture]
+
+        assert len(start_dates) == len(end_dates) == len(glucose_effects),\
+            "expected output shape to match"
+
+        return (start_dates, end_dates, glucose_effects)
+    
+
+    def test_flat_and_stable(self):
+        (momentum_starts,
+        momentum_values) = self.load_effect_fixture("flat_and_stable_momentum_effect", offset=self.UTC_OFFSET)
+
+        (insulin_effect_starts,
+        insulin_effect_values) = self.load_effect_fixture("flat_and_stable_insulin_effect", offset=self.UTC_OFFSET)
+
+        (counteraction_starts, 
+        counteraction_ends, 
+        counteraction_values) = self.load_effect_velocity_fixture("flat_and_stable_counteraction_effect", offset=self.UTC_OFFSET)
+
+        (carb_effect_starts,
+        carb_effect_values) = self.load_effect_fixture("flat_and_stable_carb_effect", offset=self.UTC_OFFSET)
+
+        now = datetime.fromisoformat("2020-08-11T20:45:02")
+        glucose_dates = [now]
+        glucose_values = [123.42849966275706]
+
+        (expected_predicted_glucose_dates, 
+        expected_predicted_glucose_values) = self.load_effect_fixture("flat_and_stable_predicted_glucose", offset=self.UTC_OFFSET)
+
+        input_dict = {
+            "time_to_calculate_at": now,
+            "glucose_dates": glucose_dates,
+            "glucose_values": glucose_values,
+            "dose_types": [],
+            "dose_start_times": [],
+            "dose_end_times": [],
+            "dose_values": [],
+            "carb_dates": [],
+            "carb_values": [],
+            "carb_absorption_times": [],
+            "settings_dictionary": self.SETTINGS_DICT,
+            "sensitivity_ratio_start_times": self.INSULIN_SENSITIVITY_STARTS,
+            "sensitivity_ratio_end_times": self.INSULIN_SENSITIVITY_ENDS,
+            "sensitivity_ratio_values": self.INSULIN_SENSITIVITY_VALUES,
+            "carb_ratio_start_times": self.CARB_RATIO_STARTS,
+            "carb_ratio_values": self.CARB_RATIO_VALUES,
+            "basal_rate_start_times": self.BASAL_RATE_STARTS,
+            "basal_rate_minutes": self.BASAL_RATE_MINUTES,
+            "basal_rate_values": self.BASAL_RATE_VALUES,
+            "target_range_start_times": self.GLUCOSE_RANGE_STARTS,
+            "target_range_end_times": self.GLUCOSE_RANGE_ENDS,
+            "target_range_minimum_values": self.GLUCOSE_RANGE_MINS,
+            "target_range_maximum_values": self.GLUCOSE_RANGE_MAXES,
+            "momentum_effect_dates": momentum_starts,
+            "momentum_effect_values": momentum_values,
+            "now_to_dia_insulin_effect_dates": insulin_effect_starts,
+            "now_to_dia_insulin_effect_values": insulin_effect_values,
+            "counteraction_starts": counteraction_starts,
+            "counteraction_ends": counteraction_ends,
+            "counteraction_values": counteraction_values,
+            "carb_effect_dates": carb_effect_starts,
+            "carb_effect_values": carb_effect_values,
+        }
+
+    result = update(input_dict)
+    print(result)
 
 
 if __name__ == '__main__':

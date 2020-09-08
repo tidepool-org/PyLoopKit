@@ -17,7 +17,7 @@ from pyloopkit.loop_math import filter_date_range, sort_dose_lists
 
 
 def get_glucose_effects(
-        types, starts, ends, values,
+        types, starts, ends, values, delivered_units,
         start_date,
         basal_starts, basal_rates, basal_minutes,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
@@ -34,6 +34,7 @@ def get_glucose_effects(
     ends -- end dates of the doses (datetime obj)
     values -- actual basal rates of doses in U/hr (if a basal)
              or the value of the boluses if in U
+    delivered_units -- net Units of insulin actually delivered by a dose
 
     start_date -- date to start calculating glucose effects
 
@@ -55,7 +56,7 @@ def get_glucose_effects(
     Output:
     Glucose effects in the format (effect_date, effect_value)
     """
-    assert len(types) == len(starts) == len(ends) == len(values),\
+    assert len(types) == len(starts) == len(ends) == len(values) == len(delivered_units),\
         "expected input shapes to match"
 
     # to properly know glucose effects at start_date,
@@ -74,7 +75,7 @@ def get_glucose_effects(
                       )
 
     filtered_doses = filter_date_range_for_doses(
-        types, starts, ends, values,
+        types, starts, ends, values, delivered_units,
         dose_start,
         end_date
         )
@@ -86,14 +87,15 @@ def get_glucose_effects(
         )
     # sort the lists because they could be slightly out of order due to
     # basals and suspends
-    sorted_reconciled_doses = sort_dose_lists(*reconciled_doses)[0:4]
+    sorted_reconciled_doses = sort_dose_lists(*reconciled_doses)[0:5]
 
     # annotate the doses with scheduled basal rate
     (a_types,
      a_starts,
      a_ends,
      a_values,
-     a_scheduled_rates
+     a_scheduled_rates,
+     a_delivered_units
      ) = annotated(
          *sorted_reconciled_doses,
          basal_starts, basal_rates, basal_minutes,
@@ -103,7 +105,7 @@ def get_glucose_effects(
     # trim the doses to start of interval
     for i in range(0, len(a_types)):
         result = trim(
-            a_types[i], a_starts[i], a_ends[i], a_values[i],
+            a_types[i], a_starts[i], a_ends[i], a_values[i], a_delivered_units[i],
             a_scheduled_rates[i],
             start_interval=dose_start
             )
@@ -113,7 +115,7 @@ def get_glucose_effects(
 
     # get the glucose effects using the prepared dose data
     glucose_effect = glucose_effects(
-        a_types, a_starts, a_ends, a_values, a_scheduled_rates,
+        a_types, a_starts, a_ends, a_values, a_scheduled_rates, a_delivered_units,
         insulin_model,
         sensitivity_starts, sensitivity_ends, sensitivity_values,
         delay=delay,

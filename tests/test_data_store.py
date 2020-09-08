@@ -83,6 +83,9 @@ class TestDataStoreFunctions(unittest.TestCase):
             for dict_ in data
         ]
         values = [dict_.get("amount") for dict_ in data]
+        delivered_units = [
+            dict_.get("deliveredUnits") or None for dict_ in data
+        ]
 
         assert len(dose_types) == len(start_dates) == len(end_dates) ==\
             len(values),\
@@ -95,8 +98,9 @@ class TestDataStoreFunctions(unittest.TestCase):
                     del start_dates[i]
                     del end_dates[i]
                     del values[i]
+                    del delivered_units[i]
 
-        return (dose_types, start_dates, end_dates, values)
+        return (dose_types, start_dates, end_dates, values, delivered_units)
 
     def load_carb_data(self, resource_name):
         """ Load carb entries data from json file

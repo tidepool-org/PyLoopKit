@@ -42,6 +42,7 @@ def update(input_dict):
         "dose_start_times" -- start times of insulin delivery
         "dose_end_times" -- end times of insulin delivery
         "dose_values" -- amounts of insulin (U/hr if a basal, U if a bolus)
+        "dose_delivered_units" -- absolute Units of insulin delivered by a dose (can be None)
 
         "carb_dates" -- times of carbohydrate entries
         "carb_values" -- amount of carbohydrates eaten
@@ -125,6 +126,7 @@ def update(input_dict):
     dose_starts = input_dict.get("dose_start_times")
     dose_ends = input_dict.get("dose_end_times")
     dose_values = input_dict.get("dose_values")
+    dose_delivered_units = input_dict.get("dose_delivered_units")
 
     carb_dates = input_dict.get("carb_dates")
     carb_values = input_dict.get("carb_values")
@@ -213,7 +215,7 @@ def update(input_dict):
     (insulin_effect_dates,
      insulin_effect_values
      ) = get_glucose_effects(
-         dose_types, dose_starts, dose_ends, dose_values,
+         dose_types, dose_starts, dose_ends, dose_values, dose_delivered_units,
          next_effect_date,
          basal_starts, basal_rates, basal_minutes,
          sensitivity_starts, sensitivity_ends, sensitivity_values,
@@ -225,7 +227,7 @@ def update(input_dict):
     (now_to_dia_insulin_effect_dates,
      now_to_dia_insulin_effect_values
      ) = get_glucose_effects(
-        dose_types, dose_starts, dose_ends, dose_values,
+        dose_types, dose_starts, dose_ends, dose_values, dose_delivered_units,
         time_to_calculate_at,
         basal_starts, basal_rates, basal_minutes,
         sensitivity_starts, sensitivity_ends, sensitivity_values,

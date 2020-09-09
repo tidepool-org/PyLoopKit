@@ -117,7 +117,8 @@ def has_single_provenance(provenance_list):
 def linear_momentum_effect(
         date_list, glucose_value_list, display_list, provenance_list,
         duration=30,
-        delta=5
+        delta=5,
+        settings_dictionary=None
     ):
     """ Calculates the short-term predicted momentum effect using
         linear regression
@@ -154,6 +155,15 @@ def linear_momentum_effect(
     slope = linear_regression(
         list(map(create_times, date_list)), glucose_value_list
     )
+
+    # ===== TMP =======
+    if settings_dictionary.get("max_physiologic_slope"):
+        slope_mgdL_min = slope * 60
+        clamped_slope_mgdL_min = min(slope_mgdL_min, settings_dictionary.get("max_physiologic_slope"))
+        if clamped_slope_mgdL_min != slope_mgdL_min:
+            print("Clamped the slope from {} to {}".format(slope_mgdL_min, clamped_slope_mgdL_min))
+        slope = clamped_slope_mgdL_min / 60
+    # ====== /TMP ======
 
     if math.isnan(slope) or math.isinf(slope):
         return ([], [])

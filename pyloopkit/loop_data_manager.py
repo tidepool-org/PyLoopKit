@@ -205,7 +205,8 @@ def update(input_dict):
          next_effect_date,
          time_to_calculate_at,
          settings_dictionary.get("momentum_data_interval") or 15,
-         5
+         5,
+         settings_dictionary=settings_dictionary
          )
 
     # calculate previous insulin effects in order to later calculate the

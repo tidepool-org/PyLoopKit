@@ -12,7 +12,7 @@ from pyloopkit.date import time_interval_since
 from pyloopkit.dose import DoseType
 
 
-def net_basal_units(type_, value, start, end, scheduled_basal_rate):
+def net_basal_units(type_, value, start, end, scheduled_basal_rate, delivered_units):
     """ Find the units of insulin delivered, net of any scheduled basal rate
         (if dose is a temp basal)
 
@@ -23,28 +23,32 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate):
     end -- datetime object representing end of dose
     scheduled_basal_rate -- the rate scheduled during the time the dose was
                             given (0 for boluses)
+    delivered_units -- units actually delivered by pump
 
     Output:
     Bolus amount (if a bolus), or basal units given, net of whatever the
-    schedule basal is
+    scheduled basal is
     """
     MINIMUM_MINIMED_INCREMENT = 20
 
     if type_ == DoseType.bolus:
-        return value
+        return delivered_units if delivered_units is not None else value
 
     elif type_ == DoseType.basal:
         return 0
 
     hours_ = hours(end, start)
 
+    if hours_ < 0:
+        return 0
+
     if type_ == DoseType.suspend:
-        units = -scheduled_basal_rate * hours_
+        scheduled_units = -scheduled_basal_rate * hours_
     else:
-        units = (value - scheduled_basal_rate) * hours_
+        scheduled_units = (value - scheduled_basal_rate) * hours_
 
     # round to the basal increments that the pump supports
-    return round(units * MINIMUM_MINIMED_INCREMENT) / MINIMUM_MINIMED_INCREMENT
+    return delivered_units if delivered_units is not None else round(scheduled_units * MINIMUM_MINIMED_INCREMENT) / MINIMUM_MINIMED_INCREMENT
 
 
 def total_units_given(type_, value, start, end):

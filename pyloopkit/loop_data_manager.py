@@ -238,7 +238,7 @@ def update(input_dict):
         (now_to_dia_insulin_effect_dates,
         now_to_dia_insulin_effect_values
         ) = get_glucose_effects(
-            dose_types, dose_starts, dose_ends, dose_values,
+            dose_types, dose_starts, dose_ends, dose_values, dose_delivered_units,
             time_to_calculate_at,
             basal_starts, basal_rates, basal_minutes,
             sensitivity_starts, sensitivity_ends, sensitivity_values,

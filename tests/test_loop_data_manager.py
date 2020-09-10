@@ -501,6 +501,7 @@ class TestLoopDataManagerDosingFromEffects(unittest.TestCase):
         "dose_start_times": [],
         "dose_end_times": [],
         "dose_values": [],
+        "dose_delivered_units": [],
         "carb_dates": [],
         "carb_values": [],
         "carb_absorption_times": [],

@@ -96,8 +96,8 @@ def update(input_dict):
         "carb_ratio_values" -- carb ratios in grams of carbohydrate per U
 
         "basal_rate_start_times" -- start times for basal rates
-        "basal_rate_end_times" -- basal rates in U/hour
-        "basal_rate_values" -- minutes the basal rate is active for
+        "basal_rate_values" -- basal rates in U/hour
+        "basal_rate_minutes" -- basal rate start minutes of offset from midnight
 
         "target_range_start_times" -- start times for the target ranges
         "target_range_end_times" -- end times for the target ranges
@@ -200,15 +200,21 @@ def update(input_dict):
         else earliest_effect_date
     )
 
-    (momentum_effect_dates,
-     momentum_effect_values
-     ) = get_recent_momentum_effects(
-         glucose_dates, glucose_values,
-         next_effect_date,
-         time_to_calculate_at,
-         settings_dictionary.get("momentum_data_interval") or 15,
-         5
-         )
+    # Allow input effects to be passed through dict for testing purposes
+    if (input_dict.get("momentum_effect_dates") and 
+        input_dict.get("momentum_effect_values")):
+        momentum_effect_dates = input_dict.get("momentum_effect_dates")
+        momentum_effect_values = input_dict.get("momentum_effect_values")
+    else:
+        (momentum_effect_dates,
+        momentum_effect_values
+        ) = get_recent_momentum_effects(
+            glucose_dates, glucose_values,
+            next_effect_date,
+            time_to_calculate_at,
+            settings_dictionary.get("momentum_data_interval") or 15,
+            5
+            )
 
     # calculate previous insulin effects in order to later calculate the
     # insulin counteraction effects
@@ -224,20 +230,34 @@ def update(input_dict):
          )
 
     # calculate future insulin effects for the purposes of predicting glucose
-    (now_to_dia_insulin_effect_dates,
-     now_to_dia_insulin_effect_values
-     ) = get_glucose_effects(
-        dose_types, dose_starts, dose_ends, dose_values, dose_delivered_units,
-        time_to_calculate_at,
-        basal_starts, basal_rates, basal_minutes,
-        sensitivity_starts, sensitivity_ends, sensitivity_values,
-        settings_dictionary.get("model"),
-        delay=settings_dictionary.get("insulin_delay") or 10
-        )
+    if (input_dict.get("now_to_dia_insulin_effect_dates") and 
+        input_dict.get("now_to_dia_insulin_effect_values")):
+        now_to_dia_insulin_effect_dates = input_dict.get("now_to_dia_insulin_effect_dates")
+        now_to_dia_insulin_effect_values = input_dict.get("now_to_dia_insulin_effect_values")
+    else:
+        (now_to_dia_insulin_effect_dates,
+        now_to_dia_insulin_effect_values
+        ) = get_glucose_effects(
+            dose_types, dose_starts, dose_ends, dose_values, dose_delivered_units,
+            time_to_calculate_at,
+            basal_starts, basal_rates, basal_minutes,
+            sensitivity_starts, sensitivity_ends, sensitivity_values,
+            settings_dictionary.get("model"),
+            delay=settings_dictionary.get("insulin_delay") or 10
+            )
+
+    
+    if (input_dict.get("counteraction_starts") and 
+        input_dict.get("counteraction_ends") and
+        input_dict.get("counteraction_values")):
+        counteraction_starts = input_dict.get("counteraction_starts")
+        counteraction_ends = input_dict.get("counteraction_ends")
+        counteraction_values = input_dict.get("counteraction_values")
+        counteraction_effects = (counteraction_starts, counteraction_ends, counteraction_values)
 
     # if our BG data is current and we know the expected insulin effects,
     # calculate tbe counteraction effects
-    if next_effect_date < last_glucose_date and insulin_effect_dates:
+    elif next_effect_date < last_glucose_date and insulin_effect_dates:
         (counteraction_starts,
          counteraction_ends,
          counteraction_values
@@ -252,19 +272,24 @@ def update(input_dict):
          counteraction_values
          ) = counteraction_effects = ([], [], [])
 
-    (carb_effect_dates,
-     carb_effect_values
-     ) = get_carb_glucose_effects(
-         carb_dates, carb_values, carb_absorptions,
-         retrospective_start,
-         *counteraction_effects if
-         settings_dictionary.get("dynamic_carb_absorption_enabled")
-         is not False else ([], [], []),
-         carb_ratio_starts, carb_ratio_values,
-         sensitivity_starts, sensitivity_ends, sensitivity_values,
-         settings_dictionary.get("default_absorption_times"),
-         delay=settings_dictionary.get("carb_delay") or 10
-         )
+    if (input_dict.get("carb_effect_dates") and 
+        input_dict.get("carb_effect_values")):
+        carb_effect_dates = input_dict.get("carb_effect_dates")
+        carb_effect_values = input_dict.get("carb_effect_values")
+    else: 
+        (carb_effect_dates,
+        carb_effect_values
+        ) = get_carb_glucose_effects(
+            carb_dates, carb_values, carb_absorptions,
+            retrospective_start,
+            *counteraction_effects if
+            settings_dictionary.get("dynamic_carb_absorption_enabled")
+            is not False else ([], [], []),
+            carb_ratio_starts, carb_ratio_values,
+            sensitivity_starts, sensitivity_ends, sensitivity_values,
+            settings_dictionary.get("default_absorption_times"),
+            delay=settings_dictionary.get("carb_delay") or 10
+            )
 
     (cob_dates,
      cob_values

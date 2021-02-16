@@ -30,25 +30,31 @@ def net_basal_units(type_, value, start, end, scheduled_basal_rate, delivered_un
     scheduled basal is
     """
     MINIMUM_MINIMED_INCREMENT = 20
+    hours_ = hours(end, start)
+
+    scheduled_basal_units = scheduled_basal_rate * hours_
+
+    net_delivered_units = None
+    if delivered_units:
+        net_delivered_units = delivered_units - scheduled_basal_units
 
     if type_ == DoseType.bolus:
-        return delivered_units if delivered_units is not None else value
+        return net_delivered_units if net_delivered_units is not None else value
 
     elif type_ == DoseType.basal:
         return 0
-
-    hours_ = hours(end, start)
 
     if hours_ < 0:
         return 0
 
     if type_ == DoseType.suspend:
-        scheduled_units = -scheduled_basal_rate * hours_
+        net_scheduled_units = -scheduled_basal_units
     else:
-        scheduled_units = (value - scheduled_basal_rate) * hours_
+        temp_basal_units = (value * hours_)
+        net_scheduled_units = temp_basal_units - scheduled_basal_units
 
     # round to the basal increments that the pump supports
-    return delivered_units if delivered_units is not None else round(scheduled_units * MINIMUM_MINIMED_INCREMENT) / MINIMUM_MINIMED_INCREMENT
+    return net_delivered_units if net_delivered_units is not None else round(net_scheduled_units * MINIMUM_MINIMED_INCREMENT) / MINIMUM_MINIMED_INCREMENT
 
 
 def total_units_given(type_, value, start, end):

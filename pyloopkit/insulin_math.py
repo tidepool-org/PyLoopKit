@@ -1232,19 +1232,17 @@ def trim(
         start_date = max(start_interval or DISTANT_PAST, start)
 
     if end.tzinfo:
-        return [dose_type,
-                start_date,
-                max(start_date,
-                    min(end_interval or TIMEZONE_DISTANT_FUTURE, end)
-                    ),
-                value,
-                scheduled_basal_rate,
-                delivered_units
-                ]
+        end_date = max(start_date, min(end_interval or TIMEZONE_DISTANT_FUTURE, end))
+    else:
+        end_date = max(start_date, min(end_interval or DISTANT_FUTURE, end))
+
+    if delivered_units:
+        trimmed_time_fraction = (end_date - start_date) / (end - start)
+        delivered_units = delivered_units * trimmed_time_fraction
 
     return [dose_type,
             start_date,
-            max(start_date, min(end_interval or DISTANT_FUTURE, end)),
+            end_date,
             value,
             scheduled_basal_rate,
             delivered_units

@@ -467,9 +467,10 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value, d
 
         output_scheduled_basal_rates.append(sched_basal_rates[i])
 
-        annotation_time_fraction = (end_date - start_date) / (dose_end_date - dose_start_date)
-        delivered_unit_annotation = delivered_unit * annotation_time_fraction
-        output_delivered_units.append(delivered_unit_annotation)
+        if delivered_unit is not None:
+            annotation_time_fraction = (end_date - start_date) / (dose_end_date - dose_start_date)
+            delivered_unit = delivered_unit * annotation_time_fraction
+        output_delivered_units.append(delivered_unit)
 
     assert len(output_types) == len(output_start_dates) ==\
         len(output_end_dates) == len(output_values) ==\

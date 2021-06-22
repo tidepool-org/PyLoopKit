@@ -156,14 +156,12 @@ def linear_momentum_effect(
         list(map(create_times, date_list)), glucose_value_list
     )
 
-    # ===== TMP =======
-    if settings_dictionary.get("max_physiologic_slope"):
+    if settings_dictionary is not None and settings_dictionary.get("max_physiologic_slope"):
         slope_mgdL_min = slope * 60
         clamped_slope_mgdL_min = min(slope_mgdL_min, settings_dictionary.get("max_physiologic_slope"))
         if clamped_slope_mgdL_min != slope_mgdL_min:
             print("Clamped the slope from {} to {}".format(slope_mgdL_min, clamped_slope_mgdL_min))
         slope = clamped_slope_mgdL_min / 60
-    # ====== /TMP ======
 
     if math.isnan(slope) or math.isinf(slope):
         return ([], [])

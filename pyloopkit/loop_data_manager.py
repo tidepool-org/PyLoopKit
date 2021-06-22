@@ -207,14 +207,15 @@ def update(input_dict):
         momentum_effect_values = input_dict.get("momentum_effect_values")
     else:
         (momentum_effect_dates,
-        momentum_effect_values
-        ) = get_recent_momentum_effects(
+         momentum_effect_values
+         ) = get_recent_momentum_effects(
             glucose_dates, glucose_values,
             next_effect_date,
             time_to_calculate_at,
             settings_dictionary.get("momentum_data_interval") or 15,
-            5
-            )
+            5,
+            settings_dictionary=settings_dictionary
+        )
 
     # calculate previous insulin effects in order to later calculate the
     # insulin counteraction effects

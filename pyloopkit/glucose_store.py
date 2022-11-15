@@ -22,7 +22,8 @@ def get_recent_momentum_effects(
         momentum_data_interval=15,
         delta=5,
         display_list=None,
-        provenances=None
+        provenances=None,
+        settings_dictionary=None
         ):
     """ Get glucose momentum effects
 
@@ -66,7 +67,8 @@ def get_recent_momentum_effects(
     effects = linear_momentum_effect(
         filtered_dates, filtered_values, display_list, provenances,
         momentum_data_interval,
-        delta
+        delta,
+        settings_dictionary
         )
 
     return effects

@@ -105,13 +105,15 @@ def get_glucose_effects(
     # trim the doses to start of interval
     for i in range(0, len(a_types)):
         result = trim(
-            a_types[i], a_starts[i], a_ends[i], a_values[i], a_delivered_units[i],
-            a_scheduled_rates[i],
-            start_interval=dose_start
+            a_types[i], a_starts[i], a_ends[i], a_values[i],
+            a_scheduled_rates[i], a_delivered_units[i],
+            start_interval=dose_start,
+            end_interval=end_date
             )
 
         a_starts[i] = result[1]
         a_ends[i] = result[2]
+        a_delivered_units[i] = result[5]
 
     # get the glucose effects using the prepared dose data
     glucose_effect = glucose_effects(

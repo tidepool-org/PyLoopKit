@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Aug 11 13:03:07 2019
-
-@author: annaquinlan
-"""
 # pylint: disable=C0103
 import json
 import datetime
@@ -21,16 +16,11 @@ from pyloopkit.pyloop_parser import (
     parse_report_and_run, parse_dictionary_from_previous_run
 )
 
-# %% find the path to the file in the repo
-# uncomment the name of the file you'd like to run
-# name = "example_issue_report_1.json"
-# name = "example_issue_report_2.json"
-name = "example_issue_report_3.json"
-# name = "example_from_previous_run.json"
-
+# Open file
+name = "TidepoolExport.xlsx"
 path = "pyloopkit/example_files/"
 
-# run the Loop algorithm with the issue report data
+# run the Loop algorithm with the tidepool export
 
 # uncomment parse_report_and_run if using an issue report; uncomment
 # parse_dictionary_from_previous_run if using data from a previous run
@@ -442,3 +432,34 @@ layout = go.Layout(
 
 fig = go.Figure(data=data, layout=layout)
 plot(fig, filename=name.split(".")[0] + '-output.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

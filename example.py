@@ -22,8 +22,7 @@ path = "pyloopkit/example_files/"
 
 # run the Loop algorithm with the tidepool export
 
-# uncomment parse_report_and_run if using an issue report; uncomment
-# parse_dictionary_from_previous_run if using data from a previous run
+# uncomment parse_dictionary_from_previous_run if using data from a previous run
 recommendations = parse_report_and_run(path, name)
 # recommendations = parse_dictionary_from_previous_run(path, name)
 

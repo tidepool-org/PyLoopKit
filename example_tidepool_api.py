@@ -8,7 +8,6 @@ from plotly.offline import plot
 
 from pyloopkit.dose import DoseType
 from pyloopkit.generate_graphs import plot_graph, plot_loop_inspired_glucose_graph
-#from .loop_kit_tests import find_root_path
 from pyloopkit.loop_math import predict_glucose
 
 from pyloopkit.tidepool_api_parser import (
@@ -16,8 +15,8 @@ from pyloopkit.tidepool_api_parser import (
 )
 
 # Load data from Tidepool API
-# Remember, this is for testing purposes, never post the code containing sensitive information
-EMAIL = 'YOUR_TIDEPOOL_EMAIL'
+# Remember, this is for testing purposes, never push code containing sensitive information and never store these files locally
+EMAIL = 'YOUR_TIDEPOOL_USERNAME'
 PASSWORD = 'YOUR_TIDEPOOL_PASSWORD'
 
 tp_api = TidepoolAPI(EMAIL, PASSWORD)

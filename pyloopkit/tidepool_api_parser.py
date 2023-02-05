@@ -59,11 +59,17 @@ def convert_to_correct_units(type_, start, end, value):
         """ Take a dose and convert it into the appropriate unit
                 (either U or U/hr)
         """
+        print("val")
+        print(value)
         if type_ == DoseType.bolus:
+            print("wtf")
             return value
         elif (start - end).total_seconds() == 0:
+            print("lasts for 0 seconds...")
             return value
         else: 
+            print("new val")
+            print(value / ((end - start).total_seconds()/60/60))
             return value / ((end - start).total_seconds()/60/60)
 
 
@@ -101,14 +107,18 @@ def get_insulin_data(
     values = []
 
     for sample in bolus_data:
+        value = sample['normal']
         date = parse_datetime_string(sample['time']) + timedelta(seconds=offset)
 
         # For bolus doses end date is not recorded in the Tidepool API
         start_dates.append(date)
         end_dates.append(date)
-        values.append(sample['normal'])
+        values.append(value)
 
     for sample in basal_data:
+        # Basal values are stored as U/h
+        value = sample['rate']
+
         start_date = parse_datetime_string(sample['time']) + timedelta(seconds=offset)
         end_date = start_date + timedelta(milliseconds=sample['duration'])
 
@@ -122,12 +132,8 @@ def get_insulin_data(
             dose_type = DoseType.from_str('basal')
             dose_types.append(dose_type)
         
-        # Convert from U/h to U for basal rates
-        basal_in_units = convert_to_correct_units(dose_type, start_date, end_date, sample['rate'])
-        values.append(basal_in_units)
+        values.append(value)
     
-    # TO DO: INSULIN DOSES THAT ARE ZERO SHOULD NOT BE INCLUDED AT ALL
-
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values),\
         "expected output shape to match"

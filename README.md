@@ -18,7 +18,7 @@ run `conda activate py-loop` to start the environment.
 
 Run `deactivate` to stop the environment.
 
-## Run example script
+## Run example script Tidepool Export
 In Terminal run
 `python3 example.py`
 in the main directory. 
@@ -26,6 +26,12 @@ in the main directory.
 The example script is the same as the original script, but instead of using Loop issue report, it uses a Tidepool export in Excel format. It uses the last measured glucose value in the data as a reference and calculates the predicted glucose trajectory.
 
 See `pyloopkit/example_files/TidepoolExport.xlsx` for the example data. Therapy settings used for blood glucose prediction can be adjusted in `pyloopkit/example_files/therapy_settings.json`.
+
+## Run example script Tidepool API
+- Go to `example_tidepool_api.py` and write your tidepool credentials (this is only for testing! Sensitive information should not be stored like this)
+- If you want to see predictions for a specific time, adjust the `time_to_run` parameter
+- Adjust therapy settings in `pyloopkit/example_files/therapy_settings.json`
+- In Terminal run `python3 example_tidepool_api.py` in the main directory
 
 ## PyLoopKit Instructions
 To read about usage instructions, input data requirements, and other important details please review [the documentation](pyloopkit/docs/pyloopkit_documentation.md).
@@ -60,7 +66,6 @@ To run PyLoopKit's unit tests, run `python3 -m unittest discover` within your Py
 - Refactoring. The focus until now has been to making it work.
 - Possibly implementing support for Nightscout API
 - Verify that the predictions are correct in several scenarious
-- Implementing a function that takes a datetime/glucose sample as an input and returns predicted values from this reference point
 - Implementing a function that takes a datetime/glucose sample as an input and returns measured values from this reference point
 - Implementing a function that calculates the forecast evaluation by Damon Bayer [documented here](https://docs.google.com/document/d/14AJ9u2oGJiiJU1cWVDf_rC_WdJc0oOj1uIkXutOovQU/edit)
 

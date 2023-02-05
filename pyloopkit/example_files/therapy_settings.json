@@ -22,11 +22,11 @@
     "insulin_sensitivity_factor_schedule": [
         {
             "startTime": 0.0,
-            "value": 80.0
+            "value": 81.0
         },
         {
             "startTime": 1800.0,
-            "value": 80.0
+            "value": 81.0
         }
     ],
     "correction_range_schedule": [

@@ -26,7 +26,7 @@ def get_glucose_data(glucose_data, offset=0):
 
         dates = []
         glucose_values = []
-        # TO DO: ACCOUNT FOR OFFSET
+
         for sample in glucose_data:
                 dates.append(parse_datetime_string(sample['time']) + timedelta(seconds=offset)) 
 
@@ -68,7 +68,7 @@ def convert_to_correct_units(type_, start, end, value):
 
 
 def get_insulin_data(
-        dataframe_bolus, dataframe_basal,
+        bolus_data, basal_data,
         offset=0, convert_to_units=False, entry_to_add=None,
         now_time=None):
     """ Load doses from an issue report cached_doses
@@ -93,55 +93,40 @@ def get_insulin_data(
     dose_types = [
         DoseType.from_str(
             "bolus"
-        ) for _ in range(dataframe_bolus.shape[0])
+        ) for _ in range(len(bolus_data))
     ]
-    for val in dataframe_basal['Delivery Type']:
-        if val == 'temp':
-            dose_types.append(DoseType.from_str('tempbasal'))
+
+    start_dates = []
+    end_dates = []
+    values = []
+
+    for sample in bolus_data:
+        date = parse_datetime_string(sample['time']) + timedelta(seconds=offset)
+
+        # For bolus doses end date is not recorded in the Tidepool API
+        start_dates.append(date)
+        end_dates.append(date)
+        values.append(sample['normal'])
+
+    for sample in basal_data:
+        start_date = parse_datetime_string(sample['time']) + timedelta(seconds=offset)
+        end_date = start_date + timedelta(milliseconds=sample['duration'])
+
+        start_dates.append(start_date)
+        end_dates.append(end_date)
+
+        if sample['deliveryType'] == 'temp':
+            dose_type = DoseType.from_str('tempbasal')
+            dose_types.append(dose_type)
         else:
-            dose_types.append(DoseType.from_str('basal'))
-
-    start_dates = [
-        datetime.strptime(
-            str(date).split('.')[0],
-            "%Y-%m-%d %H:%M:%S"
-        ) + timedelta(seconds=offset)
-        for date in dataframe_bolus['Local Time']
-    ]
-    # Tidepool export does unfortunately not add end dates to bolus doses
-    end_dates = start_dates.copy()
-    
-    for date in dataframe_basal['Local Time']:
-        start_dates.append(
-            datetime.strptime(
-            str(date).split('.')[0],
-            "%Y-%m-%d %H:%M:%S"
-            ) + timedelta(seconds=offset)
-            )
-
-    end_dates_basal = dataframe_basal.apply(lambda x: x['Local Time'] + pd.Timedelta(x["Duration (mins)"], 'm'), axis=1)
-    
-    for date in end_dates_basal:
-        end_dates.append(
-            datetime.strptime(
-            str(date).split('.')[0],
-            "%Y-%m-%d %H:%M:%S"
-            ) + timedelta(seconds=offset) 
-            )
-
-    values = [
-        val for val in dataframe_bolus['Normal']
-        ]
+            dose_type = DoseType.from_str('basal')
+            dose_types.append(dose_type)
+        
+        # Convert from U/h to U for basal rates
+        basal_in_units = convert_to_correct_units(dose_type, start_date, end_date, sample['rate'])
+        values.append(basal_in_units)
     
     # TO DO: INSULIN DOSES THAT ARE ZERO SHOULD NOT BE INCLUDED AT ALL
-
-    for val in dataframe_basal['Rate']:
-        values.append(val)
-
-    # Convert from U/h to U for basal rates
-    for i in range(len(dataframe_bolus), len(dataframe_bolus) + len(dataframe_basal)):
-        basal_in_units = convert_to_correct_units(dose_types[i], start_dates[i], end_dates[i], values[i])
-        values[i] = basal_in_units
 
     assert len(dose_types) == len(start_dates) == len(end_dates) ==\
         len(values),\
@@ -150,35 +135,31 @@ def get_insulin_data(
     return (dose_types, start_dates, end_dates, values)
 
 
-def get_carb_data(dataframe_carbs, offset=0):
-        """ Load carb information from an issue report cached_carbs dictionary
+def get_carb_data(carb_data, offset=0):
+    """ Load carb information from an issue report cached_carbs dictionary
 
-        Arguments:
-        data -- dictionary containing cached carb information
-        offset -- the offset from UTC in seconds
+    Arguments:
+    data -- dictionary containing cached carb information
+    offset -- the offset from UTC in seconds
 
-        Output:
-        3 lists in (carb_values, carb_start_dates, carb_absorption_times)
-        format
-        """
-        carb_values = [json.loads(dict_)['carbohydrate']['net'] for dict_ in dataframe_carbs['Nutrition']]
-        
-        start_dates = [
-                datetime.strptime(
-                        str(date).split('.')[0],
-                        "%Y-%m-%d %H:%M:%S"
-                ) + timedelta(seconds=offset)
-                for date in dataframe_carbs['Local Time']
-        ]
-        absorption_times = [
-        float(json.loads(dict_)['com.loopkit.AbsorptionTime']) / 60
-        if json.loads(dict_)['com.loopkit.AbsorptionTime'] is not None
-        else None for dict_ in dataframe_carbs['Payload']
-    ]
+    Output:
+    3 lists in (carb_values, carb_start_dates, carb_absorption_times)
+    format
+    """
 
-        assert len(start_dates) == len(carb_values) == len(absorption_times),\
+    start_dates = []
+    carb_values = []
+    absorption_times = []
+
+    for sample in carb_data:
+        date = parse_datetime_string(sample['time']) + timedelta(seconds=offset)
+        start_dates.append(date)
+        carb_values.append(sample['nutrition']['carbohydrate']['net'])
+        absorption_times.append(sample['payload']['com.loopkit.AbsorptionTime'] / 60)
+
+    assert len(start_dates) == len(carb_values) == len(absorption_times),\
                 "expected input shapes to match"
-        return (start_dates, carb_values, absorption_times)
+    return (start_dates, carb_values, absorption_times)
 
 
 def seconds_to_time(seconds):
@@ -541,25 +522,19 @@ def remove_too_new_values(
 
         return (l1, l2, l3, l4, l5)
 
-
-# %% Take an issue report and run it through the Loop algorithm
-def parse_report_and_run(path, name):
-        return parse_report_and_run_with_name(os.path.join(path, name))
-
-
 # TO DO!
 # TO DO: ADD ANOTHER METHOD THAT IS SIMILAR, 
 # BUT THAT ALSO TAKES IN A DATE FROM WHICH TO CALCULATE PREDICTIONS,
 # AND THAT RETURNS A LIST OF MEASURED VALUES TO COMPARE PREDICTIONS WITH!
 
  # %% Take an issue report and run it through the Loop algorithm
-def parse_report_and_run_with_name(data):
+def parse_report_and_run(user_data, time_to_run=None):
     """ Get relevent information from a Loop issue report and use it to
             run PyLoopKit
 
     Arguments:
-    path -- the path to the issue report
-    name -- the name of the file, with the .json extension
+    user_data -- the dictionary from an API call to the Tidepool data
+    time_to_run -- the datetime at which the prediction will be made, by default the last glucose sample in the data
 
     Output:
     A dictionary of all 4 effects, the predicted glucose values, and the
@@ -572,30 +547,39 @@ def parse_report_and_run_with_name(data):
     with open(settings_path_and_name, "r") as file:
         settings_dict = json.load(file)
 
-
-
-
     # Load data
-    dataframe_glucose = pd.read_excel(data_path_and_name, 'CGM')
-    dataframe_bolus = pd.read_excel(data_path_and_name, 'Bolus')
-    dataframe_basal = pd.read_excel(data_path_and_name, 'Basal')
-    dataframe_carbs = pd.read_excel(data_path_and_name, 'Food')
+    glucose_data = []
+    bolus_data = []
+    basal_data = []
+    carb_data = []
+
+    # Sort data types into lists
+    for data in user_data:
+        if data['type'] == 'cbg':
+                glucose_data.append(data)
+        elif data['type'] == 'bolus':
+                bolus_data.append(data)
+        elif data['type'] == 'basal':
+                basal_data.append(data)
+        elif data['type'] == 'food':
+                carb_data.append(data)
+
+    now = datetime.now()
+    utcNow = datetime.utcnow()
+    offset = int((now - utcNow).total_seconds())
 
     input_dict = {}
-
-    # Set offset=0 because the Tidepool export has a column for local time
-    # Note that this is not a good practice in case of changing time zones
-    # This should be handled in a better way
-    offset = 0
     
-    if not dataframe_glucose.empty:
+    if not len(glucose_data) == 0:
             (glucose_dates, glucose_values) = get_glucose_data(
-                    dataframe_glucose, 
+                    glucose_data, 
                     offset
             )
             # Time to run is the date at which the prediction will be calculated
-            # We use the first glucose measurement in the list (sorted descending)
-            time_to_run = glucose_dates[0]
+            # We use the first glucose measurement in the list (sorted descending) if there is no input
+            if time_to_run is None:
+                time_to_run = glucose_dates[0]
+
             (glucose_dates, glucose_values) = remove_too_new_values(
                     time_to_run,
                     *sort_by_first_list(
@@ -611,14 +595,14 @@ def parse_report_and_run_with_name(data):
 
     input_dict["time_to_calculate_at"] = time_to_run
 
-    if not (dataframe_bolus.empty or  dataframe_basal.empty):
+    if not (len(bolus_data) == 0 or len(basal_data) == 0):
             (dose_types,
              dose_starts,
              dose_ends,
              dose_values
              ) = get_insulin_data(
-                    dataframe_bolus, 
-                    dataframe_basal,
+                    bolus_data, 
+                    basal_data,
                     offset,
                     #entry_to_add=issue_dict.get("get_normalized_dose_entries")[-1],
                     now_time=time_to_run
@@ -630,7 +614,6 @@ def parse_report_and_run_with_name(data):
              dose_ends,
              dose_values
              ) = ([], [], [], [])
-
 
     (dose_types,
      dose_starts,
@@ -653,13 +636,13 @@ def parse_report_and_run_with_name(data):
     input_dict["dose_value_units"] = "U or U/hr"
     input_dict["dose_delivered_units"] = [None for i in range(len(dose_types))]
 
-    if not dataframe_carbs.empty:
+    if not len(carb_data) == 0:
             (carb_dates,
              carb_values,
              carb_absorptions
              ) = sort_by_first_list(
                              *get_carb_data(
-                                     dataframe_carbs,
+                                     carb_data,
                                      offset,
                              )
             )[0:3]

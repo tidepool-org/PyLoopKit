@@ -50,12 +50,13 @@ To run PyLoopKit's unit tests, run `python3 -m unittest discover` within your Py
 ## Limitations 
 - Tidepool exports do not include end dates for bolus doses, so this repository assumes that bolus injections are delivered momentarily
 - Timezone for the computer is used, not from the dataset
+- Therapy settings is assuming you are using mg/dL, there should be a simple way to adjust units used
+- Carbohydrate model is by default parabolic (linear in original repository), there should be a simple way to adjust that
 - The therapy settings are not read from the collected data and hence do not include overrides
 	- Instead, therapy settings are stored in `pyloopkit/example_files/therapy_settings.json`
 	- This is in the backlog to be fixed, but is not a bottleneck for exploring how to optimize therapy settings in Loop
 
 ## Further Plans 
-- Implement support for [Tidepool API](https://github.com/tidepool-org/data-science-tidepool-api-python) instead of Tidepool export
 - Refactoring. The focus until now has been to making it work.
 - Possibly implementing support for Nightscout API
 - Verify that the predictions are correct in several scenarious

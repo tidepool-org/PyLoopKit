@@ -275,7 +275,14 @@ def map_(
             ) / 60
                 - delay
                 )
+        """
         min_predicted_grams = linearly_absorbed_carbs(
+            entry_grams,
+            time,
+            builder_max_absorb_times[builder_index]
+        )
+        """
+        min_predicted_grams = parabolic_absorbed_carbs(
             entry_grams,
             time,
             builder_max_absorb_times[builder_index]
@@ -317,8 +324,14 @@ def map_(
             ) / 60
                 - delay
                 )
-
+        """
         min_predicted_grams = linearly_absorbed_carbs(
+            entry_grams,
+            time,
+            builder_max_absorb_times[builder_index]
+        )
+        """
+        min_predicted_grams = parabolic_absorbed_carbs(
             entry_grams,
             time,
             builder_max_absorb_times[builder_index]
@@ -432,6 +445,22 @@ def parabolic_absorbed_carbs(total, time, absorption_time):
                                                         absorption_time
                                                         )
 
+def parabolic_unabsorbed_carbs(total, time, absorption_time):
+    """
+    Find unabsorbed carbs using a linear model
+
+    Parameters:
+    total -- total grams of carbs
+    time -- relative time after eating (in minutes)
+    absorption_time --  time for carbs to completely absorb (in minutes)
+
+    Output:
+    Grams of unabsorbed carbs
+    """
+    return total * (1 - parabolic_percent_absorption_at_time(time,
+                                                          absorption_time
+                                                          )
+                    )
 
 def parabolic_percent_absorption_at_time(time, absorption_time):
     """

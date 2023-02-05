@@ -73,7 +73,7 @@ def dynamic_carbs_on_board_helper(
                 ) / 60
             + absorption_dict[6]
         )
-        return carb_math.linear_unabsorbed_carbs(
+        return carb_math.parabolic_unabsorbed_carbs(
             absorption_dict[2],
             time,
             estimated_date_duration
@@ -88,7 +88,7 @@ def dynamic_carbs_on_board_helper(
         time = time_interval_since(at_date, absorption_dict[5]) / 60
         absorption_time = absorption_dict[6]
 
-        return carb_math.linear_unabsorbed_carbs(
+        return carb_math.parabolic_unabsorbed_carbs(
             total,
             time,
             absorption_time
@@ -163,7 +163,7 @@ def dynamic_absorbed_carbs(
                 ) / 60
             + absorption_dict[6]
         )
-        return carb_math.linearly_absorbed_carbs(
+        return carb_math.parabolic_absorbed_carbs(
             absorption_dict[2],
             time,
             estimated_date_duration
@@ -178,7 +178,7 @@ def dynamic_absorbed_carbs(
         time = time_interval_since(at_date, absorption_dict[5]) / 60
         absorption_time = absorption_dict[6]
 
-        return absorption_dict[1] + carb_math.linearly_absorbed_carbs(
+        return absorption_dict[1] + carb_math.parabolic_absorbed_carbs(
             total,
             time,
             absorption_time

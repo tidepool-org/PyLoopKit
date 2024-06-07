@@ -466,6 +466,10 @@ def annotate_individual_dose(dose_type, dose_start_date, dose_end_date, value, d
             output_values.append(value)
 
         output_scheduled_basal_rates.append(sched_basal_rates[i])
+
+        if delivered_unit is not None:
+            annotation_time_fraction = (end_date - start_date) / (dose_end_date - dose_start_date)
+            delivered_unit = delivered_unit * annotation_time_fraction
         output_delivered_units.append(delivered_unit)
 
     assert len(output_types) == len(output_start_dates) ==\
@@ -1232,19 +1236,19 @@ def trim(
         start_date = max(start_interval or DISTANT_PAST, start)
 
     if end.tzinfo:
-        return [dose_type,
-                start_date,
-                max(start_date,
-                    min(end_interval or TIMEZONE_DISTANT_FUTURE, end)
-                    ),
-                value,
-                scheduled_basal_rate,
-                delivered_units
-                ]
+        end_date = max(start_date, min(end_interval or TIMEZONE_DISTANT_FUTURE, end))
+    else:
+        end_date = max(start_date, min(end_interval or DISTANT_FUTURE, end))
+
+    if delivered_units:
+        trimmed_time_fraction = 1.0
+        if (end - start).total_seconds() > 0:  # Temp basal only. Bolus dose assumed to have same start and end time.
+            trimmed_time_fraction = (end_date - start_date) / (end - start)
+        delivered_units = delivered_units * trimmed_time_fraction
 
     return [dose_type,
             start_date,
-            max(start_date, min(end_interval or DISTANT_FUTURE, end)),
+            end_date,
             value,
             scheduled_basal_rate,
             delivered_units

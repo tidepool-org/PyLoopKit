@@ -28,7 +28,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     install_requires=[
-          'numpy>=1.16.4',
+          'numpy==1.22.0',
           'backports-datetime-fromisoformat==1.0.0',
       ],
     python_requires='>=3.6',

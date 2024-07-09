@@ -29,7 +29,7 @@ setup(
     ],
     install_requires=[
           'numpy>=1.22.0',
-          'backports-datetime-fromisoformat==1.0.0',
+          'backports-datetime-fromisoformat>=1.0.0',
       ],
     python_requires='>=3.6',
 )

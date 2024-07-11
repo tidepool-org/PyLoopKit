@@ -763,11 +763,11 @@ def recommended_autobolus(
         model,
         pending_insulin,
         max_bolus,
-        autobolus_multiplier,
+        autobolus_multiplier=0.0,
         volume_rounder=None
         ):
     
-    autobolus = recommended_bolus(
+    bolus = recommended_bolus(
         glucose_dates, glucose_values,
         target_starts, target_ends, target_mins, target_maxes,
         at_date,
@@ -778,8 +778,11 @@ def recommended_autobolus(
         max_bolus,
         volume_rounder=None
         )
-        
-    autobolus[0] = autobolus[0] * autobolus_multiplier
+    
+    autobolus = None
+    if bolus:
+        autobolus = bolus
+        autobolus[0] = autobolus[0] * autobolus_multiplier
 
     return autobolus
     

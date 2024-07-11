@@ -779,6 +779,9 @@ def recommended_autobolus(
         volume_rounder=None
         )
     
+    if autobolus_multiplier is None:
+        autobolus_multiplier = 0.0
+        
     autobolus = None
     if bolus:
         autobolus = bolus

@@ -763,6 +763,8 @@ def recommended_autobolus(
         model,
         pending_insulin,
         max_bolus,
+        minimum_autobolus=None,
+        maximum_autobolus=None,
         autobolus_multiplier=None,
         volume_rounder=None
         ):
@@ -781,11 +783,20 @@ def recommended_autobolus(
     
     if autobolus_multiplier is None:
         autobolus_multiplier = 0.0
-        
-    autobolus = None
+    
+    if minimum_autobolus is None:
+        minimum_autobolus = 0
+
+    if maximum_autobolus is None:
+        maximum_autobolus = max_bolus
+    
     if bolus:
         autobolus = bolus
         autobolus[0] = autobolus[0] * autobolus_multiplier
+        autobolus[0] = min(autobolus[0], maximum_autobolus)
 
-    return autobolus
+        if autobolus[0] > minimum_autobolus:
+            return autobolus
+            
+    return None
     

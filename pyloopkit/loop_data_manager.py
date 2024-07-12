@@ -346,6 +346,8 @@ def update(input_dict):
         settings_dictionary.get("max_basal_rate"),
         settings_dictionary.get("max_bolus"),
         last_temp_basal,
+        minimum_autobolus=settings_dictionary.get("minimum_autobolus"),
+        maximum_autobolus=settings_dictionary.get("maximum_autobolus"),
         autobolus_multiplier=settings_dictionary.get("autobolus_multiplier"),
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
@@ -553,6 +555,8 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         last_temp_basal,
         duration=30,
         continuation_interval=11,
+        minimum_autobolus=0,
+        maximum_autobolus=None,
         autobolus_multiplier=0.4,
         rate_rounder=None
         ):
@@ -690,6 +694,8 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         model,
         pending_insulin,
         max_bolus,
+        minimum_autobolus,
+        maximum_autobolus,
         autobolus_multiplier,
         rate_rounder
         )

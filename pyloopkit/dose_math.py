@@ -763,7 +763,7 @@ def recommended_autobolus(
         model,
         pending_insulin,
         max_bolus,
-        autobolus_multiplier=0.0,
+        autobolus_multiplier=None,
         volume_rounder=None
         ):
     

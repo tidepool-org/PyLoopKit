@@ -348,7 +348,7 @@ def update(input_dict):
         last_temp_basal,
         minimum_autobolus=settings_dictionary.get("minimum_autobolus"),
         maximum_autobolus=settings_dictionary.get("maximum_autobolus"),
-        autobolus_multiplier=settings_dictionary.get("autobolus_multiplier"),
+        partial_application_factor=settings_dictionary.get("partial_application_factor"),
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
@@ -557,7 +557,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         continuation_interval=11,
         minimum_autobolus=0,
         maximum_autobolus=None,
-        autobolus_multiplier=0.4,
+        partial_application_factor=0.4,
         rate_rounder=None
         ):
     """ Generate glucose predictions, then use the predicted glucose along
@@ -696,7 +696,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         max_bolus,
         minimum_autobolus,
         maximum_autobolus,
-        autobolus_multiplier,
+        partial_application_factor,
         rate_rounder
         )
 

@@ -412,6 +412,7 @@ def get_settings(data):
     settings["retrospective_correction_integration_interval"] = 30
     settings["recency_interval"] = 15
     settings["retrospective_correction_grouping_interval"] = 30
+    settings["autobolus_multiplier"] = data.get("autobolus_multiplier") or 0
     settings["rate_rounder"] = 0.05
     settings["insulin_delay"] = 10
     settings["carb_delay"] = 10
@@ -565,7 +566,6 @@ def parse_report_and_run_with_name(data_path_and_name):
     with open(data_path_and_name, "r") as file:
         issue_dict = json.load(file)
     input_dict = {}
-
     if issue_dict.get("basal_rate_timeZone") is not None:
         offset = issue_dict.get("basal_rate_timeZone")
     elif issue_dict.get("carb_ratio_timeZone") is not None:

@@ -15,7 +15,7 @@ import warnings
 from pyloopkit.carb_store import get_carb_glucose_effects, get_carbs_on_board
 from pyloopkit.date import time_interval_since
 from pyloopkit.dose import DoseType
-from pyloopkit.dose_math import recommended_temp_basal, recommended_bolus
+from pyloopkit.dose_math import recommended_temp_basal, recommended_bolus, recommended_autobolus
 from pyloopkit.dose_store import get_glucose_effects
 from pyloopkit.glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
@@ -346,6 +346,9 @@ def update(input_dict):
         settings_dictionary.get("max_basal_rate"),
         settings_dictionary.get("max_bolus"),
         last_temp_basal,
+        minimum_autobolus=settings_dictionary.get("minimum_autobolus"),
+        maximum_autobolus=settings_dictionary.get("maximum_autobolus"),
+        partial_application_factor=settings_dictionary.get("partial_application_factor"),
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
@@ -552,6 +555,9 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         last_temp_basal,
         duration=30,
         continuation_interval=11,
+        minimum_autobolus=0,
+        maximum_autobolus=None,
+        partial_application_factor=0.4,
         rate_rounder=None
         ):
     """ Generate glucose predictions, then use the predicted glucose along
@@ -700,11 +706,27 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         max_bolus,
         rate_rounder
         )
-    # =========== /end changes =============
+
+    
+    autobolus = recommended_autobolus(
+        *predicted_glucoses,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        pending_insulin,
+        max_bolus,
+        minimum_autobolus,
+        maximum_autobolus,
+        partial_application_factor,
+        rate_rounder
+        )
 
     return {
         "predicted_glucose_dates": predicted_glucoses_basal[0],
         "predicted_glucose_values": predicted_glucoses_basal[1],
         "recommended_temp_basal": temp_basal,
-        "recommended_bolus": bolus
+        "recommended_bolus": bolus,
+        "recommended_autobolus": autobolus
     }

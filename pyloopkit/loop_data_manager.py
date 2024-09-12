@@ -707,9 +707,8 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         rate_rounder
         )
 
-    
     autobolus = recommended_autobolus(
-        *predicted_glucoses,
+        *predicted_glucoses_bolus,
         target_starts, target_ends, target_mins, target_maxes,
         at_date,
         suspend_threshold,

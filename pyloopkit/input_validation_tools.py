@@ -194,12 +194,12 @@ def are_basal_rates_valid(start_times, rates, minutes_active):
             + " continuing anyway"
         )
 
-    if any(duration > 1440 for duration in minutes_active):
-        warnings.warn(
-            "Error: data contains basal rates with scheduled duration greater"
-            + " than a day (1440 mins); stopping run"
-        )
-        return False
+    # if any(duration > 1440 for duration in minutes_active):
+    #     warnings.warn(
+    #         "Error: data contains basal rates with scheduled duration greater"
+    #         + " than a day (1440 mins); stopping run"
+    #     )
+    #     return False
 
     return True
 

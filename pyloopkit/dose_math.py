@@ -781,22 +781,19 @@ def recommended_autobolus(
         volume_rounder=None
         )
     
-    if partial_application_factor is None:
-        partial_application_factor = 0.0
+    if partial_application_factor is None or partial_application_factor == 0:
+        return None
     
-    if minimum_autobolus is None:
-        minimum_autobolus = 0
+    # if minimum_autobolus is None:
+    #     minimum_autobolus = 0
 
-    if maximum_autobolus is None:
-        maximum_autobolus = max_bolus
+    # if maximum_autobolus is None:
+    #     maximum_autobolus = max_bolus
     
     if bolus:
-        autobolus = bolus
-        autobolus[0] = autobolus[0] * partial_application_factor
-        autobolus[0] = min(autobolus[0], maximum_autobolus)
-
-        if autobolus[0] > minimum_autobolus:
-            return autobolus
+        bolus[0] = bolus[0] * partial_application_factor
+        
+        return bolus
             
-    return None
+    return 0.0
     

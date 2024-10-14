@@ -784,12 +784,6 @@ def recommended_autobolus(
     if partial_application_factor is None or partial_application_factor == 0:
         return None
     
-    # if minimum_autobolus is None:
-    #     minimum_autobolus = 0
-
-    # if maximum_autobolus is None:
-    #     maximum_autobolus = max_bolus
-    
     if bolus:
         bolus[0] = bolus[0] * partial_application_factor
         

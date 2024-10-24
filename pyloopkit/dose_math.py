@@ -752,3 +752,42 @@ def recommended_bolus(
         bolus = 0
 
     return bolus
+
+
+def recommended_autobolus(
+        glucose_dates, glucose_values,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        pending_insulin,
+        max_bolus,
+        minimum_autobolus=None,
+        maximum_autobolus=None,
+        partial_application_factor=None,
+        volume_rounder=None
+        ):
+    
+    bolus = recommended_bolus(
+        glucose_dates, glucose_values,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        pending_insulin,
+        max_bolus,
+        volume_rounder=None
+        )
+    
+    if partial_application_factor is None or partial_application_factor == 0:
+        return None
+    
+    if bolus:
+        bolus[0] = bolus[0] * partial_application_factor
+        
+        return bolus
+            
+    return 0.0
+    

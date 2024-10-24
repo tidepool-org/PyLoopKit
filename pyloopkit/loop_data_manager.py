@@ -12,10 +12,11 @@ Github URL: https://github.com/tidepool-org/Loop/blob/
 from datetime import timedelta
 import warnings
 
+from pyloopkit.insulin_math import find_ratio_at_time
 from pyloopkit.carb_store import get_carb_glucose_effects, get_carbs_on_board
 from pyloopkit.date import time_interval_since
 from pyloopkit.dose import DoseType
-from pyloopkit.dose_math import recommended_temp_basal, recommended_bolus
+from pyloopkit.dose_math import recommended_temp_basal, recommended_bolus, recommended_autobolus
 from pyloopkit.dose_store import get_glucose_effects
 from pyloopkit.glucose_store import (get_recent_momentum_effects,
                            get_counteraction_effects)
@@ -346,6 +347,9 @@ def update(input_dict):
         settings_dictionary.get("max_basal_rate"),
         settings_dictionary.get("max_bolus"),
         last_temp_basal,
+        minimum_autobolus=settings_dictionary.get("minimum_autobolus"),
+        maximum_autobolus=settings_dictionary.get("maximum_autobolus"),
+        partial_application_factor=settings_dictionary.get("partial_application_factor"),
         rate_rounder=settings_dictionary.get("rate_rounder")
         )
 
@@ -552,6 +556,9 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         last_temp_basal,
         duration=30,
         continuation_interval=11,
+        minimum_autobolus=0,
+        maximum_autobolus=None,
+        partial_application_factor=0.4,
         rate_rounder=None
         ):
     """ Generate glucose predictions, then use the predicted glucose along
@@ -627,7 +634,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         warnings.warn("Warning: expected to receive effect data")
         return (None, None, None)
 
-    predicted_glucoses = predict_glucose(
+    predicted_glucoses_basal = predict_glucose(
         glucose_dates[-1], glucose_values[-1],
         momentum_dates, momentum_values,
         carb_effect_dates, carb_effect_values,
@@ -642,9 +649,9 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
     else:
         final_date = glucose_dates[-1] + timedelta(minutes=model[0])
 
-    if predicted_glucoses[0][-1] < final_date:
-        predicted_glucoses[0].append(final_date)
-        predicted_glucoses[1].append(predicted_glucoses[1][-1])
+    if predicted_glucoses_basal[0][-1] < final_date:
+        predicted_glucoses_basal[0].append(final_date)
+        predicted_glucoses_basal[1].append(predicted_glucoses_basal[1][-1])
 
     pending_insulin = get_pending_insulin(
         at_date,
@@ -653,7 +660,7 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
     )
 
     temp_basal = recommended_temp_basal(
-        *predicted_glucoses,
+        *predicted_glucoses_basal,
         target_starts, target_ends, target_mins, target_maxes,
         at_date,
         suspend_threshold,
@@ -667,8 +674,30 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         rate_rounder
         )
 
+    # ======= CS Aug 6: Proposed Algorithm Changes from iCGM Analysis =========
+    # ======= All positive RC and Momentum for bolus only are removed from predictions ========
+    (retrospective_effect_dates_bolus, retrospective_effect_values_bolus) = (retrospective_effect_dates, retrospective_effect_values)
+    if len(retrospective_effect_values) > 0 and retrospective_effect_values[-1] > retrospective_effect_values[0]:
+        (retrospective_effect_dates_bolus,
+         retrospective_effect_values_bolus
+         ) = ([], [])
+
+    (momentum_effect_dates_bolus, momentum_effect_values_bolus) = (momentum_dates, momentum_values)
+    if sum(momentum_values) > 0:
+        (momentum_effect_dates_bolus,
+         momentum_effect_values_bolus
+         ) = ([], [])
+
+    predicted_glucoses_bolus = predict_glucose(
+        glucose_dates[-1], glucose_values[-1],
+        momentum_effect_dates_bolus, momentum_effect_values_bolus,
+        carb_effect_dates, carb_effect_values,
+        insulin_effect_dates, insulin_effect_values,
+        retrospective_effect_dates_bolus, retrospective_effect_values_bolus
+        )
+
     bolus = recommended_bolus(
-        *predicted_glucoses,
+        *predicted_glucoses_bolus,
         target_starts, target_ends, target_mins, target_maxes,
         at_date,
         suspend_threshold,
@@ -679,9 +708,25 @@ def update_predicted_glucose_and_recommended_basal_and_bolus(
         rate_rounder
         )
 
+    autobolus = recommended_autobolus(
+        *predicted_glucoses_bolus,
+        target_starts, target_ends, target_mins, target_maxes,
+        at_date,
+        suspend_threshold,
+        sensitivity_starts, sensitivity_ends, sensitivity_values,
+        model,
+        pending_insulin,
+        max_bolus,
+        minimum_autobolus,
+        maximum_autobolus,
+        partial_application_factor,
+        rate_rounder
+        )
+    
     return {
-        "predicted_glucose_dates": predicted_glucoses[0],
-        "predicted_glucose_values": predicted_glucoses[1],
+        "predicted_glucose_dates": predicted_glucoses_basal[0],
+        "predicted_glucose_values": predicted_glucoses_basal[1],
         "recommended_temp_basal": temp_basal,
-        "recommended_bolus": bolus
+        "recommended_bolus": bolus,
+        "recommended_autobolus": autobolus
     }

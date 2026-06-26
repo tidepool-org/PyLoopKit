@@ -15,7 +15,9 @@ from datetime import datetime, time, timedelta
 #from . import path_grabber  # pylint: disable=unused-import
 from .loop_kit_tests import load_fixture
 from pyloopkit.carb_math import (map_, carb_glucose_effects, carbs_on_board,
-                       dynamic_carbs_on_board, dynamic_glucose_effects)
+                       dynamic_carbs_on_board, dynamic_glucose_effects,
+                       parabolic_percent_absorption_at_time,
+                       parabolic_absorbed_carbs, carb_glucose_effect)
 
 
 class TestCarbKitFunctions(unittest.TestCase):
@@ -844,6 +846,35 @@ class TestCarbKitFunctions(unittest.TestCase):
             self.assertAlmostEqual(
                 expected_values[i], effect_values[i], 2
             )
+
+    def test_parabolic_percent_absorption_rejects_nonpositive_absorption(self):
+        # absorption_time is divided into, so a non-positive value previously
+        # raised an opaque ZeroDivisionError rather than validating the input
+        self.assertRaises(
+            ValueError, parabolic_percent_absorption_at_time, 0, 0
+        )
+        self.assertRaises(
+            ValueError, parabolic_percent_absorption_at_time, 5, -10
+        )
+        # a positive absorption time is unaffected
+        self.assertEqual(parabolic_percent_absorption_at_time(0, 120), 0)
+        self.assertEqual(parabolic_percent_absorption_at_time(240, 120), 1)
+        self.assertRaises(
+            ValueError, parabolic_absorbed_carbs, 10, 0, 0
+        )
+
+    def test_carb_glucose_effect_rejects_nonpositive_carb_ratio(self):
+        # carb_ratio is divided into, so zero previously raised an opaque
+        # ZeroDivisionError rather than validating the input
+        a_date = datetime(2019, 1, 1, 12, 0, 0)
+        self.assertRaises(
+            ValueError, carb_glucose_effect,
+            a_date, 10, a_date, 0, 40, 120, 10
+        )
+        self.assertRaises(
+            ValueError, carb_glucose_effect,
+            a_date, 10, a_date, -5, 40, 120, 10
+        )
 
 
 if __name__ == '__main__':

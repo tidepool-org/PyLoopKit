@@ -444,6 +444,9 @@ def parabolic_percent_absorption_at_time(time, absorption_time):
     Output:
     Percent of absorbed carbs
     """
+    if absorption_time <= 0:
+        raise ValueError("absorption_time must be positive")
+
     if time < 0:
         return 0
 
@@ -866,6 +869,8 @@ def carb_glucose_effect(
     Output:
     Glucose effect (mg/dL/min)
     """
+    if carb_ratio <= 0:
+        raise ValueError("carb_ratio must be positive")
 
     return insulin_sensitivity / carb_ratio * absorbed_carbs(
         carb_start,
